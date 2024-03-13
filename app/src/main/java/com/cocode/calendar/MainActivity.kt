@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import com.cocode.calendar.ui.theme.CalendarTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
@@ -32,7 +33,11 @@ import java.util.*
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import java.time.ZoneId
 import java.time.ZonedDateTime
 
@@ -60,16 +65,14 @@ fun CalendarApp() {
     // This state is remembered across recompositions but not configuration changes like rotations.
     var isJalaliCalendar by remember { mutableStateOf(false) }
 
-    val adjustedDate = adjustDateForDeviceTimeZone()
+    /*val adjustedDate = adjustDateForDeviceTimeZone()
     val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss Z")
     val formattedDate = adjustedDate.format(formatter)
 
     val iranTime = getCurrentTimeInIran()
-    val formattedIranTime = iranTime.format(formatter)
+    val formattedIranTime = iranTime.format(formatter)*/
 
 
-    Log.d("AdjustedDate", "The Adjusted date and time is: $formattedDate")
-    Log.d("iranDateTime", "The Adjusted date and time is: $formattedIranTime")
     // This is the main screen composable of your app
     CalendarScreen(isJalaliCalendar) {
         // This lambda is triggered when the button is pressed
@@ -113,6 +116,7 @@ fun CalendarView(
 
     Column(modifier = Modifier.fillMaxWidth()) {
         CalendarHeader(yearMonth = yearMonth, isJalaliCalendar)
+        DisplayTimeInIran()
         WeekDaysHeader(isJalaliCalendar)
         CalendarGrid(yearMonth = yearMonth, onDayClicked = onDayClicked, isJalaliCalendar)
     }
@@ -261,7 +265,7 @@ fun DayBox(
     }
 
     val text = if(isJalaliCalendar) {
-        val (year, jMonth, jDay) = PersianCalendarConverter.gregorianToJalali(currentDay.year, currentDay.monthValue, currentDay.dayOfMonth)
+        val (_, _, jDay) = PersianCalendarConverter.gregorianToJalali(currentDay.year, currentDay.monthValue, currentDay.dayOfMonth)
         "$jDay"
     } else {
         currentDay.dayOfMonth.toString()
@@ -314,4 +318,29 @@ fun adjustDateForDeviceTimeZone(): ZonedDateTime {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
+@Composable
+fun DisplayTimeInIran() {
+    // This state is remembered across recompositions
+    val currentTime = remember {
+        mutableStateOf("")
+    }
 
+    var formattedIranTime: String = ""
+
+    LaunchedEffect(key1 = Unit){
+        while (currentCoroutineContext().isActive){
+            val iranTime = getCurrentTimeInIran()
+            val formatter = DateTimeFormatter.ofPattern("HH:mm:ss Z")
+            formattedIranTime = iranTime.format(formatter)
+            currentTime.value = formattedIranTime
+            delay(1000)
+        }
+    }
+    // put the text in a row and center it
+    Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxWidth()) {
+        Text(text = "Iran time is: ${currentTime.value}")
+    }
+
+
+}
