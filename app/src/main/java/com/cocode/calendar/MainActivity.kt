@@ -33,7 +33,6 @@ import java.util.*
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
@@ -227,7 +226,6 @@ fun WeekRow(
         for (day in 1..daysInWeek) {
             DayBox(
                 currentDay = currentDay,
-                yearMonth = yearMonth,
                 onDayClicked = onDayClicked,
                 isJalaliCalendar = isJalaliCalendar,
                 isInCurrentMonth = currentDay.month == yearMonth.month
@@ -242,7 +240,6 @@ fun WeekRow(
 @Composable
 fun DayBox(
     currentDay: LocalDate,
-    yearMonth: YearMonth,
     onDayClicked: (LocalDate) -> Unit,
     isInCurrentMonth: Boolean,
     isJalaliCalendar: Boolean,
@@ -265,7 +262,12 @@ fun DayBox(
     }
 
     val text = if(isJalaliCalendar) {
-        val (_, _, jDay) = PersianCalendarConverter.gregorianToJalali(currentDay.year, currentDay.monthValue, currentDay.dayOfMonth)
+        val adjustedCurrentDate = adjustDateForDeviceTimeZone()
+        val (_, _, jDay) = PersianCalendarConverter.gregorianToJalali(
+            adjustedCurrentDate.year,
+            adjustedCurrentDate.monthValue,
+            adjustedCurrentDate.dayOfMonth
+        )
         "$jDay"
     } else {
         currentDay.dayOfMonth.toString()
@@ -286,7 +288,7 @@ fun gregorianToJalaliString(yearMonth: YearMonth): String {
     // Convert the provided YearMonth to the first day of that month
 
     // Format the Jalali date as a string (assuming you have the month names in an array or a way to get them)
-    val (monthName, year, jMonth) = PersianCalendarConverter.getJalaliMonthName(yearMonth) // Implement this according to your localization
+    val (monthName, year, _) = PersianCalendarConverter.getJalaliMonthName(yearMonth) // Implement this according to your localization
     return "$monthName $year"
 }
 
@@ -326,13 +328,12 @@ fun DisplayTimeInIran() {
         mutableStateOf("")
     }
 
-    var formattedIranTime: String = ""
 
     LaunchedEffect(key1 = Unit){
         while (currentCoroutineContext().isActive){
             val iranTime = getCurrentTimeInIran()
             val formatter = DateTimeFormatter.ofPattern("HH:mm:ss Z")
-            formattedIranTime = iranTime.format(formatter)
+            val formattedIranTime = iranTime.format(formatter)
             currentTime.value = formattedIranTime
             delay(1000)
         }

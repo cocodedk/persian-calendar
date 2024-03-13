@@ -46,7 +46,7 @@ class PersianCalendarConverter {
             val firstDayOfMonth = yearMonth.atDay(1)
 
             // Convert the LocalDate to the Jalali date
-            val (year, month, day) = gregorianToJalali(
+            val (year, month, _) = gregorianToJalali(
                 firstDayOfMonth.year,
                 firstDayOfMonth.monthValue,
                 firstDayOfMonth.dayOfMonth
