@@ -1,5 +1,6 @@
 import android.os.Build
 import androidx.annotation.RequiresApi
+import java.time.LocalDate
 import java.time.YearMonth
 
 class PersianCalendarConverter {
@@ -11,7 +12,8 @@ class PersianCalendarConverter {
             "آذر", "دی", "بهمن", "اسفند"
         )
 
-        fun gregorianToJalali(gy: Int, gm: Int, gd: Int): Triple<Int, Int, Int> {
+        @RequiresApi(Build.VERSION_CODES.O)
+        fun gregorianToJalali(gy: Int, gm: Int, gd: Int): LocalDate {
             var year: Int
             val gyAdjusted = if (gy > 1600) {
                 year = 979
@@ -36,7 +38,7 @@ class PersianCalendarConverter {
             val month = if (days < 186) 1 + days / 31 else 7 + (days - 186) / 30
             val day = 1 + if (days < 186) days % 31 else (days - 186) % 30
 
-            return Triple(year, month, day)
+            return LocalDate.of(year, month, day)
         }
 
         @RequiresApi(Build.VERSION_CODES.O)
@@ -46,7 +48,7 @@ class PersianCalendarConverter {
             val firstDayOfMonth = yearMonth.atDay(1)
 
             // Convert the LocalDate to the Jalali date
-            val (year, month, _) = gregorianToJalali(
+            val jalaliDate = gregorianToJalali(
                 firstDayOfMonth.year,
                 firstDayOfMonth.monthValue,
                 firstDayOfMonth.dayOfMonth
@@ -54,7 +56,7 @@ class PersianCalendarConverter {
 
             // 'month' is the Jalali month number. Use it to get the month name from the array.
             // Adjust for zero-based index
-            return Triple(persianMonthNames[month - 1], year, month)
+            return Triple(persianMonthNames[jalaliDate.monthValue - 1], jalaliDate.year, jalaliDate.monthValue)
         }
     }
 }

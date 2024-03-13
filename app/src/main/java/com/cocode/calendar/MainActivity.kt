@@ -193,7 +193,7 @@ fun CalendarGrid(
     Column {
         while (currentDay <= endDayOfWeek) {
             WeekRow(
-                startDay = currentDay,
+                startDate = currentDay,
                 daysInWeek = daysInWeek,
                 yearMonth = yearMonth,
                 onDayClicked = onDayClicked,
@@ -208,7 +208,7 @@ fun CalendarGrid(
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun WeekRow(
-    startDay: LocalDate,
+    startDate: LocalDate,
     daysInWeek: Int,
     yearMonth: YearMonth,
     onDayClicked: (LocalDate) -> Unit,
@@ -222,76 +222,66 @@ fun WeekRow(
             .fillMaxWidth()
             .padding(4.dp)
     ) {
-        var currentDay = startDay
+        var currentDate = startDate
         for (day in 1..daysInWeek) {
+            var jaliliDate = LocalDate.now()
+            if (isJalaliCalendar) {
+                jaliliDate = PersianCalendarConverter.gregorianToJalali(
+                    currentDate.year,
+                    currentDate.monthValue,
+                    currentDate.dayOfMonth
+                )
+            }
             DayBox(
-                currentDay = currentDay,
+                currentDate = currentDate,
                 onDayClicked = onDayClicked,
                 isJalaliCalendar = isJalaliCalendar,
-                isInCurrentMonth = currentDay.month == yearMonth.month
+                jaliliDate = jaliliDate,
+                isInCurrentMonth = currentDate.month == yearMonth.month
             )
-            currentDay = currentDay.plusDays(1)
+            currentDate = currentDate.plusDays(1)
         }
-        updateDay(currentDay)
+        updateDay(currentDate)
     }
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun DayBox(
-    currentDay: LocalDate,
+    currentDate: LocalDate,
     onDayClicked: (LocalDate) -> Unit,
     isInCurrentMonth: Boolean,
     isJalaliCalendar: Boolean,
-    today: LocalDate = LocalDate.now()
+    jaliliDate: LocalDate
 ) {
-    val isToday = currentDay.isEqual(today)
-    var modifier: Modifier = Modifier
-        .width(50.dp)
-        .height(50.dp)
-        .padding(4.dp)
-
-    modifier = if (!isInCurrentMonth) {
-        modifier.background(Color.LightGray)
-    } else if (isToday) {
-
-        modifier
-            .background(Color.Green)
-            .border(width = 3.dp, color = Color.Green)
-
-    } else {
-        modifier.border(width = 1.dp, color = Color.Black)
+    // using when to determine modifier's background color
+    val backgroundColor = when {
+        !isInCurrentMonth -> Color.LightGray
+        !isJalaliCalendar && currentDate.isEqual(LocalDate.now()) -> Color.Green
+        isJalaliCalendar && currentDate.isEqual(adjustDateForDeviceTimeZone()) -> Color.Green
+        else -> Color.White
     }
 
     val text = if(isJalaliCalendar) {
-        if (isToday) {
-            // Making sure that the date in Iran is shown as today's date
-            // Due to the time difference, the date in Iran might be ahead of the local date
-            val adjustedCurrentDate = adjustDateForDeviceTimeZone()
-            val (_, _, jDay) = PersianCalendarConverter.gregorianToJalali(
-                adjustedCurrentDate.year,
-                adjustedCurrentDate.monthValue,
-                adjustedCurrentDate.dayOfMonth
-            )
-            "$jDay"
-        } else {
-            val (_, _, jDay) = PersianCalendarConverter.gregorianToJalali(
-                currentDay.year,
-                currentDay.monthValue,
-                currentDay.dayOfMonth
-            )
-            "$jDay"
-        }
+        jaliliDate.dayOfMonth.toString()
     } else {
-        currentDay.dayOfMonth.toString()
+        currentDate.dayOfMonth.toString()
     }
 
-    Box(contentAlignment = Alignment.Center, modifier = modifier) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier
+            .width(50.dp)
+            .height(50.dp)
+            .padding(4.dp)
+            .background(backgroundColor)
+            .border(width = 1.dp, color = Color.Gray)
+            .clickable(enabled = isInCurrentMonth) { onDayClicked(currentDate) }
+    ) {
         Text(
             text = text,
-            style = if (isToday && isInCurrentMonth) MaterialTheme.typography.bodyLarge else MaterialTheme.typography.bodyMedium,
-            color = if (!isInCurrentMonth) Color.Gray else if (isToday) Color.Black else Color.Black,
-            modifier = Modifier.clickable(enabled = isInCurrentMonth) { onDayClicked(currentDay) }
+            style = MaterialTheme.typography.bodyMedium,
+            color = if (!isInCurrentMonth) Color.Gray else Color.Black,
         )
     }
 }
@@ -319,7 +309,7 @@ fun adjustDateForDeviceTimeZone(): LocalDate {
     val deviceZoneId = ZoneId.systemDefault()
     // Get the current time in Iran
     val currentTimeInIran = getCurrentTimeInIran()
-
+    Log.d("IranTime", "Current time in Iran: $currentTimeInIran")
     // Convert Iran's current time to the local time zone
     val deviceTime = currentTimeInIran.withZoneSameInstant(deviceZoneId)
 
@@ -341,7 +331,6 @@ fun DisplayTimeInIran() {
         mutableStateOf("")
     }
 
-
     LaunchedEffect(key1 = Unit){
         while (currentCoroutineContext().isActive){
             val iranTime = getCurrentTimeInIran()
@@ -355,6 +344,5 @@ fun DisplayTimeInIran() {
     Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxWidth()) {
         Text(text = "Iran time is: ${currentTime.value}")
     }
-
 
 }
