@@ -254,21 +254,34 @@ fun DayBox(
     modifier = if (!isInCurrentMonth) {
         modifier.background(Color.LightGray)
     } else if (isToday) {
+
         modifier
             .background(Color.Green)
             .border(width = 3.dp, color = Color.Green)
+
     } else {
         modifier.border(width = 1.dp, color = Color.Black)
     }
 
     val text = if(isJalaliCalendar) {
-        val adjustedCurrentDate = adjustDateForDeviceTimeZone()
-        val (_, _, jDay) = PersianCalendarConverter.gregorianToJalali(
-            adjustedCurrentDate.year,
-            adjustedCurrentDate.monthValue,
-            adjustedCurrentDate.dayOfMonth
-        )
-        "$jDay"
+        if (isToday) {
+            // Making sure that the date in Iran is shown as today's date
+            // Due to the time difference, the date in Iran might be ahead of the local date
+            val adjustedCurrentDate = adjustDateForDeviceTimeZone()
+            val (_, _, jDay) = PersianCalendarConverter.gregorianToJalali(
+                adjustedCurrentDate.year,
+                adjustedCurrentDate.monthValue,
+                adjustedCurrentDate.dayOfMonth
+            )
+            "$jDay"
+        } else {
+            val (_, _, jDay) = PersianCalendarConverter.gregorianToJalali(
+                currentDay.year,
+                currentDay.monthValue,
+                currentDay.dayOfMonth
+            )
+            "$jDay"
+        }
     } else {
         currentDay.dayOfMonth.toString()
     }
@@ -301,7 +314,7 @@ fun getCurrentTimeInIran(): ZonedDateTime {
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
-fun adjustDateForDeviceTimeZone(): ZonedDateTime {
+fun adjustDateForDeviceTimeZone(): LocalDate {
     // Get the device's current time zone
     val deviceZoneId = ZoneId.systemDefault()
     // Get the current time in Iran
@@ -313,10 +326,10 @@ fun adjustDateForDeviceTimeZone(): ZonedDateTime {
     // Check if the local time has not yet reached the current day in Iran
     return if (deviceTime.toLocalDate().isBefore(currentTimeInIran.toLocalDate())) {
         // If the local date is still behind Iran's date, use Iran's current date
-        currentTimeInIran
+        currentTimeInIran.toLocalDate()
     } else {
         // Otherwise, use the local date and time
-        deviceTime
+        deviceTime.toLocalDate()
     }
 }
 
