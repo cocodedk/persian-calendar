@@ -40,6 +40,10 @@ import kotlinx.coroutines.isActive
 import java.time.ZoneId
 import java.time.ZonedDateTime
 
+// Describe the application
+// This is a simple calendar app that displays a calendar view
+// with the ability to toggle between Gregorian and Persian (Jalali) calendars.
+
 class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -58,19 +62,14 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun CalendarApp() {
+    // Document the function
+    // This composable function is the entry point for the app.
     // This state is remembered across recompositions but not configuration changes like rotations.
     var isJalaliCalendar by remember { mutableStateOf(false) }
-
-    /*val adjustedDate = adjustDateForDeviceTimeZone()
-    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss Z")
-    val formattedDate = adjustedDate.format(formatter)
-
-    val iranTime = getCurrentTimeInIran()
-    val formattedIranTime = iranTime.format(formatter)*/
-
 
     // This is the main screen composable of your app
     CalendarScreen(isJalaliCalendar) {
@@ -83,14 +82,19 @@ fun CalendarApp() {
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun CalendarScreen(isJalaliCalendar: Boolean, onToggleCalendar: () -> Unit) {
+
+    // This composable function is the main screen of the app.
     Column {
         ToggleCalendarButton(isJalaliCalendar, onToggleCalendar) // Button to toggle calendar view
         CalendarView(isJalaliCalendar = isJalaliCalendar) // Calendar view to display dates
     }
 }
 
+
 @Composable
 fun ToggleCalendarButton(isJalaliCalendar: Boolean, onToggleCalendar: () -> Unit) {
+
+    // This composable function is a button to toggle between Gregorian and Persian (Jalali) calendars.
     Row(
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
@@ -113,6 +117,7 @@ fun CalendarView(
     onDayClicked: (LocalDate) -> Unit = {}
 ) {
 
+    // This composable function is the calendar view that displays the dates.
     Column(modifier = Modifier.fillMaxWidth()) {
         CalendarHeader(yearMonth = yearMonth, isJalaliCalendar)
         DisplayTimeInIran()
@@ -121,9 +126,12 @@ fun CalendarView(
     }
 }
 
+
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun CalendarHeader(yearMonth: YearMonth, isJalaliCalendar: Boolean) {
+
+    // This composable function is the header of the calendar view.
     val displayText = if(isJalaliCalendar) {
         gregorianToJalaliString(yearMonth)
     } else{
@@ -141,8 +149,11 @@ fun CalendarHeader(yearMonth: YearMonth, isJalaliCalendar: Boolean) {
     Spacer(modifier = Modifier.height(8.dp))
 }
 
+
 @Composable
 fun WeekDaysHeader(isJalaliCalendar: Boolean) {
+
+    // This composable function is the header of the calendar view that displays the days of the week.
     val daysOfWeek = if (isJalaliCalendar) {
         listOf("ی", "د", "س", "چ", "پ", "ج", "ش") // Short names for days in Persian
     } else {
@@ -171,6 +182,7 @@ fun WeekDaysHeader(isJalaliCalendar: Boolean) {
     }
 }
 
+
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun CalendarGrid(
@@ -178,6 +190,8 @@ fun CalendarGrid(
     onDayClicked: (LocalDate) -> Unit,
     isJalaliCalendar: Boolean
 ) {
+
+    // This composable function is the grid of the calendar view that displays the dates.
     val daysInWeek = WeekFields.of(Locale.getDefault()).dayOfWeek().range().maximum.toInt()
     val firstDayOfMonth = yearMonth.atDay(1)
     val lastDayOfMonth = yearMonth.atEndOfMonth()
@@ -205,6 +219,7 @@ fun CalendarGrid(
     }
 }
 
+
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun WeekRow(
@@ -215,6 +230,8 @@ fun WeekRow(
     isJalaliCalendar: Boolean,
     updateDay: (LocalDate) -> Unit
 ) {
+
+    // This composable function is a row in the calendar grid that displays the dates for a week.
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
@@ -245,6 +262,7 @@ fun WeekRow(
     }
 }
 
+
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun DayBox(
@@ -254,6 +272,8 @@ fun DayBox(
     isJalaliCalendar: Boolean,
     jaliliDate: LocalDate
 ) {
+
+    // This composable function is a box that displays a date in the calendar grid.
     // using when to determine modifier's background color
     val backgroundColor = when {
         !isInCurrentMonth -> Color.LightGray
@@ -286,8 +306,11 @@ fun DayBox(
     }
 }
 
+
 @RequiresApi(Build.VERSION_CODES.O)
 fun gregorianToJalaliString(yearMonth: YearMonth): String {
+
+    // This function converts the provided YearMonth to a Jalali date and returns it as a string.
     // Convert the provided YearMonth to the first day of that month
 
     // Format the Jalali date as a string (assuming you have the month names in an array or a way to get them)
@@ -295,16 +318,24 @@ fun gregorianToJalaliString(yearMonth: YearMonth): String {
     return "$monthName $year"
 }
 
+
 @RequiresApi(Build.VERSION_CODES.O)
 fun getCurrentTimeInIran(): ZonedDateTime {
+
+    // This function gets the current date and time in Iran.
     // Define the time zone for Iran. Iran Standard Time (IRST) is usually UTC+3:30
     val iranZoneId = ZoneId.of("Asia/Tehran")
     // Get the current date and time in Iran
     return ZonedDateTime.now(iranZoneId)
 }
 
+
 @RequiresApi(Build.VERSION_CODES.O)
 fun adjustDateForDeviceTimeZone(): LocalDate {
+
+    // Returns the current date in Iran if the local time has not yet reached the current day in Iran.
+    // Otherwise, it returns the local date and time.
+
     // Get the device's current time zone
     val deviceZoneId = ZoneId.systemDefault()
     // Get the current time in Iran
@@ -322,9 +353,12 @@ fun adjustDateForDeviceTimeZone(): LocalDate {
     }
 }
 
+
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun DisplayTimeInIran() {
+
+    // This composable function displays the current time in Iran.
     // This state is remembered across recompositions
     val currentTime = remember {
         mutableStateOf("")
