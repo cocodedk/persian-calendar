@@ -309,7 +309,6 @@ fun adjustDateForDeviceTimeZone(): LocalDate {
     val deviceZoneId = ZoneId.systemDefault()
     // Get the current time in Iran
     val currentTimeInIran = getCurrentTimeInIran()
-    Log.d("IranTime", "Current time in Iran: $currentTimeInIran")
     // Convert Iran's current time to the local time zone
     val deviceTime = currentTimeInIran.withZoneSameInstant(deviceZoneId)
 
