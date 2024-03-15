@@ -1,5 +1,3 @@
-import android.os.Build
-import androidx.annotation.RequiresApi
 import java.time.LocalDate
 import java.time.YearMonth
 
@@ -31,36 +29,35 @@ class CalendarConverter {
          * @param date The Gregorian LocalDate object
          * @return A JalaliDate object representing the Jalali date
          */
-        @RequiresApi(Build.VERSION_CODES.O)
         fun gregorianToJalali(date: LocalDate): JalaliDate {
-            val gy = date.year
-            val gm = date.monthValue
-            val gd = date.dayOfMonth
-            var year: Int
-            val gyAdjusted = if (gy > 1600) {
-                year = 979
-                gy - 1600
+            val gregorianYear = date.year
+            val gregorianMonth = date.monthValue
+            val gregorianDay = date.dayOfMonth
+            var jalaliYear: Int
+            val adjustedGregorianYear = if (gregorianYear > 1600) {
+                jalaliYear = 979
+                gregorianYear - 1600
             } else {
-                year = 0
-                gy - 621
+                jalaliYear = 0
+                gregorianYear - 621
             }
 
-            val gy2 = if (gm > 2) gyAdjusted + 1 else gyAdjusted
-            var days: Int = (365 * gyAdjusted) + ((gy2 + 3) / 4) - ((gy2 + 99) / 100) + ((gy2 + 399) / 400) - 80 + gd + gregorianMonthDays[gm - 1]
-            year += 33 * (days / 12053)
+            val adjustedGregorianYear2 = if (gregorianMonth > 2) adjustedGregorianYear + 1 else adjustedGregorianYear
+            var days: Int = (365 * adjustedGregorianYear) + ((adjustedGregorianYear2 + 3) / 4) - ((adjustedGregorianYear2 + 99) / 100) + ((adjustedGregorianYear2 + 399) / 400) - 80 + gregorianDay + gregorianMonthDays[gregorianMonth - 1]
+            jalaliYear += 33 * (days / 12053)
             days %= 12053
-            year += 4 * (days / 1461)
+            jalaliYear += 4 * (days / 1461)
             days %= 1461
 
             if (days > 365) {
-                year += (days - 1) / 365
+                jalaliYear += (days - 1) / 365
                 days = (days - 1) % 365
             }
 
             val monthValue = if (days < 186) 1 + days / 31 else 7 + (days - 186) / 30
             val dayOfMonth = 1 + if (days < 186) days % 31 else (days - 186) % 30
 
-            return JalaliDate(year, monthValue, dayOfMonth)
+            return JalaliDate(jalaliYear, monthValue, dayOfMonth)
         }
 
         /**
@@ -71,7 +68,6 @@ class CalendarConverter {
          * @param jalaliD The Jalali day
          * @return A LocalDate object representing the Gregorian date
          */
-        @RequiresApi(Build.VERSION_CODES.O)
         fun jalaliToGregorian(jalaliY: Int, jalaliM: Int, jalaliD: Int): LocalDate {
 
             val jalaliYear = jalaliY - 979
@@ -123,10 +119,8 @@ class CalendarConverter {
         /**
          * Returns the name of the Jalali month for a given YearMonth object.
          *
-         * @param yearMonth The YearMonth object in Gregorian calendar
          * @return A JalaliMonth object representing the Jalali month
          */
-        @RequiresApi(Build.VERSION_CODES.O)
         fun toJalaliMonth(gregorianDate: LocalDate): JalaliMonth {
 
             // First convert the YearMonth to a LocalDate representing the first of the month
