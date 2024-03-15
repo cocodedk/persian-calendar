@@ -9,7 +9,7 @@ android {
 
     defaultConfig {
         applicationId = "com.cocode.calendar"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -59,7 +59,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.3.1")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.7.0")
     implementation("androidx.compose.runtime:runtime:1.1.0")
     implementation("androidx.compose.runtime:runtime-livedata:1.1.0")
     implementation(libs.androidx.lifecycle.viewmodel.compose)
