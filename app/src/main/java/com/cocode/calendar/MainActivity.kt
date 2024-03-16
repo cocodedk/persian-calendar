@@ -2,6 +2,7 @@ package com.cocode.calendar
 
 import CalendarConverter
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
@@ -37,6 +38,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -46,6 +50,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.isActive
 import java.time.ZoneId
 import java.time.ZonedDateTime
+
 
 // Describe the application
 // This is a simple calendar app that displays a calendar view
@@ -73,7 +78,7 @@ class MainActivity : ComponentActivity() {
                 // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
+                    color = CalColors.background
                 ) {
                     // Call the main screen composable of the calendar application
                     CalendarApp()
@@ -174,7 +179,7 @@ fun CalendarScreen() {
         WeekDaysHeader()
 
         // The grid of the calendar view that displays the dates.
-        CalendarGrid(onDayClicked = {})
+        CalendarGrid()
 
         // A button to update the date to today's date.
         TodayButton()
@@ -284,13 +289,15 @@ fun WeekDaysHeader() {
     val isJalaliCalendar by viewModel.isJalaliCalendar.observeAsState(initial = false)
 
     // Determine the days of the week to display based on the current calendar mode
-    val daysOfWeek = if (isJalaliCalendar) {
+    /*val daysOfWeek = if (isJalaliCalendar) {
         // If the current calendar mode is Jalali, use the short names for days in Persian
         listOf("ی", "د", "س", "چ", "پ", "ج", "ش")
     } else {
         // If the current calendar mode is Gregorian, use the English names for days
         listOf("Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat")
-    }
+    }*/
+
+    val daysOfWeek = listOf("Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat")
 
     // Create a Row Composable for the header
     Row(
@@ -301,7 +308,6 @@ fun WeekDaysHeader() {
         // Apply a Modifier to the Row to fill the maximum width and set a specific width
         modifier = Modifier
             .fillMaxWidth()
-            .width(50.dp)
     ) {
         // Loop through each day in the daysOfWeek list
         for (day in daysOfWeek) {
@@ -312,7 +318,7 @@ fun WeekDaysHeader() {
                 // Apply a Modifier to the Box to make each Box take up equal space, add padding, and add a border
                 modifier = Modifier
                     .weight(1f)
-                    .padding(6.dp)
+                    .padding(1.dp)
                     .border(width = 1.dp, color = Color.Gray)
             ) {
                 // Create a Text Composable to display the name of the day
@@ -332,14 +338,10 @@ fun WeekDaysHeader() {
  * The grid includes dates from the previous month and the next month to fill the entire grid.
  * Each date in the grid is a Composable function that represents a day in the calendar.
  *
- * @param onDayClicked A lambda function that is invoked when a day in the calendar is clicked. It takes a LocalDate representing the clicked date.
- *
  * @Composable This annotation indicates that this function is a Composable function in Jetpack Compose, a modern toolkit for building native Android UI.
  */
 @Composable
-fun CalendarGrid(
-    onDayClicked: (LocalDate) -> Unit
-) {
+fun CalendarGrid() {
     // Get an instance of the CalendarViewModel
     val viewModel: CalendarViewModel = viewModel()
     // Observe the gregorianDate LiveData from the ViewModel
@@ -368,8 +370,7 @@ fun CalendarGrid(
             WeekRow(
                 startDate = currentDay,
                 daysInWeek = daysInWeek,
-                yearMonth = yearMonth,
-                onDayClicked = onDayClicked
+                yearMonth = yearMonth
             ) {
                 // Update the current day to the start day of the next week
                 currentDay = currentDay.plusDays(7)
@@ -387,7 +388,6 @@ fun CalendarGrid(
  * @param startDate The start date of the week.
  * @param daysInWeek The number of days in a week.
  * @param yearMonth The YearMonth of the current month.
- * @param onDayClicked A lambda function that is invoked when a day in the calendar is clicked. It takes a LocalDate representing the clicked date.
  * @param updateDay A lambda function that is invoked to update the current day to the start day of the next week.
  *
  * @Composable This annotation indicates that this function is a Composable function in Jetpack Compose, a modern toolkit for building native Android UI.
@@ -397,7 +397,6 @@ fun WeekRow(
     startDate: LocalDate,
     daysInWeek: Int,
     yearMonth: YearMonth,
-    onDayClicked: (LocalDate) -> Unit,
     updateDay: (LocalDate) -> Unit
 ) {
 
@@ -415,7 +414,8 @@ fun WeekRow(
         // Apply a Modifier to the Row to fill the maximum width and add padding
         modifier = Modifier
             .fillMaxWidth()
-            .padding(4.dp)
+            .padding(0.dp)
+            .border(width = 1.dp, color = Color.Black)
     ) {
         // Initialize the current date to the start date
         var currentDate = startDate
@@ -430,7 +430,6 @@ fun WeekRow(
             // Create a DayBox Composable for each day
             DayBox(
                 currentDate = currentDate,
-                onDayClicked = onDayClicked,
                 jalaliDate = jalaliDate,
                 isInCurrentMonth = currentDate.month == yearMonth.month
             )
@@ -449,7 +448,6 @@ fun WeekRow(
  * The box includes the date number and is colored based on certain conditions.
  *
  * @param currentDate The current date that the box represents.
- * @param onDayClicked A lambda function that is invoked when the box is clicked. It takes a LocalDate representing the clicked date.
  * @param isInCurrentMonth A boolean indicating whether the date is in the current month.
  * @param jalaliDate The Jalali date that the box represents, if the current calendar mode is Jalali.
  *
@@ -458,11 +456,9 @@ fun WeekRow(
 @Composable
 fun DayBox(
     currentDate: LocalDate,
-    onDayClicked: (LocalDate) -> Unit,
     isInCurrentMonth: Boolean,
     jalaliDate: CalendarConverter.Companion.JalaliDate
 ) {
-
     // Get an instance of the CalendarViewModel
     val viewModel: CalendarViewModel = viewModel()
     // Observe the isJalaliCalendar LiveData from the ViewModel
@@ -470,19 +466,22 @@ fun DayBox(
     // Observe the gregorianDate LiveData from the ViewModel
     val gregorianDate by viewModel.gregorianDate.observeAsState(initial = LocalDate.now())
 
+
     // Determine the background color and font color of the box based on certain conditions
     val backgroundColor = when {
         !isJalaliCalendar && !isInCurrentMonth -> Color.DarkGray
         !isJalaliCalendar && currentDate.isEqual(LocalDate.now()) -> Color(0xFF029a62)
-        isJalaliCalendar && jalaliDate.monthValue != CalendarConverter.gregorianToJalali(gregorianDate).monthValue -> Color.DarkGray
+        isJalaliCalendar && jalaliDate.monthValue != CalendarConverter.gregorianToJalali(gregorianDate).monthValue -> Color.Red
         isJalaliCalendar && currentDate.isEqual(adjustDateForDeviceTimeZone()) -> Color(0xFF029a62) // Dark Green
         else -> Color.White
     }
 
+
+
     val fontColor = when {
         !isJalaliCalendar && !isInCurrentMonth -> Color.Gray
         !isJalaliCalendar && currentDate.isEqual(LocalDate.now()) -> Color.White
-        isJalaliCalendar && jalaliDate.monthValue != CalendarConverter.gregorianToJalali(gregorianDate).monthValue -> Color.Gray
+        isJalaliCalendar && jalaliDate.monthValue != CalendarConverter.gregorianToJalali(gregorianDate).monthValue -> Color.Red
         isJalaliCalendar && currentDate.isEqual(adjustDateForDeviceTimeZone()) -> Color.White
         else -> Color.Black
     }
@@ -498,12 +497,12 @@ fun DayBox(
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
-            .width(50.dp)
-            .height(50.dp)
-            .padding(4.dp)
+            .width(57.dp)
+            .height(80.dp)
+            .padding(0.dp)
             .background(backgroundColor)
-            .border(width = 1.dp, color = Color(0xFF029a62))
-            .clickable(enabled = isInCurrentMonth) { onDayClicked(currentDate) }
+            .border(width = 1.dp, color = Color.Black)
+            .clickable(enabled = isInCurrentMonth) {}
     ) {
         // Create a Text Composable to display the date number
         Text(
