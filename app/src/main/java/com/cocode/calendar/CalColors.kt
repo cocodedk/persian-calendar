@@ -8,9 +8,11 @@ import androidx.compose.ui.graphics.Color
  */
 class CalColors {
     companion object{
-        val background = Color(0xFF05455D)
+        val background = Color(0xFF025842)
         val text = Color(0xFFFFFFFF)
-        val day_background = Color(0xFF023E55)
+        val day_background = Color(0xFF019A64)
+        val current_day_background = Color(0xFF43C7F9)
+        val current_day_text = Color(0xFFFFFFFF)
         val day_text_dark = Color(0xFFEF4E58)
         val day_text_light = Color(0xFFFFFFFF)
         val weekday_text = Color(0xFF43C7F9)

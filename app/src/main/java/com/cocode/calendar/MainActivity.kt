@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.cocode.calendar.ui.theme.CalendarTheme
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowForward
@@ -38,8 +39,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
@@ -79,6 +82,7 @@ class MainActivity : ComponentActivity() {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = CalColors.background
+
                 ) {
                     // Call the main screen composable of the calendar application
                     CalendarApp()
@@ -165,9 +169,6 @@ fun CalendarScreen() {
 
     // This Composable function is the main screen of the app.
     Column {
-        // A button to toggle between Gregorian and Persian (Jalali) calendars.
-        ToggleCalendarButton()
-
         // The header of the calendar view, which includes the current month and year,
         // and buttons to navigate to the next and previous months.
         CalendarHeader()
@@ -181,39 +182,12 @@ fun CalendarScreen() {
         // The grid of the calendar view that displays the dates.
         CalendarGrid()
 
-        // A button to update the date to today's date.
-        TodayButton()
+        // The controls for the calendar view, including a button to navigate to today's date
+        CalControls()
 
     }
 }
 
-
-/**
- * This Composable function represents a button that toggles
- * the calendar view between Gregorian and Persian (Jalali) modes.
- *
- * @Composable This annotation indicates that this function is a
- * Composable function in Jetpack Compose, a modern toolkit for building native Android UI.
- */
-@Composable
-fun ToggleCalendarButton() {
-
-    val viewModel: CalendarViewModel = viewModel()
-    val isJalaliCalendar by viewModel.isJalaliCalendar.observeAsState(initial = false)
-
-    // This composable function is a button to toggle between Gregorian and Persian (Jalali) calendars.
-    Row(
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(4.dp)
-    ) {
-        Button(onClick = {viewModel.toggleIsJalaliCalendar()}) {
-            Text(text = if (isJalaliCalendar) "> Gregorian" else "> Persian")
-        }
-    }
-}
 
 
 /**
@@ -251,27 +225,76 @@ fun CalendarHeader() {
         // Apply a Modifier to the Row to fill the maximum width and add padding
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp)
     ) {
         // Create an IconButton Composable for navigating to the previous month
         IconButton(onClick = { viewModel.changeMonth(yearMonth.minusMonths(1)) }) {
-            Icon(Icons.Default.ArrowBack, contentDescription = "Previous Month")
+            Icon(Icons.Default.ArrowBack, contentDescription = "Previous Month", tint = CalColors.text)
         }
 
         // Create a Text Composable for displaying the current month and year
         Text(
             text = displayText,
             style = MaterialTheme.typography.headlineMedium,
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
+            color = CalColors.text
         )
 
         // Create an IconButton Composable for navigating to the next month
         IconButton(onClick = { viewModel.changeMonth(yearMonth.plusMonths(1)) }) {
-            Icon(Icons.Default.ArrowForward, contentDescription = "Next Month")
+            Icon(Icons.Default.ArrowForward, contentDescription = "Next Month", tint = CalColors.text)
         }
     }
     // Add a Spacer Composable to create space below the header
     Spacer(modifier = Modifier.height(8.dp))
+}
+
+
+/**
+ * This Composable function displays the current time in Iran.
+ *
+ * It first creates a mutable state to hold the current time. This state is remembered across recompositions.
+ * Then, it launches a coroutine that continuously updates the current time every second.
+ * The current time is retrieved by calling the getCurrentTimeInIran function, which returns the current date and time in Iran.
+ * The retrieved time is then formatted to a string of "HH:mm:ss Z" and stored in the mutable state.
+ * Finally, it displays the current time in a Text Composable that is centered in a Box Composable.
+ *
+ * @Composable This annotation indicates that this function is a Composable function in Jetpack Compose, a modern toolkit for building native Android UI.
+ */
+@Composable
+fun DisplayTimeInIran() {
+
+    // This composable function displays the current time in Iran.
+    // This state is remembered across recompositions
+    val currentTime = remember {
+        mutableStateOf("")
+    }
+
+    LaunchedEffect(key1 = Unit){
+        while (currentCoroutineContext().isActive){
+            val iranTime = getCurrentTimeInIran()
+            val formatter = DateTimeFormatter.ofPattern("HH:mm:ss")
+            val formattedIranTime = iranTime.format(formatter)
+            currentTime.value = formattedIranTime
+            delay(1000)
+        }
+    }
+    Row(
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 10.dp)
+    ) {
+        // put the text in a row and center it
+        Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxWidth()) {
+            Text(
+                text = "Iran time: ${currentTime.value}",
+                style = MaterialTheme.typography.bodyLarge,
+                color = CalColors.text
+            )
+        }
+    }
+
 }
 
 
@@ -306,25 +329,40 @@ fun WeekDaysHeader() {
         // Align the children of the Row vertically in the center
         verticalAlignment = Alignment.CenterVertically,
         // Apply a Modifier to the Row to fill the maximum width and set a specific width
-        modifier = Modifier
-            .fillMaxWidth()
+
     ) {
         // Loop through each day in the daysOfWeek list
         for (day in daysOfWeek) {
             // Create a Box Composable for each day
+            val roundedCornerShape = when {
+                day == "Sun" -> RoundedCornerShape(10.dp, 0.dp, 0.dp, 0.dp)
+                day == "Sat" -> RoundedCornerShape(0.dp, 10.dp, 0.dp, 0.dp)
+                else -> RoundedCornerShape(0.dp, 0.dp, 0.dp, 0.dp)
+            }
+
             Box(
                 // Align the content of the Box in the center
                 contentAlignment = Alignment.Center,
                 // Apply a Modifier to the Box to make each Box take up equal space, add padding, and add a border
+
                 modifier = Modifier
-                    .weight(1f)
-                    .padding(1.dp)
-                    .border(width = 1.dp, color = Color.Gray)
+                    .width(57.dp)
+                    .height(40.dp)
+                    .border(width = 0.dp, color = Color.Black, roundedCornerShape)
+                    .let { modifier ->
+                        if (day == "Sun") {
+                            modifier.clip(RoundedCornerShape(topStart = 100.dp))
+                        } else {
+                            modifier
+                        }
+                    }
             ) {
                 // Create a Text Composable to display the name of the day
+                val color = if(day != "Sun" && day != "Sat") CalColors.weekday_text else CalColors.weekend_text
                 Text(
                     text = day,
-                    modifier = Modifier
+                    modifier = Modifier,
+                    color = color
                 )
             }
         }
@@ -412,10 +450,6 @@ fun WeekRow(
         // Align the children of the Row vertically in the center
         verticalAlignment = Alignment.CenterVertically,
         // Apply a Modifier to the Row to fill the maximum width and add padding
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(0.dp)
-            .border(width = 1.dp, color = Color.Black)
     ) {
         // Initialize the current date to the start date
         var currentDate = startDate
@@ -469,18 +503,18 @@ fun DayBox(
 
     // Determine the background color and font color of the box based on certain conditions
     val backgroundColor = when {
-        !isJalaliCalendar && !isInCurrentMonth -> Color.DarkGray
-        !isJalaliCalendar && currentDate.isEqual(LocalDate.now()) -> Color(0xFF029a62)
-        isJalaliCalendar && jalaliDate.monthValue != CalendarConverter.gregorianToJalali(gregorianDate).monthValue -> Color.Red
-        isJalaliCalendar && currentDate.isEqual(adjustDateForDeviceTimeZone()) -> Color(0xFF029a62) // Dark Green
+        !isJalaliCalendar && !isInCurrentMonth -> CalColors.day_background
+        !isJalaliCalendar && currentDate.isEqual(LocalDate.now()) -> CalColors.current_day_background
+        isJalaliCalendar && jalaliDate.monthValue != CalendarConverter.gregorianToJalali(gregorianDate).monthValue -> CalColors.day_background
+        isJalaliCalendar && currentDate.isEqual(adjustDateForDeviceTimeZone()) -> CalColors.current_day_background
         else -> Color.White
     }
 
 
 
     val fontColor = when {
-        !isJalaliCalendar && !isInCurrentMonth -> Color.Gray
-        !isJalaliCalendar && currentDate.isEqual(LocalDate.now()) -> Color.White
+        !isJalaliCalendar && !isInCurrentMonth -> CalColors.day_text_dark
+        !isJalaliCalendar && currentDate.isEqual(LocalDate.now()) -> CalColors.current_day_text
         isJalaliCalendar && jalaliDate.monthValue != CalendarConverter.gregorianToJalali(gregorianDate).monthValue -> Color.Red
         isJalaliCalendar && currentDate.isEqual(adjustDateForDeviceTimeZone()) -> Color.White
         else -> Color.Black
@@ -501,7 +535,7 @@ fun DayBox(
             .height(80.dp)
             .padding(0.dp)
             .background(backgroundColor)
-            .border(width = 1.dp, color = Color.Black)
+            .border(width = 0.dp, color = Color.Black)
             .clickable(enabled = isInCurrentMonth) {}
     ) {
         // Create a Text Composable to display the date number
@@ -509,8 +543,77 @@ fun DayBox(
             text = text,
             style = MaterialTheme.typography.bodyMedium,
             color = fontColor,
+            fontWeight = FontWeight.Bold
         )
     }
+}
+
+@Composable
+fun CalControls() {
+    Row(
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(4.dp)
+    ) {
+        TodayButton()
+        ToggleCalendarButton()
+    }
+}
+
+/**
+ * This Composable function represents a button that toggles
+ * the calendar view between Gregorian and Persian (Jalali) modes.
+ *
+ * @Composable This annotation indicates that this function is a
+ * Composable function in Jetpack Compose, a modern toolkit for building native Android UI.
+ */
+@Composable
+fun ToggleCalendarButton() {
+
+    val viewModel: CalendarViewModel = viewModel()
+    val isJalaliCalendar by viewModel.isJalaliCalendar.observeAsState(initial = false)
+
+    // This composable function is a button to toggle between Gregorian and Persian (Jalali) calendars.
+    Box(
+        modifier = Modifier
+            .padding(4.dp)
+            .border(1.dp, colorResource(id = R.color.purple_500), RoundedCornerShape(4.dp))
+    ) {
+        Button(onClick = {viewModel.toggleIsJalaliCalendar()}) {
+            Text(text = if (isJalaliCalendar) "Gregorian" else "Persian")
+        }
+    }
+}
+
+
+/**
+ * This Composable function represents a button that updates the current date to today's date.
+ *
+ * @Composable This annotation indicates that this function is a Composable function in Jetpack Compose, a modern toolkit for building native Android UI.
+ */
+@Composable
+fun TodayButton() {
+    // Get an instance of the CalendarViewModel
+    val viewModel: CalendarViewModel = viewModel()
+
+    // Center the button in the row
+    Box(
+        modifier = Modifier
+            .padding(4.dp)
+    ) {
+        // Create a Button Composable
+        Button(
+            // Set the click event handler for the button
+            // When the button is clicked, it calls the updateGregorianDate function of the CalendarViewModel with today's date
+            onClick = { viewModel.updateGregorianDate(LocalDate.now()) }
+        ) {
+            // Set the display text for the button
+            Text(text = "Today")
+        }
+    }
+
 }
 
 
@@ -574,70 +677,4 @@ fun adjustDateForDeviceTimeZone(): LocalDate {
 }
 
 
-/**
- * This Composable function displays the current time in Iran.
- *
- * It first creates a mutable state to hold the current time. This state is remembered across recompositions.
- * Then, it launches a coroutine that continuously updates the current time every second.
- * The current time is retrieved by calling the getCurrentTimeInIran function, which returns the current date and time in Iran.
- * The retrieved time is then formatted to a string of "HH:mm:ss Z" and stored in the mutable state.
- * Finally, it displays the current time in a Text Composable that is centered in a Box Composable.
- *
- * @Composable This annotation indicates that this function is a Composable function in Jetpack Compose, a modern toolkit for building native Android UI.
- */
-@Composable
-fun DisplayTimeInIran() {
 
-    // This composable function displays the current time in Iran.
-    // This state is remembered across recompositions
-    val currentTime = remember {
-        mutableStateOf("")
-    }
-
-    LaunchedEffect(key1 = Unit){
-        while (currentCoroutineContext().isActive){
-            val iranTime = getCurrentTimeInIran()
-            val formatter = DateTimeFormatter.ofPattern("HH:mm:ss Z")
-            val formattedIranTime = iranTime.format(formatter)
-            currentTime.value = formattedIranTime
-            delay(1000)
-        }
-    }
-    // put the text in a row and center it
-    Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxWidth()) {
-        Text(text = "Iran time is: ${currentTime.value}")
-    }
-
-}
-
-
-/**
- * This Composable function represents a button that updates the current date to today's date.
- *
- * @Composable This annotation indicates that this function is a Composable function in Jetpack Compose, a modern toolkit for building native Android UI.
- */
-@Composable
-fun TodayButton() {
-    // Get an instance of the CalendarViewModel
-    val viewModel: CalendarViewModel = viewModel()
-
-    // Center the button in the row
-    Row(
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(4.dp)
-    ) {
-        // Create a Button Composable
-        Button(
-            // Set the click event handler for the button
-            // When the button is clicked, it calls the updateGregorianDate function of the CalendarViewModel with today's date
-            onClick = { viewModel.updateGregorianDate(LocalDate.now()) }
-        ) {
-            // Set the display text for the button
-            Text(text = "> Today")
-        }
-    }
-
-}
