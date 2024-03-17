@@ -329,16 +329,18 @@ fun WeekDaysHeader() {
         // Align the children of the Row vertically in the center
         verticalAlignment = Alignment.CenterVertically,
         // Apply a Modifier to the Row to fill the maximum width and set a specific width
-
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 4.dp, vertical = 0.dp)
+            .border(
+                width = 1.dp,
+                color = CalColors.day_background,
+                RoundedCornerShape(10.dp, 10.dp, 0.dp, 0.dp)
+            )
     ) {
         // Loop through each day in the daysOfWeek list
         for (day in daysOfWeek) {
             // Create a Box Composable for each day
-            val roundedCornerShape = when {
-                day == "Sun" -> RoundedCornerShape(10.dp, 0.dp, 0.dp, 0.dp)
-                day == "Sat" -> RoundedCornerShape(0.dp, 10.dp, 0.dp, 0.dp)
-                else -> RoundedCornerShape(0.dp, 0.dp, 0.dp, 0.dp)
-            }
 
             Box(
                 // Align the content of the Box in the center
@@ -348,14 +350,8 @@ fun WeekDaysHeader() {
                 modifier = Modifier
                     .width(57.dp)
                     .height(40.dp)
-                    .border(width = 0.dp, color = Color.Black, roundedCornerShape)
-                    .let { modifier ->
-                        if (day == "Sun") {
-                            modifier.clip(RoundedCornerShape(topStart = 100.dp))
-                        } else {
-                            modifier
-                        }
-                    }
+                    //.border(width = 0.dp, color = Color.Black)
+
             ) {
                 // Create a Text Composable to display the name of the day
                 val color = if(day != "Sun" && day != "Sat") CalColors.weekday_text else CalColors.weekend_text
@@ -364,6 +360,7 @@ fun WeekDaysHeader() {
                     modifier = Modifier,
                     color = color
                 )
+
             }
         }
     }
@@ -450,6 +447,9 @@ fun WeekRow(
         // Align the children of the Row vertically in the center
         verticalAlignment = Alignment.CenterVertically,
         // Apply a Modifier to the Row to fill the maximum width and add padding
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 4.dp, vertical = 0.dp)
     ) {
         // Initialize the current date to the start date
         var currentDate = startDate
@@ -465,7 +465,8 @@ fun WeekRow(
             DayBox(
                 currentDate = currentDate,
                 jalaliDate = jalaliDate,
-                isInCurrentMonth = currentDate.month == yearMonth.month
+                isInCurrentMonth = currentDate.month == yearMonth.month,
+                lastRow = currentDate >= yearMonth.atEndOfMonth()
             )
             // Update the current date to the next day
             currentDate = currentDate.plusDays(1)
@@ -491,7 +492,8 @@ fun WeekRow(
 fun DayBox(
     currentDate: LocalDate,
     isInCurrentMonth: Boolean,
-    jalaliDate: CalendarConverter.Companion.JalaliDate
+    jalaliDate: CalendarConverter.Companion.JalaliDate,
+    lastRow: Boolean = false
 ) {
     // Get an instance of the CalendarViewModel
     val viewModel: CalendarViewModel = viewModel()
@@ -499,7 +501,6 @@ fun DayBox(
     val isJalaliCalendar by viewModel.isJalaliCalendar.observeAsState(initial = false)
     // Observe the gregorianDate LiveData from the ViewModel
     val gregorianDate by viewModel.gregorianDate.observeAsState(initial = LocalDate.now())
-
 
     // Determine the background color and font color of the box based on certain conditions
     val backgroundColor = when {
@@ -509,8 +510,6 @@ fun DayBox(
         isJalaliCalendar && currentDate.isEqual(adjustDateForDeviceTimeZone()) -> CalColors.current_day_background
         else -> Color.White
     }
-
-
 
     val fontColor = when {
         !isJalaliCalendar && !isInCurrentMonth -> CalColors.day_text_dark
@@ -527,15 +526,26 @@ fun DayBox(
         currentDate.dayOfMonth.toString()
     }
 
+    if(lastRow) {
+        Log.d("lastRow", lastRow.toString())
+        Log.d("currentDate", currentDate.toString())
+        Log.d("dayOfWeek", currentDate.dayOfWeek.toString())
+    }
+
+    val roundedCornerShape = when {
+        lastRow && "SUN" in currentDate.dayOfWeek.toString() -> RoundedCornerShape(0.dp, 0.dp, 0.dp, 10.dp)
+        lastRow && "SAT" in currentDate.dayOfWeek.toString() -> RoundedCornerShape(0.dp, 0.dp, 10.dp, 0.dp)
+        else -> RoundedCornerShape(0.dp, 0.dp, 0.dp, 0.dp)
+    }
+
     // Create a Box Composable for the date
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
             .width(57.dp)
-            .height(80.dp)
-            .padding(0.dp)
+            .height(60.dp)
             .background(backgroundColor)
-            .border(width = 0.dp, color = Color.Black)
+            .border(width = 0.dp, color = CalColors.day_background, roundedCornerShape)
             .clickable(enabled = isInCurrentMonth) {}
     ) {
         // Create a Text Composable to display the date number
