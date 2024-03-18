@@ -21,6 +21,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.LaunchedEffect
@@ -39,11 +40,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -307,9 +304,9 @@ fun DisplayTimeInIran() {
 @Composable
 fun WeekDaysHeader() {
     // Get an instance of the CalendarViewModel
-    val viewModel: CalendarViewModel = viewModel()
+    //val viewModel: CalendarViewModel = viewModel()
     // Observe the isJalaliCalendar LiveData from the ViewModel
-    val isJalaliCalendar by viewModel.isJalaliCalendar.observeAsState(initial = false)
+    // val isJalaliCalendar by viewModel.isJalaliCalendar.observeAsState(initial = false)
 
     // Determine the days of the week to display based on the current calendar mode
     /*val daysOfWeek = if (isJalaliCalendar) {
@@ -348,7 +345,7 @@ fun WeekDaysHeader() {
                 // Apply a Modifier to the Box to make each Box take up equal space, add padding, and add a border
 
                 modifier = Modifier
-                    .width(57.dp)
+                    .width(55.dp)
                     .height(40.dp)
                     //.border(width = 0.dp, color = Color.Black)
 
@@ -465,8 +462,7 @@ fun WeekRow(
             DayBox(
                 currentDate = currentDate,
                 jalaliDate = jalaliDate,
-                isInCurrentMonth = currentDate.month == yearMonth.month,
-                lastRow = currentDate >= yearMonth.atEndOfMonth()
+                isInCurrentMonth = currentDate.month == yearMonth.month
             )
             // Update the current date to the next day
             currentDate = currentDate.plusDays(1)
@@ -493,7 +489,6 @@ fun DayBox(
     currentDate: LocalDate,
     isInCurrentMonth: Boolean,
     jalaliDate: CalendarConverter.Companion.JalaliDate,
-    lastRow: Boolean = false
 ) {
     // Get an instance of the CalendarViewModel
     val viewModel: CalendarViewModel = viewModel()
@@ -526,27 +521,16 @@ fun DayBox(
         currentDate.dayOfMonth.toString()
     }
 
-    if(lastRow) {
-        Log.d("lastRow", lastRow.toString())
-        Log.d("currentDate", currentDate.toString())
-        Log.d("dayOfWeek", currentDate.dayOfWeek.toString())
-    }
-
-    val roundedCornerShape = when {
-        lastRow && "SUN" in currentDate.dayOfWeek.toString() -> RoundedCornerShape(0.dp, 0.dp, 0.dp, 10.dp)
-        lastRow && "SAT" in currentDate.dayOfWeek.toString() -> RoundedCornerShape(0.dp, 0.dp, 10.dp, 0.dp)
-        else -> RoundedCornerShape(0.dp, 0.dp, 0.dp, 0.dp)
-    }
-
     // Create a Box Composable for the date
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
-            .width(57.dp)
+            .width(55.dp)
             .height(60.dp)
             .background(backgroundColor)
-            .border(width = 0.dp, color = CalColors.day_background, roundedCornerShape)
+            .border(width = 0.dp, color = CalColors.day_border)
             .clickable(enabled = isInCurrentMonth) {}
+
     ) {
         // Create a Text Composable to display the date number
         Text(
@@ -558,6 +542,7 @@ fun DayBox(
     }
 }
 
+
 @Composable
 fun CalControls() {
     Row(
@@ -565,7 +550,7 @@ fun CalControls() {
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(4.dp)
+            .absolutePadding(left = 4.dp, top = 1.dp, right = 4.dp, bottom = 0.dp)
     ) {
         TodayButton()
         ToggleCalendarButton()
@@ -586,13 +571,22 @@ fun ToggleCalendarButton() {
     val isJalaliCalendar by viewModel.isJalaliCalendar.observeAsState(initial = false)
 
     // This composable function is a button to toggle between Gregorian and Persian (Jalali) calendars.
-    Box(
-        modifier = Modifier
-            .padding(4.dp)
-            .border(1.dp, colorResource(id = R.color.purple_500), RoundedCornerShape(4.dp))
-    ) {
-        Button(onClick = {viewModel.toggleIsJalaliCalendar()}) {
-            Text(text = if (isJalaliCalendar) "Gregorian" else "Persian")
+    Box {
+        Button(
+            onClick = {viewModel.toggleIsJalaliCalendar()},
+            colors = ButtonDefaults.buttonColors(containerColor = CalColors.day_background),
+            shape = RoundedCornerShape(0.dp, 0.dp, 10.dp, 0.dp),
+            modifier = Modifier
+                .width(192.dp)
+                .height(52.dp)
+
+        ) {
+            Text(
+                text = if (isJalaliCalendar) "Gregorian" else "Persian",
+                color = CalColors.text,
+                fontWeight = FontWeight.Bold
+
+            )
         }
     }
 }
@@ -609,18 +603,24 @@ fun TodayButton() {
     val viewModel: CalendarViewModel = viewModel()
 
     // Center the button in the row
-    Box(
-        modifier = Modifier
-            .padding(4.dp)
-    ) {
+    Box {
         // Create a Button Composable
         Button(
             // Set the click event handler for the button
             // When the button is clicked, it calls the updateGregorianDate function of the CalendarViewModel with today's date
-            onClick = { viewModel.updateGregorianDate(LocalDate.now()) }
+            onClick = { viewModel.updateGregorianDate(LocalDate.now()) },
+            colors = ButtonDefaults.buttonColors(containerColor = CalColors.day_background),
+            shape = RoundedCornerShape(0.dp, 0.dp, 0.dp, 10.dp),
+            modifier = Modifier
+                .width(193.dp)
+                .height(52.dp)
         ) {
             // Set the display text for the button
-            Text(text = "Today")
+            Text(
+                text = "Today",
+                color = CalColors.text,
+                fontWeight = FontWeight.Bold
+            )
         }
     }
 
@@ -685,6 +685,3 @@ fun adjustDateForDeviceTimeZone(): LocalDate {
         deviceTime.toLocalDate()
     }
 }
-
-
-
