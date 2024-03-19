@@ -1,5 +1,4 @@
 import java.time.LocalDate
-import java.time.YearMonth
 
 /**
  * This class provides methods to convert Gregorian dates to Jalali (Persian) dates and vice versa.
@@ -122,13 +121,7 @@ class CalendarConverter {
          * @return A JalaliMonth object representing the Jalali month
          */
         fun toJalaliMonth(gregorianDate: LocalDate): JalaliMonth {
-
-            // First convert the YearMonth to a LocalDate representing the first of the month
-            val firstDayOfMonth = YearMonth.from(gregorianDate).atDay(1)
-
-            // Convert the LocalDate to the Jalali date
-            val jalaliDate = gregorianToJalali(firstDayOfMonth)
-
+            val jalaliDate = gregorianToJalali(gregorianDate)
             // 'month' is the Jalali month number. Use it to get the month name from the array.
             // Adjust for zero-based index
             val monthName = persianMonthNames[jalaliDate.monthValue - 1]

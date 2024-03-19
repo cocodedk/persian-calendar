@@ -10,15 +10,17 @@ class CalColors {
     companion object{
         val background = Color(0xFF025842)
         val text = Color(0xFFFFFFFF)
-        val day_background = Color(0xFF019A64)
+        val not_current_month = Color(0xFF019A64)
+        val day_background = Color(0xFFFFFFFF)
         val current_day_background = Color(0xFF43C7F9)
         val current_day_text = Color(0xFFFFFFFF)
-        val day_text_dark = Color(0xFFEF4E58)
+        val not_current_month_text = Color(0xFFEF4E58)
         val day_text_light = Color(0xFFFFFFFF)
         val weekday_text = Color(0xFF43C7F9)
         val weekend_text = Color(0xFFF05066)
         val border_color = Color(0xFFFFFFFF)
         val day_border = Color(0xFF025842)
         val week_border = Color(0xFF43C7F9)
+        val button_background = Color(0xFF019A64)
     }
 }

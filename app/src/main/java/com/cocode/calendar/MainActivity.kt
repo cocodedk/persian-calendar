@@ -2,7 +2,7 @@ package com.cocode.calendar
 
 import CalendarConverter
 import android.os.Bundle
-import android.util.Log
+// import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
@@ -209,7 +209,22 @@ fun CalendarHeader() {
     // Determine the display text for the header based on the current calendar mode
     val displayText = if(isJalaliCalendar) {
         // If the current calendar mode is Jalali, convert the gregorianDate to a Jalali string
-        gregorianToJalaliString(gregorianDate)
+
+        // If gregorian date' current month is equal to current month, display use adjustDateForDeviceTimeZone() instead of gregorianDate
+        // get the Gregorian date's current month
+        val gregorianDateMonth = gregorianDate.monthValue
+        // get the current month
+        val currentMonth = LocalDate.now().monthValue
+        // get the Gregorian date's current year
+        val gregorianDateYear = gregorianDate.year
+        // get the current year
+        val currentYear = LocalDate.now().year
+
+        if (gregorianDateMonth == currentMonth && gregorianDateYear == currentYear) {
+            gregorianToJalaliString(adjustDateForDeviceTimeZone())
+        } else {
+            gregorianToJalaliString(gregorianDate)
+        }
     } else{
         // If the current calendar mode is Gregorian, format the gregorianDate to a string of "MMMM yyyy"
         gregorianDate.format(DateTimeFormatter.ofPattern("MMMM yyyy"))
@@ -499,18 +514,18 @@ fun DayBox(
 
     // Determine the background color and font color of the box based on certain conditions
     val backgroundColor = when {
-        !isJalaliCalendar && !isInCurrentMonth -> CalColors.day_background
+        !isJalaliCalendar && !isInCurrentMonth -> CalColors.not_current_month
         !isJalaliCalendar && currentDate.isEqual(LocalDate.now()) -> CalColors.current_day_background
-        isJalaliCalendar && jalaliDate.monthValue != CalendarConverter.gregorianToJalali(gregorianDate).monthValue -> CalColors.day_background
         isJalaliCalendar && currentDate.isEqual(adjustDateForDeviceTimeZone()) -> CalColors.current_day_background
+        isJalaliCalendar && jalaliDate.monthValue != CalendarConverter.gregorianToJalali(gregorianDate).monthValue -> CalColors.day_background
         else -> Color.White
     }
 
     val fontColor = when {
-        !isJalaliCalendar && !isInCurrentMonth -> CalColors.day_text_dark
+        !isJalaliCalendar && !isInCurrentMonth -> CalColors.not_current_month_text
         !isJalaliCalendar && currentDate.isEqual(LocalDate.now()) -> CalColors.current_day_text
-        isJalaliCalendar && jalaliDate.monthValue != CalendarConverter.gregorianToJalali(gregorianDate).monthValue -> Color.Red
-        isJalaliCalendar && currentDate.isEqual(adjustDateForDeviceTimeZone()) -> Color.White
+        isJalaliCalendar && currentDate.isEqual(adjustDateForDeviceTimeZone()) -> CalColors.current_day_text
+        isJalaliCalendar && jalaliDate.monthValue != CalendarConverter.gregorianToJalali(gregorianDate).monthValue -> CalColors.not_current_month_text
         else -> Color.Black
     }
 
@@ -574,7 +589,7 @@ fun ToggleCalendarButton() {
     Box {
         Button(
             onClick = {viewModel.toggleIsJalaliCalendar()},
-            colors = ButtonDefaults.buttonColors(containerColor = CalColors.day_background),
+            colors = ButtonDefaults.buttonColors(containerColor = CalColors.button_background),
             shape = RoundedCornerShape(0.dp, 0.dp, 10.dp, 0.dp),
             modifier = Modifier
                 .width(192.dp)
@@ -609,7 +624,7 @@ fun TodayButton() {
             // Set the click event handler for the button
             // When the button is clicked, it calls the updateGregorianDate function of the CalendarViewModel with today's date
             onClick = { viewModel.updateGregorianDate(LocalDate.now()) },
-            colors = ButtonDefaults.buttonColors(containerColor = CalColors.day_background),
+            colors = ButtonDefaults.buttonColors(containerColor = CalColors.button_background),
             shape = RoundedCornerShape(0.dp, 0.dp, 0.dp, 10.dp),
             modifier = Modifier
                 .width(193.dp)
