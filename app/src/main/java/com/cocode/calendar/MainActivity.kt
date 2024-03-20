@@ -2,7 +2,7 @@ package com.cocode.calendar
 
 import CalendarConverter
 import android.os.Bundle
-// import android.util.Log
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
@@ -134,9 +134,16 @@ class CalendarViewModel : ViewModel() {
      */
     fun changeMonth(newYearMonth: YearMonth) {
         val newDate = LocalDate.of(newYearMonth.year, newYearMonth.monthValue, 1)
-        _gregorianDate.value = newDate
+        // if newDate's year is equal to the current year and the month is equal to the current month, use LocalDate.now() instead of newDate
+        val now = LocalDate.now()
+        if (newDate.monthValue == now.monthValue && newDate.year == now.year) {
+            _gregorianDate.value = now
+        } else {
+            _gregorianDate.value = newDate
+        }
     }
 }
+
 
 /**
  * This Composable function represents the main application for the calendar.
@@ -467,12 +474,7 @@ fun WeekRow(
         var currentDate = startDate
         // Loop through each day in the week
         for (day in 1..daysInWeek) {
-            // Initialize a JalaliDate with default values
-            var jalaliDate = CalendarConverter.Companion.JalaliDate(0, 0, 0)
-            // If the current calendar mode is Jalali, convert the current date to a Jalali date
-            if (isJalaliCalendar) {
-                jalaliDate = CalendarConverter.gregorianToJalali(currentDate)
-            }
+            val jalaliDate = CalendarConverter.gregorianToJalali(currentDate)
             // Create a DayBox Composable for each day
             DayBox(
                 currentDate = currentDate,
@@ -513,19 +515,23 @@ fun DayBox(
     val gregorianDate by viewModel.gregorianDate.observeAsState(initial = LocalDate.now())
 
     // Determine the background color and font color of the box based on certain conditions
+
+    val convertedGregorianDate = CalendarConverter.gregorianToJalali(gregorianDate)
+
     val backgroundColor = when {
-        !isJalaliCalendar && !isInCurrentMonth -> CalColors.not_current_month
+        !isJalaliCalendar && !isInCurrentMonth -> CalColors.not_current_month_background
         !isJalaliCalendar && currentDate.isEqual(LocalDate.now()) -> CalColors.current_day_background
         isJalaliCalendar && currentDate.isEqual(adjustDateForDeviceTimeZone()) -> CalColors.current_day_background
-        isJalaliCalendar && jalaliDate.monthValue != CalendarConverter.gregorianToJalali(gregorianDate).monthValue -> CalColors.day_background
+        (isJalaliCalendar && ((jalaliDate.monthValue > convertedGregorianDate.monthValue) or (jalaliDate.year > convertedGregorianDate.year))) -> CalColors.not_current_month_background
         else -> Color.White
     }
+
 
     val fontColor = when {
         !isJalaliCalendar && !isInCurrentMonth -> CalColors.not_current_month_text
         !isJalaliCalendar && currentDate.isEqual(LocalDate.now()) -> CalColors.current_day_text
         isJalaliCalendar && currentDate.isEqual(adjustDateForDeviceTimeZone()) -> CalColors.current_day_text
-        isJalaliCalendar && jalaliDate.monthValue != CalendarConverter.gregorianToJalali(gregorianDate).monthValue -> CalColors.not_current_month_text
+        (isJalaliCalendar && ((jalaliDate.monthValue > convertedGregorianDate.monthValue) or (jalaliDate.year > convertedGregorianDate.year))) -> CalColors.not_current_month_text
         else -> Color.Black
     }
 

@@ -10,7 +10,7 @@ class CalColors {
     companion object{
         val background = Color(0xFF025842)
         val text = Color(0xFFFFFFFF)
-        val not_current_month = Color(0xFF019A64)
+        val not_current_month_background = Color(0xFF019A64)
         val day_background = Color(0xFFFFFFFF)
         val current_day_background = Color(0xFF43C7F9)
         val current_day_text = Color(0xFFFFFFFF)
