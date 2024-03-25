@@ -214,28 +214,11 @@ fun CalendarHeader() {
     // Get the YearMonth from the observed gregorianDate
     val yearMonth = YearMonth.from(gregorianDate)
     // Determine the display text for the header based on the current calendar mode
-    val displayText = if(isJalaliCalendar) {
-        // If the current calendar mode is Jalali, convert the gregorianDate to a Jalali string
+    val jalaliDate = gregorianToJalaliString(gregorianDate)
+    val gregorianDateText = gregorianDate.format(DateTimeFormatter.ofPattern("MMMM yyyy"))
 
-        // If gregorian date' current month is equal to current month, display use adjustDateForDeviceTimeZone() instead of gregorianDate
-        // get the Gregorian date's current month
-        val gregorianDateMonth = gregorianDate.monthValue
-        // get the current month
-        val currentMonth = LocalDate.now().monthValue
-        // get the Gregorian date's current year
-        val gregorianDateYear = gregorianDate.year
-        // get the current year
-        val currentYear = LocalDate.now().year
-
-        if (gregorianDateMonth == currentMonth && gregorianDateYear == currentYear) {
-            gregorianToJalaliString(adjustDateForDeviceTimeZone())
-        } else {
-            gregorianToJalaliString(gregorianDate)
-        }
-    } else{
-        // If the current calendar mode is Gregorian, format the gregorianDate to a string of "MMMM yyyy"
-        gregorianDate.format(DateTimeFormatter.ofPattern("MMMM yyyy"))
-    }
+    // Add a Spacer Composable to create space above the header
+    Spacer(modifier = Modifier.height(8.dp))
 
     // Create a Row Composable for the header
     Row(
@@ -244,23 +227,60 @@ fun CalendarHeader() {
         // Apply a Modifier to the Row to fill the maximum width and add padding
         modifier = Modifier
             .fillMaxWidth()
+            .padding(horizontal = 4.dp, vertical = 0.dp)
     ) {
         // Create an IconButton Composable for navigating to the previous month
-        IconButton(onClick = { viewModel.changeMonth(yearMonth.minusMonths(1)) }) {
-            Icon(Icons.Default.ArrowBack, contentDescription = "Previous Month", tint = CalColors.text)
+        Column(
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .width(50.dp)
+         ) {
+            IconButton(onClick = { viewModel.changeMonth(yearMonth.minusMonths(1)) }) {
+                Icon(
+                    Icons.Default.ArrowBack,
+                    contentDescription = "Previous Month",
+                    tint = CalColors.text,
+                    modifier = Modifier.size(40.dp)
+                )
+            }
         }
 
         // Create a Text Composable for displaying the current month and year
-        Text(
-            text = displayText,
-            style = MaterialTheme.typography.headlineMedium,
-            textAlign = TextAlign.Center,
-            color = CalColors.text
-        )
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = if (isJalaliCalendar) "Persian: $jalaliDate" else "Gregorian: $gregorianDateText",
+                style = MaterialTheme.typography.headlineSmall,
+                textAlign = TextAlign.Center,
+                color = CalColors.active_text
+            )
+
+            Spacer(modifier = Modifier.height(4.dp)) // Space between the two texts
+
+            Text(
+                text = if (isJalaliCalendar) "Gregorian: $gregorianDateText" else "Persian: $jalaliDate",
+                style = MaterialTheme.typography.headlineSmall,
+                textAlign = TextAlign.Center,
+                color = CalColors.inactive_text
+            )
+        }
 
         // Create an IconButton Composable for navigating to the next month
-        IconButton(onClick = { viewModel.changeMonth(yearMonth.plusMonths(1)) }) {
-            Icon(Icons.Default.ArrowForward, contentDescription = "Next Month", tint = CalColors.text)
+        Column(
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.width(50.dp)
+        ) {
+            IconButton(onClick = { viewModel.changeMonth(yearMonth.plusMonths(1)) }) {
+                Icon(
+                    Icons.Default.ArrowForward,
+                    contentDescription = "Next Month",
+                    tint = CalColors.text,
+                    modifier = Modifier.size(40.dp)
+                )
+            }
         }
     }
     // Add a Spacer Composable to create space below the header
@@ -453,12 +473,6 @@ fun WeekRow(
     yearMonth: YearMonth,
     updateDay: (LocalDate) -> Unit
 ) {
-
-    // Get an instance of the CalendarViewModel
-    val viewModel: CalendarViewModel = viewModel()
-    // Observe the isJalaliCalendar LiveData from the ViewModel
-    val isJalaliCalendar by viewModel.isJalaliCalendar.observeAsState(initial = false)
-
     // Create a Row Composable for the week
     Row(
         // Arrange the children of the Row horizontally with space between them

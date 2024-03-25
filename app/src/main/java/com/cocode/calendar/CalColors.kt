@@ -22,5 +22,7 @@ class CalColors {
         val day_border = Color(0xFF025842)
         val week_border = Color(0xFF43C7F9)
         val button_background = Color(0xFF019A64)
+        var active_text = Color(0xFFFFFFFF)
+        var inactive_text = Color(0xFFA4D3B3)
     }
 }
