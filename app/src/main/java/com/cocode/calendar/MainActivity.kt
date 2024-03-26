@@ -561,7 +561,7 @@ fun DayBox(
                 || (jalaliDate.year > convertedGregorianDate.year))) -> {
             CalColors.next_month_background
                 }
-        (isJalaliCalendar && ((jalaliDate.monthValue < convertedGregorianDate.monthValue && jalaliDate.year <= convertedGregorianDate.year)
+        (isJalaliCalendar && ((jalaliDate.monthValue < convertedGregorianDate.monthValue)
                 || (jalaliDate.year < convertedGregorianDate.year))) -> {
             CalColors.prev_month_background
                 }
@@ -587,7 +587,7 @@ fun DayBox(
                 || (jalaliDate.year > convertedGregorianDate.year))) -> {
             CalColors.next_month_text
                 }
-        (isJalaliCalendar && ((jalaliDate.monthValue < convertedGregorianDate.monthValue && jalaliDate.year <= convertedGregorianDate.year)
+        (isJalaliCalendar && ((jalaliDate.monthValue < convertedGregorianDate.monthValue)
                 || (jalaliDate.year < convertedGregorianDate.year))) -> {
             CalColors.prev_month_text
                 }
@@ -706,21 +706,6 @@ fun TodayButton() {
         }
     }
 
-}
-
-
-/**
- * Converts the provided Gregorian date to a Jalali date and returns it as a string.
- * The returned string is in the format of "MonthName Year".
- *
- * @param gregorianDate The Gregorian date to convert to a Jalali date.
- * @return A string representing the Jalali date.
- */
-fun gregorianToJalaliString(gregorianDate: LocalDate): String {
-    // Convert the provided Gregorian date to a Jalali date
-    val jalaliMonth = CalendarConverter.toJalaliMonth(gregorianDate)
-    // Return the Jalali date as a string in the format of "MonthName Year"
-    return "${jalaliMonth.monthName} ${jalaliMonth.year}"
 }
 
 

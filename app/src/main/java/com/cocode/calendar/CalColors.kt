@@ -11,9 +11,9 @@ class CalColors {
         val background = Color(0xFF025842)
         val text = Color(0xFFFFFFFF)
         val prev_month_background = Color(0xFF019A64) // previously not_current_month_background
-        val prev_month_text = Color(0xFFEF4E58) // previously not_current_month_text
+        val prev_month_text = Color(0xFFFFFFFF) // previously not_current_month_text
         val next_month_background = Color(0xFFA4D3B3) // new color
-        val next_month_text = Color(0xFF43C7F9) // new color
+        val next_month_text = Color(0xFFFFFFFF)
         val day_background = Color(0xFFFFFFFF)
         val current_day_background = Color(0xFF43C7F9)
         val current_day_text = Color(0xFFFFFFFF)
