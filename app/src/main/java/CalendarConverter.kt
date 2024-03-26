@@ -22,6 +22,7 @@ class CalendarConverter {
         data class JalaliDate(val year: Int, val monthValue: Int, val dayOfMonth: Int)
         data class JalaliMonth(val monthName: String, val monthValue: Int, val year: Int)
 
+
         /**
          * Converts a Gregorian date to a Jalali date.
          *
@@ -58,6 +59,7 @@ class CalendarConverter {
 
             return JalaliDate(jalaliYear, monthValue, dayOfMonth)
         }
+
 
         /**
          * Converts a Jalali date to a Gregorian date.
@@ -115,6 +117,7 @@ class CalendarConverter {
             return LocalDate.of(gregorianYear, gregorianMonth, gregorianDay)
         }
 
+
         /**
          * Returns the name of the Jalali month for a given YearMonth object.
          *
@@ -127,6 +130,37 @@ class CalendarConverter {
             val monthName = persianMonthNames[jalaliDate.monthValue - 1]
 
             return JalaliMonth(monthName, jalaliDate.monthValue, jalaliDate.year)
+        }
+
+
+        /**
+         * Returns a list of Jalali months and years for a given Gregorian month.
+         *
+         * @return A list of Jalali months and years
+         */
+        fun gregorianToJalaliMonths(gregorianDate: LocalDate): Map<String, JalaliMonth> {
+            // Create LocalDate instances for the start and end of the Gregorian month
+            val startDate = gregorianDate.withDayOfMonth(1)
+            val endDate = startDate.withDayOfMonth(startDate.lengthOfMonth())
+
+            // Convert the start and end dates to Jalali
+            val startJalaliMonth = CalendarConverter.toJalaliMonth(startDate)
+            val endJalaliMonth = CalendarConverter.toJalaliMonth(endDate)
+
+            // Create a map to hold the Jalali months
+            val jalaliMonths = mutableMapOf<String, JalaliMonth>()
+
+            // If the Jalali month of the end date is different from that of the start date, add it to the map
+            if (startJalaliMonth.monthName != endJalaliMonth.monthName) {
+                jalaliMonths["left"] = startJalaliMonth
+                jalaliMonths["right"] = endJalaliMonth
+            } else {
+                jalaliMonths["left"] = startJalaliMonth
+                jalaliMonths["right"] = startJalaliMonth
+            }
+
+            // Return the map of Jalali months
+            return jalaliMonths
         }
     }
 }

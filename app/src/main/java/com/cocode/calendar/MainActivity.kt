@@ -214,7 +214,11 @@ fun CalendarHeader() {
     // Get the YearMonth from the observed gregorianDate
     val yearMonth = YearMonth.from(gregorianDate)
     // Determine the display text for the header based on the current calendar mode
-    val jalaliDate = gregorianToJalaliString(gregorianDate)
+
+    val jalaliMonths = CalendarConverter.gregorianToJalaliMonths(gregorianDate)
+
+    // val jalaliDate = gregorianToJalaliString(gregorianDate)
+    val jalaliMonthsString = "${jalaliMonths["left"]?.monthName} - ${jalaliMonths["right"]?.monthName} ${jalaliMonths["right"]?.year}"
     val gregorianDateText = gregorianDate.format(DateTimeFormatter.ofPattern("MMMM yyyy"))
 
     // Add a Spacer Composable to create space above the header
@@ -251,7 +255,11 @@ fun CalendarHeader() {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = if (isJalaliCalendar) "Persian: $jalaliDate" else "Gregorian: $gregorianDateText",
+                text = if (isJalaliCalendar) {
+                    jalaliMonthsString
+                } else {
+                    gregorianDateText
+                },
                 style = MaterialTheme.typography.headlineSmall,
                 textAlign = TextAlign.Center,
                 color = CalColors.active_text
@@ -260,7 +268,11 @@ fun CalendarHeader() {
             Spacer(modifier = Modifier.height(4.dp)) // Space between the two texts
 
             Text(
-                text = if (isJalaliCalendar) "Gregorian: $gregorianDateText" else "Persian: $jalaliDate",
+                text = if (isJalaliCalendar) {
+                    gregorianDateText
+                } else {
+                    jalaliMonthsString
+                },
                 style = MaterialTheme.typography.headlineSmall,
                 textAlign = TextAlign.Center,
                 color = CalColors.inactive_text
@@ -533,20 +545,55 @@ fun DayBox(
     val convertedGregorianDate = CalendarConverter.gregorianToJalali(gregorianDate)
 
     val backgroundColor = when {
-        !isJalaliCalendar && !isInCurrentMonth -> CalColors.not_current_month_background
-        !isJalaliCalendar && currentDate.isEqual(LocalDate.now()) -> CalColors.current_day_background
-        isJalaliCalendar && currentDate.isEqual(adjustDateForDeviceTimeZone()) -> CalColors.current_day_background
-        (isJalaliCalendar && ((jalaliDate.monthValue > convertedGregorianDate.monthValue) or (jalaliDate.year > convertedGregorianDate.year))) -> CalColors.not_current_month_background
-        else -> Color.White
+        !isJalaliCalendar && !isInCurrentMonth && currentDate.isBefore(gregorianDate) -> {
+            CalColors.prev_month_background
+        }
+        !isJalaliCalendar && !isInCurrentMonth && currentDate.isAfter(gregorianDate) -> {
+            CalColors.next_month_background
+        }
+        !isJalaliCalendar && currentDate.isEqual(LocalDate.now()) -> {
+            CalColors.current_day_background
+        }
+        isJalaliCalendar && currentDate.isEqual(adjustDateForDeviceTimeZone()) -> {
+            CalColors.current_day_background
+        }
+        (isJalaliCalendar && ((jalaliDate.monthValue > convertedGregorianDate.monthValue && jalaliDate.year >= convertedGregorianDate.year)
+                || (jalaliDate.year > convertedGregorianDate.year))) -> {
+            CalColors.next_month_background
+                }
+        (isJalaliCalendar && ((jalaliDate.monthValue < convertedGregorianDate.monthValue && jalaliDate.year <= convertedGregorianDate.year)
+                || (jalaliDate.year < convertedGregorianDate.year))) -> {
+            CalColors.prev_month_background
+                }
+        else -> {
+            Color.White
+        }
     }
 
-
     val fontColor = when {
-        !isJalaliCalendar && !isInCurrentMonth -> CalColors.not_current_month_text
-        !isJalaliCalendar && currentDate.isEqual(LocalDate.now()) -> CalColors.current_day_text
-        isJalaliCalendar && currentDate.isEqual(adjustDateForDeviceTimeZone()) -> CalColors.current_day_text
-        (isJalaliCalendar && ((jalaliDate.monthValue > convertedGregorianDate.monthValue) or (jalaliDate.year > convertedGregorianDate.year))) -> CalColors.not_current_month_text
-        else -> Color.Black
+        !isJalaliCalendar && !isInCurrentMonth && currentDate.isBefore(gregorianDate) -> {
+            CalColors.prev_month_text
+        }
+        !isJalaliCalendar && !isInCurrentMonth && currentDate.isAfter(gregorianDate) -> {
+            CalColors.next_month_text
+        }
+        !isJalaliCalendar && currentDate.isEqual(LocalDate.now()) -> {
+            CalColors.current_day_text
+        }
+        isJalaliCalendar && currentDate.isEqual(adjustDateForDeviceTimeZone()) -> {
+            CalColors.current_day_text
+        }
+        (isJalaliCalendar && ((jalaliDate.monthValue > convertedGregorianDate.monthValue && jalaliDate.year >= convertedGregorianDate.year)
+                || (jalaliDate.year > convertedGregorianDate.year))) -> {
+            CalColors.next_month_text
+                }
+        (isJalaliCalendar && ((jalaliDate.monthValue < convertedGregorianDate.monthValue && jalaliDate.year <= convertedGregorianDate.year)
+                || (jalaliDate.year < convertedGregorianDate.year))) -> {
+            CalColors.prev_month_text
+                }
+        else -> {
+            Color.Black
+        }
     }
 
     // Determine the text to display in the box based on the current calendar mode
