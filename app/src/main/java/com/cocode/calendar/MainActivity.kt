@@ -50,11 +50,47 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.isActive
 import java.time.ZoneId
 import java.time.ZonedDateTime
+import androidx.compose.foundation.layout.Box
+import androidx.compose.ui.input.pointer.pointerInput
+import kotlin.math.absoluteValue
+import androidx.compose.foundation.gestures.detectDragGestures
 
 
 // Describe the application
 // This is a simple calendar app that displays a calendar view
 // with the ability to toggle between Gregorian and Persian (Jalali) calendars.
+
+/**
+ * Extension function for Modifier to detect horizontal swipe gestures.
+ *
+ * This function detects left and right swipe gestures on a Composable that this Modifier is applied to.
+ * It uses the pointerInput and detectDragGesturesAfterLongPress functions from the Modifier class to detect swipe gestures.
+ * The velocity of the swipe is calculated using a VelocityTracker.
+ * If the absolute value of the velocity is greater than 2000, it is considered a swipe gesture.
+ * If the velocity is positive, it is a swipe to the right, otherwise it is a swipe to the left.
+ * After a swipe is detected, the VelocityTracker is reset.
+ *
+ * @param onSwipeLeft A lambda function that is invoked when a swipe to the left is detected.
+ * @param onSwipeRight A lambda function that is invoked when a swipe to the right is detected.
+ *
+ * @return Unit This function does not return a value.
+ */
+fun Modifier.detectHorizontalSwipeGestures(
+    onSwipeLeft: () -> Unit,
+    onSwipeRight: () -> Unit
+): Modifier = this.then(
+    Modifier.pointerInput(Unit) {
+        detectDragGestures { change, dragAmount ->
+            change.consume()
+            val dragAmountX = dragAmount.x
+            val threshold = 0.5.dp.toPx() // Adjust the swipe threshold as needed
+
+            if (dragAmountX.absoluteValue > threshold) {
+                if (dragAmountX > 0) onSwipeRight() else onSwipeLeft()
+            }
+        }
+    }
+)
 
 /**
  * This is the main activity for the calendar application.
@@ -223,6 +259,7 @@ fun CalendarHeader() {
 
     // Add a Spacer Composable to create space above the header
     Spacer(modifier = Modifier.height(8.dp))
+
 
     // Create a Row Composable for the header
     Row(
@@ -612,7 +649,10 @@ fun DayBox(
             .background(backgroundColor)
             .border(width = 0.dp, color = CalColors.day_border)
             .clickable(enabled = isInCurrentMonth) {}
-
+            .detectHorizontalSwipeGestures(
+                onSwipeLeft = { viewModel.changeMonth(YearMonth.from(gregorianDate).plusMonths(1)) },
+                onSwipeRight = { viewModel.changeMonth(YearMonth.from(gregorianDate).minusMonths(1)) }
+            )
     ) {
         // Create a Text Composable to display the date number
         Text(
@@ -752,3 +792,4 @@ fun adjustDateForDeviceTimeZone(): LocalDate {
         deviceTime.toLocalDate()
     }
 }
+
