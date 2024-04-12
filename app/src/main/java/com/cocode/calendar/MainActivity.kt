@@ -2,7 +2,6 @@ package com.cocode.calendar
 
 import CalendarConverter
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
@@ -51,46 +50,20 @@ import kotlinx.coroutines.isActive
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import androidx.compose.foundation.layout.Box
-import androidx.compose.ui.input.pointer.pointerInput
-import kotlin.math.absoluteValue
-import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.pointerInteropFilter
 
 
 // Describe the application
 // This is a simple calendar app that displays a calendar view
 // with the ability to toggle between Gregorian and Persian (Jalali) calendars.
 
-/**
- * Extension function for Modifier to detect horizontal swipe gestures.
- *
- * This function detects left and right swipe gestures on a Composable that this Modifier is applied to.
- * It uses the pointerInput and detectDragGesturesAfterLongPress functions from the Modifier class to detect swipe gestures.
- * The velocity of the swipe is calculated using a VelocityTracker.
- * If the absolute value of the velocity is greater than 2000, it is considered a swipe gesture.
- * If the velocity is positive, it is a swipe to the right, otherwise it is a swipe to the left.
- * After a swipe is detected, the VelocityTracker is reset.
- *
- * @param onSwipeLeft A lambda function that is invoked when a swipe to the left is detected.
- * @param onSwipeRight A lambda function that is invoked when a swipe to the right is detected.
- *
- * @return Unit This function does not return a value.
- */
-fun Modifier.detectHorizontalSwipeGestures(
-    onSwipeLeft: () -> Unit,
-    onSwipeRight: () -> Unit
-): Modifier = this.then(
-    Modifier.pointerInput(Unit) {
-        detectDragGestures { change, dragAmount ->
-            change.consume()
-            val dragAmountX = dragAmount.x
-            val threshold = 0.5.dp.toPx() // Adjust the swipe threshold as needed
-
-            if (dragAmountX.absoluteValue > threshold) {
-                if (dragAmountX > 0) onSwipeRight() else onSwipeLeft()
-            }
-        }
-    }
-)
 
 /**
  * This is the main activity for the calendar application.
@@ -178,6 +151,12 @@ class CalendarViewModel : ViewModel() {
             _gregorianDate.value = newDate
         }
     }
+
+
+    fun changeYear(newYear: Int) {
+        val newDate = LocalDate.of(newYear, _gregorianDate.value.month, 1)
+        _gregorianDate.value = newDate
+    }
 }
 
 
@@ -207,6 +186,10 @@ fun CalendarApp() {
 @Composable
 fun CalendarScreen() {
 
+    // Get an instance of the CalendarViewModel
+    val viewModel: CalendarViewModel = viewModel()
+    val gregorianDate by viewModel.gregorianDate.observeAsState(initial = LocalDate.now())
+
     // This Composable function is the main screen of the app.
     Column {
         // The header of the calendar view, which includes the current month and year,
@@ -224,7 +207,25 @@ fun CalendarScreen() {
 
         // The controls for the calendar view, including a button to navigate to today's date
         CalControls()
+        // The cross-swipe area for navigating between months and years
+        /*CrossSwipeArea(
+            onSwipeLeft = { viewModel.changeMonth(YearMonth.from(gregorianDate).plusMonths(1)) },
+            onSwipeRight = { viewModel.changeMonth(YearMonth.from(gregorianDate).minusMonths(1)) },
+            onSwipeUp = { viewModel.changeYear(gregorianDate.year + 1) },
+            onSwipeDown = { viewModel.changeYear(gregorianDate.year - 1) }
+        )*/
 
+        Spacer(modifier = Modifier.weight(1f))
+
+        CrossClickArea(
+            onClickRight = { viewModel.changeMonth(YearMonth.from(gregorianDate).plusMonths(1)) },
+            onClickLeft = { viewModel.changeMonth(YearMonth.from(gregorianDate).minusMonths(1)) },
+            onClickUp = { viewModel.changeYear(gregorianDate.year + 1) },
+            onClickDown = { viewModel.changeYear(gregorianDate.year - 1) },
+            modifier = Modifier
+                .height(150.dp)
+                .fillMaxWidth()
+        )
     }
 }
 
@@ -276,16 +277,7 @@ fun CalendarHeader() {
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .width(50.dp)
-         ) {
-            IconButton(onClick = { viewModel.changeMonth(yearMonth.minusMonths(1)) }) {
-                Icon(
-                    Icons.Default.ArrowBack,
-                    contentDescription = "Previous Month",
-                    tint = CalColors.text,
-                    modifier = Modifier.size(40.dp)
-                )
-            }
-        }
+         ) {}
 
         // Create a Text Composable for displaying the current month and year
         Column(
@@ -321,16 +313,7 @@ fun CalendarHeader() {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.width(50.dp)
-        ) {
-            IconButton(onClick = { viewModel.changeMonth(yearMonth.plusMonths(1)) }) {
-                Icon(
-                    Icons.Default.ArrowForward,
-                    contentDescription = "Next Month",
-                    tint = CalColors.text,
-                    modifier = Modifier.size(40.dp)
-                )
-            }
-        }
+        ) {}
     }
     // Add a Spacer Composable to create space below the header
     Spacer(modifier = Modifier.height(8.dp))
@@ -648,11 +631,7 @@ fun DayBox(
             .height(60.dp)
             .background(backgroundColor)
             .border(width = 0.dp, color = CalColors.day_border)
-            .clickable(enabled = isInCurrentMonth) {}
-            .detectHorizontalSwipeGestures(
-                onSwipeLeft = { viewModel.changeMonth(YearMonth.from(gregorianDate).plusMonths(1)) },
-                onSwipeRight = { viewModel.changeMonth(YearMonth.from(gregorianDate).minusMonths(1)) }
-            )
+            .clickable(enabled = isInCurrentMonth) {} // Add a click listener to the box
     ) {
         // Create a Text Composable to display the date number
         Text(
@@ -678,6 +657,92 @@ fun CalControls() {
         ToggleCalendarButton()
     }
 }
+
+
+@Composable
+fun CrossClickArea(
+    onClickLeft: () -> Unit,
+    onClickRight: () -> Unit,
+    onClickUp: () -> Unit,
+    onClickDown: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(modifier = modifier) {
+        Row(modifier = Modifier
+            .weight(1f)
+            .fillMaxWidth()) {
+            InactiveCell(width = 0.2f)
+            ClickableCell(
+                onClick = onClickUp, onLongPress = onClickUp, width = 0.75f, Icons.Default.KeyboardArrowUp, contentDescription = "Next year")
+            InactiveCell(width = 1f)
+        }
+        Row(modifier = Modifier
+            .weight(1f)
+            .fillMaxWidth()) {
+            ClickableCell(
+                onClick = onClickLeft, onLongPress = onClickLeft, width = 0.2f, Icons.Default.KeyboardArrowLeft, contentDescription = "Previous Month")
+            InactiveCell(width = 0.75f)  // Optionally, this cell can be interactive or display info.
+            ClickableCell(
+                onClick = onClickRight, onLongPress = onClickRight, width = 1f, Icons.Default.KeyboardArrowRight, contentDescription = "Next Month")
+        }
+        Row(modifier = Modifier
+            .weight(1f)
+            .fillMaxWidth()) {
+            InactiveCell(0.2f)
+            ClickableCell(onClick = onClickDown, onLongPress = onClickDown, width = 0.75f, Icons.Default.KeyboardArrowDown, contentDescription = "Next year")
+            InactiveCell(1f)
+        }
+    }
+}
+
+
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+fun ClickableCell(onClick: () -> Unit, onLongPress: () -> Unit, width: Float= 0.5f, icon: ImageVector, contentDescription: String? = null) {
+    var holding by remember { mutableStateOf(false) }
+    LaunchedEffect(holding) {
+        while (holding) {
+            onLongPress()
+            delay(300) // Delay between repeated actions, adjust as necessary
+        }
+    }
+    Icon(
+        icon,
+        contentDescription = contentDescription,
+        tint = CalColors.text,
+        modifier = Modifier
+            .height(50.dp)
+            .fillMaxWidth(width)
+            //.border(1.dp, Color.Red)
+            //.background(Color.LightGray)
+            .pointerInteropFilter {
+                when (it.action) {
+                    android.view.MotionEvent.ACTION_DOWN -> {
+                        holding = true
+                        onClick() // Also trigger onClick at the start
+                    }
+
+                    android.view.MotionEvent.ACTION_UP, android.view.MotionEvent.ACTION_CANCEL -> {
+                        holding = false
+                    }
+                }
+                true
+            }
+    )
+}
+
+
+@Composable
+fun InactiveCell(width: Float = 0.5f) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth(width)
+            .height(50.dp)
+            //.border(1.dp, Color.Cyan)
+            //.background(Color.Gray)
+    )
+}
+
 
 /**
  * This Composable function represents a button that toggles
