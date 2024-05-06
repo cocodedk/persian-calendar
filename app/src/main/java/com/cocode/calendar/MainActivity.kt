@@ -1,6 +1,7 @@
 package com.cocode.calendar
 
 import CalendarConverter
+// import android.util.Log
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -17,12 +18,9 @@ import com.cocode.calendar.ui.theme.CalendarTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
@@ -47,8 +45,6 @@ import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.isActive
-import java.time.ZoneId
-import java.time.ZonedDateTime
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
@@ -58,6 +54,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInteropFilter
+import androidx.compose.ui.unit.sp
+import utils.DateTimeUtils
 
 
 // Describe the application
@@ -248,19 +246,18 @@ fun CalendarHeader() {
     // Observe the isJalaliCalendar LiveData from the ViewModel
     val isJalaliCalendar by viewModel.isJalaliCalendar.observeAsState(initial = false)
 
-    // Get the YearMonth from the observed gregorianDate
-    val yearMonth = YearMonth.from(gregorianDate)
     // Determine the display text for the header based on the current calendar mode
 
     val jalaliMonths = CalendarConverter.gregorianToJalaliMonths(gregorianDate)
 
-    // val jalaliDate = gregorianToJalaliString(gregorianDate)
-    val jalaliMonthsString = "${jalaliMonths["left"]?.monthName} - ${jalaliMonths["right"]?.monthName} ${jalaliMonths["right"]?.year}"
-    val gregorianDateText = gregorianDate.format(DateTimeFormatter.ofPattern("MMMM yyyy"))
+    val jalaliDate = CalendarConverter.gregorianToJalali(gregorianDate)
+    val jalaliWeekNumber = CalendarConverter.getJalaliWeekNumber(jalaliDate)
+
+    val jalaliMonthsString = "week $jalaliWeekNumber - ${jalaliMonths["left"]?.monthName} - ${jalaliMonths["right"]?.monthName} ${jalaliMonths["right"]?.year}"
+    val gregorianDateText = gregorianDate.format(DateTimeFormatter.ofPattern("MMMM yyyy"))  + " - week ${DateTimeUtils.getCurrentWeekNumber(gregorianDate)}"
 
     // Add a Spacer Composable to create space above the header
     Spacer(modifier = Modifier.height(8.dp))
-
 
     // Create a Row Composable for the header
     Row(
@@ -271,17 +268,11 @@ fun CalendarHeader() {
             .fillMaxWidth()
             .padding(horizontal = 4.dp, vertical = 0.dp)
     ) {
-        // Create an IconButton Composable for navigating to the previous month
-        Column(
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
-                .width(50.dp)
-         ) {}
-
         // Create a Text Composable for displaying the current month and year
         Column(
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .fillMaxWidth()
         ) {
             Text(
                 text = if (isJalaliCalendar) {
@@ -291,7 +282,7 @@ fun CalendarHeader() {
                 },
                 style = MaterialTheme.typography.headlineSmall,
                 textAlign = TextAlign.Center,
-                color = CalColors.active_text
+                color = CalColors.active_text,
             )
 
             Spacer(modifier = Modifier.height(4.dp)) // Space between the two texts
@@ -304,16 +295,10 @@ fun CalendarHeader() {
                 },
                 style = MaterialTheme.typography.headlineSmall,
                 textAlign = TextAlign.Center,
-                color = CalColors.inactive_text
+                color = CalColors.inactive_text,
+                fontSize = 12.sp
             )
         }
-
-        // Create an IconButton Composable for navigating to the next month
-        Column(
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.width(50.dp)
-        ) {}
     }
     // Add a Spacer Composable to create space below the header
     Spacer(modifier = Modifier.height(8.dp))
@@ -342,7 +327,7 @@ fun DisplayTimeInIran() {
 
     LaunchedEffect(key1 = Unit){
         while (currentCoroutineContext().isActive){
-            val iranTime = getCurrentTimeInIran()
+            val iranTime = DateTimeUtils.getCurrentTimeInIran()
             val formatter = DateTimeFormatter.ofPattern("HH:mm:ss")
             val formattedIranTime = iranTime.format(formatter)
             currentTime.value = formattedIranTime
@@ -574,7 +559,7 @@ fun DayBox(
         !isJalaliCalendar && currentDate.isEqual(LocalDate.now()) -> {
             CalColors.current_day_background
         }
-        isJalaliCalendar && currentDate.isEqual(adjustDateForDeviceTimeZone()) -> {
+        isJalaliCalendar && currentDate.isEqual(DateTimeUtils.adjustDateForDeviceTimeZone()) -> {
             CalColors.current_day_background
         }
         (isJalaliCalendar && ((jalaliDate.monthValue > convertedGregorianDate.monthValue && jalaliDate.year >= convertedGregorianDate.year)
@@ -600,7 +585,7 @@ fun DayBox(
         !isJalaliCalendar && currentDate.isEqual(LocalDate.now()) -> {
             CalColors.current_day_text
         }
-        isJalaliCalendar && currentDate.isEqual(adjustDateForDeviceTimeZone()) -> {
+        isJalaliCalendar && currentDate.isEqual(DateTimeUtils.adjustDateForDeviceTimeZone()) -> {
             CalColors.current_day_text
         }
         (isJalaliCalendar && ((jalaliDate.monthValue > convertedGregorianDate.monthValue && jalaliDate.year >= convertedGregorianDate.year)
@@ -812,49 +797,3 @@ fun TodayButton() {
     }
 
 }
-
-
-/**
- * Retrieves the current date and time in Iran.
- *
- * This function first defines the time zone for Iran (Asia/Tehran), which is usually UTC+3:30.
- * Then, it gets the current date and time in Iran by using the defined time zone.
- *
- * @return A ZonedDateTime object representing the current date and time in Iran.
- */
-fun getCurrentTimeInIran(): ZonedDateTime {
-    // Define the time zone for Iran. Iran Standard Time (IRST) is usually UTC+3:30
-    val iranZoneId = ZoneId.of("Asia/Tehran")
-    // Get the current date and time in Iran
-    return ZonedDateTime.now(iranZoneId)
-}
-
-
-/**
- * Adjusts the current date to match the date in Iran's timezone.
- *
- * This function first retrieves the device's current timezone and the current date and time in Iran.
- * It then converts Iran's current time to the device's timezone.
- * If the local date is still behind Iran's date, it returns Iran's current date.
- * Otherwise, it returns the local date.
- *
- * @return A LocalDate object representing the adjusted date.
- */
-fun adjustDateForDeviceTimeZone(): LocalDate {
-    // Get the device's current time zone
-    val deviceZoneId = ZoneId.systemDefault()
-    // Get the current time in Iran
-    val currentTimeInIran = getCurrentTimeInIran()
-    // Convert Iran's current time to the local time zone
-    val deviceTime = currentTimeInIran.withZoneSameInstant(deviceZoneId)
-
-    // Check if the local time has not yet reached the current day in Iran
-    return if (deviceTime.toLocalDate().isBefore(currentTimeInIran.toLocalDate())) {
-        // If the local date is still behind Iran's date, use Iran's current date
-        currentTimeInIran.toLocalDate()
-    } else {
-        // Otherwise, use the local date and time
-        deviceTime.toLocalDate()
-    }
-}
-

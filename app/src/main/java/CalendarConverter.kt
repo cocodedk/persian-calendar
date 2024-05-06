@@ -22,6 +22,22 @@ class CalendarConverter {
         data class JalaliDate(val year: Int, val monthValue: Int, val dayOfMonth: Int)
         data class JalaliMonth(val monthName: String, val monthValue: Int, val year: Int)
 
+        /**
+         * Returns the week number for a given Jalali date.
+         *
+         * @param jalaliDate The JalaliDate object
+         * @return An integer representing the week number
+         */
+        fun getJalaliWeekNumber(jalaliDate: JalaliDate): Int {
+            // Calculate the number of days passed since the start of the Jalali year
+            val daysPassed = jalaliDaysInMonth.take(jalaliDate.monthValue - 1).sum() + jalaliDate.dayOfMonth
+
+            // Calculate the week number
+            val weekNumber = (daysPassed + 6) / 7
+
+            return weekNumber
+        }
+
 
         /**
          * Converts a Gregorian date to a Jalali date.
@@ -144,8 +160,8 @@ class CalendarConverter {
             val endDate = startDate.withDayOfMonth(startDate.lengthOfMonth())
 
             // Convert the start and end dates to Jalali
-            val startJalaliMonth = CalendarConverter.toJalaliMonth(startDate)
-            val endJalaliMonth = CalendarConverter.toJalaliMonth(endDate)
+            val startJalaliMonth = toJalaliMonth(startDate)
+            val endJalaliMonth = toJalaliMonth(endDate)
 
             // Create a map to hold the Jalali months
             val jalaliMonths = mutableMapOf<String, JalaliMonth>()
