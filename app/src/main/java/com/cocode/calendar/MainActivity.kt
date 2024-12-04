@@ -46,14 +46,17 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.isActive
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInteropFilter
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.sp
 import utils.DateTimeUtils
 
@@ -134,26 +137,34 @@ class CalendarViewModel : ViewModel() {
     }
 
     /**
-     * Changes the current month.
-     * It sets the current Gregorian date to the first day of the new month.
+     * Changes the current month in the calendar.
      *
-     * @param newYearMonth The new YearMonth to set.
+     * This function updates the current Gregorian date to either the current date (if the new month
+     * is the current month) or the first day of the new month. It ensures that when changing to
+     * the current month, the date is set to today's date rather than the first day of the month.
+     *
+     * @param newYearMonth The new year and month to set the calendar to. This parameter
+     *                     determines which month the calendar will display.
      */
     fun changeMonth(newYearMonth: YearMonth) {
-        val newDate = LocalDate.of(newYearMonth.year, newYearMonth.monthValue, 1)
-        // if newDate's year is equal to the current year and the month is equal to the current month, use LocalDate.now() instead of newDate
         val now = LocalDate.now()
-        if (newDate.monthValue == now.monthValue && newDate.year == now.year) {
-            _gregorianDate.value = now
+        _gregorianDate.value = if (newYearMonth.year == now.year && newYearMonth.monthValue == now.monthValue) {
+            now
         } else {
-            _gregorianDate.value = newDate
+            newYearMonth.atDay(1)
         }
     }
 
-
+    /**
+     * Changes the year of the current Gregorian date.
+     *
+     * This function updates the current Gregorian date to the first day of the specified year.
+     * It maintains the current month but resets the day to the first of that month.
+     *
+     * @param newYear The year to set the current date to.
+     */
     fun changeYear(newYear: Int) {
-        val newDate = LocalDate.of(newYear, _gregorianDate.value.month, 1)
-        _gregorianDate.value = newDate
+        _gregorianDate.value = _gregorianDate.value.withYear(newYear).withDayOfMonth(1)
     }
 }
 
@@ -187,7 +198,9 @@ fun CalendarScreen() {
     // Get an instance of the CalendarViewModel
     val viewModel: CalendarViewModel = viewModel()
     val gregorianDate by viewModel.gregorianDate.observeAsState(initial = LocalDate.now())
-
+    // this state variable controls the visibility of the converter
+    var showConverter by remember { mutableStateOf(false) }
+    
     // This Composable function is the main screen of the app.
     Column {
         // The header of the calendar view, which includes the current month and year,
@@ -205,13 +218,26 @@ fun CalendarScreen() {
 
         // The controls for the calendar view, including a button to navigate to today's date
         CalControls()
-        // The cross-swipe area for navigating between months and years
-        /*CrossSwipeArea(
-            onSwipeLeft = { viewModel.changeMonth(YearMonth.from(gregorianDate).plusMonths(1)) },
-            onSwipeRight = { viewModel.changeMonth(YearMonth.from(gregorianDate).minusMonths(1)) },
-            onSwipeUp = { viewModel.changeYear(gregorianDate.year + 1) },
-            onSwipeDown = { viewModel.changeYear(gregorianDate.year - 1) }
-        )*/
+
+        Spacer(modifier = Modifier.height(1.dp))
+
+        // Add a button to toggle the visibility of the converter
+        Button(
+            onClick = { showConverter = !showConverter },
+            modifier = Modifier.align(Alignment.CenterHorizontally),
+            colors = ButtonDefaults.buttonColors(containerColor = CalColors.button_background)
+        ) {
+            Text(
+                text = if (showConverter) "Hide Converter" else "Show Converter",
+                style = MaterialTheme.typography.bodyLarge,
+                color = Color.White
+            )
+        }
+
+        // Conditionally render the converter based on the showConverter state
+        if (showConverter) {
+            JalaliToGregorianConverter()
+        }
 
         Spacer(modifier = Modifier.weight(1f))
 
@@ -228,7 +254,6 @@ fun CalendarScreen() {
 }
 
 
-
 /**
  * This Composable function represents the header of the calendar application.
  * It displays the current month and year, and buttons to navigate to the next and previous months.
@@ -239,69 +264,44 @@ fun CalendarScreen() {
  */
 @Composable
 fun CalendarHeader() {
-    // Get an instance of the CalendarViewModel
     val viewModel: CalendarViewModel = viewModel()
-    // Observe the gregorianDate LiveData from the ViewModel
     val gregorianDate by viewModel.gregorianDate.observeAsState(initial = LocalDate.now())
-    // Observe the isJalaliCalendar LiveData from the ViewModel
     val isJalaliCalendar by viewModel.isJalaliCalendar.observeAsState(initial = false)
 
-    // Determine the display text for the header based on the current calendar mode
+    val (primaryText, secondaryText) = remember(gregorianDate, isJalaliCalendar) {
+        val jalaliMonths = CalendarConverter.gregorianToJalaliMonths(gregorianDate)
+        val jalaliDate = CalendarConverter.gregorianToJalali(gregorianDate)
+        val jalaliWeekNumber = CalendarConverter.getJalaliWeekNumber(jalaliDate)
 
-    val jalaliMonths = CalendarConverter.gregorianToJalaliMonths(gregorianDate)
+        val jalaliText = "week $jalaliWeekNumber - ${jalaliMonths["left"]?.monthName} - ${jalaliMonths["right"]?.monthName} ${jalaliMonths["right"]?.year}"
+        val gregorianText = "${gregorianDate.format(DateTimeFormatter.ofPattern("MMMM yyyy"))} - week ${DateTimeUtils.getCurrentWeekNumber(gregorianDate)}"
 
-    val jalaliDate = CalendarConverter.gregorianToJalali(gregorianDate)
-    val jalaliWeekNumber = CalendarConverter.getJalaliWeekNumber(jalaliDate)
+        if (isJalaliCalendar) jalaliText to gregorianText else gregorianText to jalaliText
+    }
 
-    val jalaliMonthsString = "week $jalaliWeekNumber - ${jalaliMonths["left"]?.monthName} - ${jalaliMonths["right"]?.monthName} ${jalaliMonths["right"]?.year}"
-    val gregorianDateText = gregorianDate.format(DateTimeFormatter.ofPattern("MMMM yyyy"))  + " - week ${DateTimeUtils.getCurrentWeekNumber(gregorianDate)}"
-
-    // Add a Spacer Composable to create space above the header
-    Spacer(modifier = Modifier.height(8.dp))
-
-    // Create a Row Composable for the header
-    Row(
-        // Arrange the children of the Row horizontally with space between them
-        horizontalArrangement = Arrangement.SpaceBetween,
-        // Apply a Modifier to the Row to fill the maximum width and add padding
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 4.dp, vertical = 0.dp)
+            .padding(vertical = 8.dp)
     ) {
-        // Create a Text Composable for displaying the current month and year
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
-                .fillMaxWidth()
-        ) {
-            Text(
-                text = if (isJalaliCalendar) {
-                    jalaliMonthsString
-                } else {
-                    gregorianDateText
-                },
-                style = MaterialTheme.typography.headlineSmall,
-                textAlign = TextAlign.Center,
-                color = CalColors.active_text,
-            )
+        Text(
+            text = primaryText,
+            style = MaterialTheme.typography.headlineSmall,
+            textAlign = TextAlign.Center,
+            color = CalColors.active_text
+        )
 
-            Spacer(modifier = Modifier.height(4.dp)) // Space between the two texts
+        Spacer(modifier = Modifier.height(4.dp))
 
-            Text(
-                text = if (isJalaliCalendar) {
-                    gregorianDateText
-                } else {
-                    jalaliMonthsString
-                },
-                style = MaterialTheme.typography.headlineSmall,
-                textAlign = TextAlign.Center,
-                color = CalColors.inactive_text,
-                fontSize = 12.sp
-            )
-        }
+        Text(
+            text = secondaryText,
+            style = MaterialTheme.typography.headlineSmall,
+            textAlign = TextAlign.Center,
+            color = CalColors.inactive_text,
+            fontSize = 12.sp
+        )
     }
-    // Add a Spacer Composable to create space below the header
-    Spacer(modifier = Modifier.height(8.dp))
 }
 
 
@@ -355,36 +355,194 @@ fun DisplayTimeInIran() {
 
 
 /**
- * This Composable function represents the header of the calendar view that displays the days of the week.
- * It observes the current calendar mode (Gregorian or Jalali) from the ViewModel and displays the days of the week accordingly.
+ * Displays a box representing a day in the calendar.
  *
- * @Composable This annotation indicates that this function is a Composable function in Jetpack Compose, a modern toolkit for building native Android UI.
+ * This composable function creates a box for a specific date, which can be either in Gregorian
+ * or Jalali calendar format. The box's appearance (background color and text color) is determined
+ * based on whether the date is in the current month, is today's date, or belongs to the previous
+ * or next month.
+ *
+ * @param currentDate The date to be displayed in the box (in Gregorian format).
+ * @param isInCurrentMonth Boolean indicating whether this date is part of the currently displayed month.
+ * @param jalaliDate The Jalali (Persian) equivalent of the currentDate.
+ * @param viewModel The [CalendarViewModel] used to access calendar state and operations. Defaults to the current ViewModel.
+ */
+@Composable
+fun DayBox(
+    currentDate: LocalDate,
+    isInCurrentMonth: Boolean,
+    jalaliDate: CalendarConverter.Companion.JalaliDate,
+    viewModel: CalendarViewModel = viewModel()
+) {
+    val isJalaliCalendar by viewModel.isJalaliCalendar.observeAsState(initial = false)
+    val gregorianDate by viewModel.gregorianDate.observeAsState(initial = LocalDate.now())
+
+    val convertedGregorianDate = remember(gregorianDate) {
+        CalendarConverter.gregorianToJalali(gregorianDate)
+    }
+
+    val (backgroundColor, fontColor) = remember(isJalaliCalendar, currentDate, gregorianDate, jalaliDate, convertedGregorianDate, isInCurrentMonth) {
+        calculateColors(isJalaliCalendar, currentDate, gregorianDate, jalaliDate, convertedGregorianDate, isInCurrentMonth)
+    }
+
+    val text = if (isJalaliCalendar) jalaliDate.dayOfMonth.toString() else currentDate.dayOfMonth.toString()
+
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier
+            .size(width = 55.dp, height = 60.dp)
+            .background(backgroundColor)
+            .border(width = 0.dp, color = CalColors.day_border)
+            .clickable(enabled = isInCurrentMonth) {}
+    ) {
+        Text(
+            text = text,
+            style = MaterialTheme.typography.bodyMedium,
+            color = fontColor,
+            fontWeight = FontWeight.Bold
+        )
+    }
+}
+
+/**
+ * Calculates the background and text colors for a calendar day based on the current calendar system and date.
+ *
+ * @param isJalaliCalendar Boolean indicating whether the Jalali (Persian) calendar is in use.
+ * @param currentDate The date for which colors are being calculated.
+ * @param gregorianDate The current Gregorian date being displayed in the calendar.
+ * @param jalaliDate The Jalali equivalent of the current date.
+ * @param convertedGregorianDate The Jalali equivalent of the gregorianDate.
+ * @param isInCurrentMonth Boolean indicating whether the currentDate is in the currently displayed month.
+ * @return A Pair of Color objects, where the first Color is the background color and the second is the text color.
+ */
+private fun calculateColors(
+    isJalaliCalendar: Boolean,
+    currentDate: LocalDate,
+    gregorianDate: LocalDate,
+    jalaliDate: CalendarConverter.Companion.JalaliDate,
+    convertedGregorianDate: CalendarConverter.Companion.JalaliDate,
+    isInCurrentMonth: Boolean
+): Pair<Color, Color> {
+    if (isJalaliCalendar) {
+        return calculateJalaliColors(currentDate, jalaliDate, convertedGregorianDate)
+    }
+    return calculateGregorianColors(currentDate, gregorianDate, isInCurrentMonth)
+}
+
+/**
+ * Calculates the background and text colors for a day in the Jalali calendar.
+ *
+ * This function determines the appropriate colors for a calendar day based on its relationship
+ * to the current date and the displayed month in the Jalali calendar system.
+ *
+ * @param currentDate The Gregorian date being evaluated.
+ * @param jalaliDate The Jalali (Persian) equivalent of the current date.
+ * @param convertedGregorianDate The Jalali equivalent of the currently displayed Gregorian date in the calendar.
+ * @return A Pair of Color objects, where the first Color is the background color and the second is the text color.
+ */
+private fun calculateJalaliColors(
+    currentDate: LocalDate,
+    jalaliDate: CalendarConverter.Companion.JalaliDate,
+    convertedGregorianDate: CalendarConverter.Companion.JalaliDate
+): Pair<Color, Color> {
+    val adjustedDate = DateTimeUtils.adjustDateForDeviceTimeZone()
+    when {
+        currentDate.isEqual(adjustedDate) ->
+            return Pair(CalColors.current_day_background, CalColors.current_day_text)
+        isJalaliDateAfter(jalaliDate, convertedGregorianDate) ->
+            return Pair(CalColors.next_month_background, CalColors.next_month_text)
+        isJalaliDateBefore(jalaliDate, convertedGregorianDate) ->
+            return Pair(CalColors.prev_month_background, CalColors.prev_month_text)
+        else -> return Pair(Color.White, Color.Black)
+    }
+}
+
+
+/**
+ * Calculates the background and text colors for a day in the Gregorian calendar.
+ *
+ * This function determines the appropriate colors for a calendar day based on its relationship
+ * to the current date and the displayed month in the Gregorian calendar system.
+ *
+ * @param currentDate The date being evaluated for color assignment.
+ * @param gregorianDate The current Gregorian date being displayed in the calendar.
+ * @param isInCurrentMonth Boolean indicating whether the [currentDate] is in the currently displayed month.
+ * @return A Pair of Color objects, where the first Color is the background color and the second is the text color.
+ */
+private fun calculateGregorianColors(
+    currentDate: LocalDate,
+    gregorianDate: LocalDate,
+    isInCurrentMonth: Boolean
+): Pair<Color, Color> {
+    when {
+        !isInCurrentMonth && currentDate.isBefore(gregorianDate) ->
+            return Pair(CalColors.prev_month_background, CalColors.prev_month_text)
+        !isInCurrentMonth && currentDate.isAfter(gregorianDate) ->
+            return Pair(CalColors.next_month_background, CalColors.next_month_text)
+        currentDate.isEqual(LocalDate.now()) ->
+            return Pair(CalColors.current_day_background, CalColors.current_day_text)
+        else -> return Pair(Color.White, Color.Black)
+    }
+}
+
+
+/**
+ * Determines if a given Jalali date is after another Jalali date.
+ *
+ * This function compares two Jalali dates to check if the first date is chronologically
+ * after the second date. The comparison is based on both the year and month values.
+ *
+ * @param jalaliDate The Jalali date to be checked.
+ * @param convertedGregorianDate The Jalali date to compare against, typically converted from a Gregorian date.
+ * @return Boolean True if [jalaliDate] is after [convertedGregorianDate], false otherwise.
+ */
+private fun isJalaliDateAfter(
+    jalaliDate: CalendarConverter.Companion.JalaliDate,
+    convertedGregorianDate: CalendarConverter.Companion.JalaliDate
+): Boolean {
+    return (jalaliDate.monthValue > convertedGregorianDate.monthValue && jalaliDate.year >= convertedGregorianDate.year)
+            || (jalaliDate.year > convertedGregorianDate.year)
+}
+
+
+/**
+ * Determines if a given Jalali date is before another Jalali date.
+ *
+ * This function compares two Jalali dates to check if the first date is chronologically
+ * before the second date. The comparison is based on both the year and month values.
+ *
+ * @param jalaliDate The Jalali date to be checked.
+ * @param convertedGregorianDate The Jalali date to compare against, typically converted from a Gregorian date.
+ * @return Boolean True if [jalaliDate] is before [convertedGregorianDate], false otherwise.
+ */
+private fun isJalaliDateBefore(
+    jalaliDate: CalendarConverter.Companion.JalaliDate,
+    convertedGregorianDate: CalendarConverter.Companion.JalaliDate
+): Boolean {
+    return (jalaliDate.monthValue < convertedGregorianDate.monthValue)
+            || (jalaliDate.year < convertedGregorianDate.year)
+}
+
+
+/**
+ * Displays a header row containing the days of the week.
+ *
+ * This composable function creates a horizontal row that shows the abbreviated names
+ * of the days of the week (Sun, Mon, Tue, etc.). The row is styled with a border
+ * and rounded corners at the top.
+ *
+ * The function uses [remember] to memorize the list of day names, preventing
+ * unnecessary recomposition.
+ *
+ * @see DayOfWeekBox
  */
 @Composable
 fun WeekDaysHeader() {
-    // Get an instance of the CalendarViewModel
-    //val viewModel: CalendarViewModel = viewModel()
-    // Observe the isJalaliCalendar LiveData from the ViewModel
-    // val isJalaliCalendar by viewModel.isJalaliCalendar.observeAsState(initial = false)
+    val daysOfWeek = remember { listOf("Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat") }
 
-    // Determine the days of the week to display based on the current calendar mode
-    /*val daysOfWeek = if (isJalaliCalendar) {
-        // If the current calendar mode is Jalali, use the short names for days in Persian
-        listOf("ی", "د", "س", "چ", "پ", "ج", "ش")
-    } else {
-        // If the current calendar mode is Gregorian, use the English names for days
-        listOf("Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat")
-    }*/
-
-    val daysOfWeek = listOf("Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat")
-
-    // Create a Row Composable for the header
     Row(
-        // Arrange the children of the Row horizontally with space between them
         horizontalArrangement = Arrangement.SpaceBetween,
-        // Align the children of the Row vertically in the center
         verticalAlignment = Alignment.CenterVertically,
-        // Apply a Modifier to the Row to fill the maximum width and set a specific width
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 4.dp, vertical = 0.dp)
@@ -394,31 +552,33 @@ fun WeekDaysHeader() {
                 RoundedCornerShape(10.dp, 10.dp, 0.dp, 0.dp)
             )
     ) {
-        // Loop through each day in the daysOfWeek list
-        for (day in daysOfWeek) {
-            // Create a Box Composable for each day
-
-            Box(
-                // Align the content of the Box in the center
-                contentAlignment = Alignment.Center,
-                // Apply a Modifier to the Box to make each Box take up equal space, add padding, and add a border
-
-                modifier = Modifier
-                    .width(55.dp)
-                    .height(40.dp)
-                    //.border(width = 0.dp, color = Color.Black)
-
-            ) {
-                // Create a Text Composable to display the name of the day
-                val color = if(day != "Sun" && day != "Sat") CalColors.weekday_text else CalColors.weekend_text
-                Text(
-                    text = day,
-                    modifier = Modifier,
-                    color = color
-                )
-
-            }
+        daysOfWeek.forEach { day ->
+            DayOfWeekBox(day)
         }
+    }
+}
+
+/**
+ * Displays a box containing the day of the week.
+ *
+ * This composable function creates a box with centered text representing a day of the week.
+ * The text color is different for weekdays and weekends.
+ *
+ * @param day The string representation of the day of the week (e.g., "Mon", "Tue").
+ */
+@Composable
+fun DayOfWeekBox(day: String) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier
+            .width(55.dp)
+            .height(40.dp)
+    ) {
+        val color = if(day != "Sun" && day != "Sat") CalColors.weekday_text else CalColors.weekend_text
+        Text(
+            text = day,
+            color = color
+        )
     }
 }
 
@@ -796,4 +956,91 @@ fun TodayButton() {
         }
     }
 
+}
+
+/**
+ * Jalali to Gregorian Date Convertor
+ */
+
+@Composable
+fun JalaliToGregorianConverter() {
+    var jalaliYear by remember { mutableStateOf("") }
+    var jalaliMonth by remember { mutableStateOf("") }
+    var jalaliDay by remember { mutableStateOf("") }
+    var gregorianDate by remember { mutableStateOf<LocalDate?>(null) }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    ) {
+        Text(
+            "Convert Jalali to Gregorian",
+            style = MaterialTheme.typography.headlineSmall,
+            color = Color.White
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            TextField(
+                value = jalaliYear,
+                onValueChange = { jalaliYear = it },
+                label = { Text("Year") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                modifier = Modifier.weight(1f)
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            TextField(
+                value = jalaliMonth,
+                onValueChange = { jalaliMonth = it },
+                label = { Text("Month") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                modifier = Modifier.weight(1f)
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            TextField(
+                value = jalaliDay,
+                onValueChange = { jalaliDay = it },
+                label = { Text("Day") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                modifier = Modifier.weight(1f)
+            )
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Button(
+            onClick = {
+                try {
+                    val year = jalaliYear.toInt()
+                    val month = jalaliMonth.toInt()
+                    val day = jalaliDay.toInt()
+                    gregorianDate = CalendarConverter.jalaliToGregorian(year, month, day)
+                } catch (e: Exception) {
+                    gregorianDate = null
+                }
+            },
+            modifier = Modifier.align(Alignment.CenterHorizontally)
+        ) {
+            Text("Convert")
+        }
+
+        gregorianDate?.let {
+            Text(
+                "Gregorian Date: ${it.format(DateTimeFormatter.ISO_LOCAL_DATE)}",
+                style = MaterialTheme.typography.bodyLarge,
+                color = Color.White,
+                textAlign = TextAlign.Center
+            )
+        } ?: run {
+            Text(
+                "Enter a valid Jalali date",
+                style = MaterialTheme.typography.bodyLarge,
+                color = Color.Red
+            )
+        }
+    }
 }

@@ -49,31 +49,34 @@ class CalendarConverter {
             val gregorianYear = date.year
             val gregorianMonth = date.monthValue
             val gregorianDay = date.dayOfMonth
-            var jalaliYear: Int
-            val adjustedGregorianYear = if (gregorianYear > 1600) {
-                jalaliYear = 979
-                gregorianYear - 1600
+            
+            val (jalaliYear, adjustedGregorianYear) = if (gregorianYear > 1600) {
+                979 to gregorianYear - 1600
             } else {
-                jalaliYear = 0
-                gregorianYear - 621
+                0 to gregorianYear - 621
             }
-
-            val adjustedGregorianYear2 = if (gregorianMonth > 2) adjustedGregorianYear + 1 else adjustedGregorianYear
-            var days: Int = (365 * adjustedGregorianYear) + ((adjustedGregorianYear2 + 3) / 4) - ((adjustedGregorianYear2 + 99) / 100) + ((adjustedGregorianYear2 + 399) / 400) - 80 + gregorianDay + gregorianMonthDays[gregorianMonth - 1]
-            jalaliYear += 33 * (days / 12053)
+        
+            val adjustedGregorianYear2 = adjustedGregorianYear + if (gregorianMonth > 2) 1 else 0
+            var days = (365 * adjustedGregorianYear) + 
+                       ((adjustedGregorianYear2 + 3) / 4) - 
+                       ((adjustedGregorianYear2 + 99) / 100) + 
+                       ((adjustedGregorianYear2 + 399) / 400) - 
+                       80 + gregorianDay + gregorianMonthDays[gregorianMonth - 1]
+            
+            var finalJalaliYear = jalaliYear + 33 * (days / 12053)
             days %= 12053
-            jalaliYear += 4 * (days / 1461)
+            finalJalaliYear += 4 * (days / 1461)
             days %= 1461
-
+        
             if (days > 365) {
-                jalaliYear += (days - 1) / 365
+                finalJalaliYear += (days - 1) / 365
                 days = (days - 1) % 365
             }
-
+        
             val monthValue = if (days < 186) 1 + days / 31 else 7 + (days - 186) / 30
             val dayOfMonth = 1 + if (days < 186) days % 31 else (days - 186) % 30
-
-            return JalaliDate(jalaliYear, monthValue, dayOfMonth)
+        
+            return JalaliDate(finalJalaliYear, monthValue, dayOfMonth)
         }
 
 
@@ -139,7 +142,7 @@ class CalendarConverter {
          *
          * @return A JalaliMonth object representing the Jalali month
          */
-        fun toJalaliMonth(gregorianDate: LocalDate): JalaliMonth {
+        private fun toJalaliMonth(gregorianDate: LocalDate): JalaliMonth {
             val jalaliDate = gregorianToJalali(gregorianDate)
             // 'month' is the Jalali month number. Use it to get the month name from the array.
             // Adjust for zero-based index
@@ -149,34 +152,34 @@ class CalendarConverter {
         }
 
 
-        /**
-         * Returns a list of Jalali months and years for a given Gregorian month.
-         *
-         * @return A list of Jalali months and years
-         */
-        fun gregorianToJalaliMonths(gregorianDate: LocalDate): Map<String, JalaliMonth> {
-            // Create LocalDate instances for the start and end of the Gregorian month
-            val startDate = gregorianDate.withDayOfMonth(1)
-            val endDate = startDate.withDayOfMonth(startDate.lengthOfMonth())
 
-            // Convert the start and end dates to Jalali
-            val startJalaliMonth = toJalaliMonth(startDate)
-            val endJalaliMonth = toJalaliMonth(endDate)
+         /**
+          * Converts a Gregorian month to its corresponding Jalali month(s).
+          *
+          * This function takes a Gregorian date and determines the Jalali month(s) that overlap with the given Gregorian month.
+          * It returns a map with either one or two Jalali months, depending on whether the Gregorian month spans across two Jalali months.
+          *
+          * @param gregorianDate The Gregorian date for which to find the corresponding Jalali month(s). The day of the month is ignored.
+          * @return A map containing either one or two entries:
+          *         - If the Gregorian month falls entirely within one Jalali month, the map will contain:
+          *           "left" -> The Jalali month corresponding to the start of the Gregorian month
+          *           "right" -> The same Jalali month as "left"
+          *         - If the Gregorian month spans two Jalali months, the map will contain:
+          *           "left" -> The Jalali month corresponding to the start of the Gregorian month
+          *           "right" -> The Jalali month corresponding to the end of the Gregorian month
+          */
+         fun gregorianToJalaliMonths(gregorianDate: LocalDate): Map<String, JalaliMonth> {
+             val startDate = gregorianDate.withDayOfMonth(1)
+             val endDate = startDate.withDayOfMonth(startDate.lengthOfMonth())
 
-            // Create a map to hold the Jalali months
-            val jalaliMonths = mutableMapOf<String, JalaliMonth>()
+             val startJalaliMonth = toJalaliMonth(startDate)
+             val endJalaliMonth = toJalaliMonth(endDate)
 
-            // If the Jalali month of the end date is different from that of the start date, add it to the map
-            if (startJalaliMonth.monthName != endJalaliMonth.monthName) {
-                jalaliMonths["left"] = startJalaliMonth
-                jalaliMonths["right"] = endJalaliMonth
-            } else {
-                jalaliMonths["left"] = startJalaliMonth
-                jalaliMonths["right"] = startJalaliMonth
-            }
-
-            // Return the map of Jalali months
-            return jalaliMonths
-        }
+             return if (startJalaliMonth.monthName != endJalaliMonth.monthName) {
+                 mapOf("left" to startJalaliMonth, "right" to endJalaliMonth)
+             } else {
+                 mapOf("left" to startJalaliMonth, "right" to startJalaliMonth)
+             }
+         }
     }
 }
