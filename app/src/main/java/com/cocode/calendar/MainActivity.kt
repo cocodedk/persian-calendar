@@ -57,6 +57,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.sp
 import utils.DateTimeUtils
 
@@ -821,15 +822,43 @@ fun CrossClickArea(
                 onClick = onClickUp, onLongPress = onClickUp, width = 0.75f, Icons.Default.KeyboardArrowUp, contentDescription = "Next year")
             InactiveCell(width = 1f)
         }
+
+        Text("+Y", modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center, fontWeight = FontWeight.Bold, color = CalColors.text, fontSize = 12.sp)
+
         Row(modifier = Modifier
             .weight(1f)
-            .fillMaxWidth()) {
+            .fillMaxWidth()
+
+        ) {
             ClickableCell(
                 onClick = onClickLeft, onLongPress = onClickLeft, width = 0.2f, Icons.Default.KeyboardArrowLeft, contentDescription = "Previous Month")
-            InactiveCell(width = 0.75f)  // Optionally, this cell can be interactive or display info.
+            Box(modifier = Modifier.height(50.dp), contentAlignment = Alignment.Center) {
+                Text("-M",
+                    modifier = Modifier.width(20.dp),
+                    textAlign = TextAlign.Center,
+                    fontWeight = FontWeight.Bold,
+                    color = CalColors.text,
+                    fontSize = 12.sp
+                )
+            }
+            InactiveCell(width = 0.67f)  // Optionally, this cell can be interactive or display info.
+            Box(modifier = Modifier.height(50.dp), contentAlignment = Alignment.Center) {
+                Text(
+                    "+M",
+                    modifier = Modifier.width(20.dp),
+                    textAlign = TextAlign.Center,
+                    fontWeight = FontWeight.Bold,
+                    color = CalColors.text,
+                    fontSize = 12.sp
+                )
+            }
             ClickableCell(
                 onClick = onClickRight, onLongPress = onClickRight, width = 1f, Icons.Default.KeyboardArrowRight, contentDescription = "Next Month")
+
         }
+
+        Text("-Y", modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center, fontWeight = FontWeight.Bold, color = CalColors.text, fontSize = 12.sp)
+
         Row(modifier = Modifier
             .weight(1f)
             .fillMaxWidth()) {
@@ -839,6 +868,7 @@ fun CrossClickArea(
         }
     }
 }
+
 
 
 @OptIn(ExperimentalComposeUiApi::class)
