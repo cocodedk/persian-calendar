@@ -727,7 +727,7 @@ fun CalendarToggleButton() {
 @Composable
 fun CalendarConverterBox() {
 
-    //JalaliToGregorianConverter()
+    JalaliToGregorianConverter()
     GregorianToJalaliConverter()
 }
 
