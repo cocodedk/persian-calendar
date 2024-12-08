@@ -127,6 +127,12 @@ class CalendarViewModel : ViewModel() {
     private val _showConverter = MutableStateFlow(false)
     val showConverter: StateFlow<Boolean> = _showConverter.asStateFlow()
 
+    private val _showJalaliToGregorianConverter = MutableStateFlow(true)
+    val showJalaliToGregorianConverter: StateFlow<Boolean> = _showJalaliToGregorianConverter.asStateFlow()
+
+    private val _showGregorianToJalaliConverter = MutableStateFlow(false)
+    val showGregorianToJalaliConverter: StateFlow<Boolean> = _showGregorianToJalaliConverter.asStateFlow()
+
     /**
      * Updates the current Gregorian date.
      *
@@ -147,6 +153,13 @@ class CalendarViewModel : ViewModel() {
     fun toggleConverter() {
         _showConverter.value =!_showConverter.value
     }
+
+    fun toggleJalaliToGregorianConverter() {
+        Log.d("Converter", "toggleJalaliToGregorianConverter ${_showJalaliToGregorianConverter.value} ${_showGregorianToJalaliConverter.value}")
+        _showJalaliToGregorianConverter.value = !_showJalaliToGregorianConverter.value
+        _showGregorianToJalaliConverter.value = !_showGregorianToJalaliConverter.value
+    }
+
 
     /**
      * Changes the current month in the calendar.
@@ -608,7 +621,18 @@ fun DayBox(
     }
 }
 
-
+/**
+ * Displays the control buttons for the calendar application.
+ *
+ * This composable function creates a row containing three buttons:
+ * - A "Today" button to reset the calendar to the current date
+ * - A toggle button for the date converter
+ * - A toggle button to switch between Gregorian and Jalali calendars
+ *
+ * The buttons are arranged with space between them and vertically centered.
+ *
+ * @Composable This function is a Jetpack Compose composable.
+ */
 @Composable
 fun CalControls() {
     Row(
@@ -660,6 +684,15 @@ fun TodayButton() {
 
 }
 
+/**
+ * A composable function that creates a toggle button for the date converter.
+ *
+ * This button allows users to show or hide the date converter interface. The button's appearance
+ * changes based on whether the converter is currently visible or not.
+ *
+ * The function doesn't explicitly return a value, but it creates and displays a Button composable
+ * as part of the Jetpack Compose UI.
+ */
 @Composable
 fun DateConverterToggleButton() {
     val viewModel: CalendarViewModel = viewModel()
@@ -724,11 +757,44 @@ fun CalendarToggleButton() {
 }
 
 
+/**
+ * Displays a calendar converter box that allows switching between Jalali and Gregorian date converters.
+ *
+ * This composable function creates a UI element for date conversion. It shows a button to toggle
+ * between Jalali to Gregorian and Gregorian to Jalali converters, and displays the appropriate
+ * converter based on the current state.
+ *
+ * @return A composable that displays the calendar converter UI when showConverter is true.
+ */
 @Composable
 fun CalendarConverterBox() {
+    val viewModel: CalendarViewModel = viewModel()
+    val showConverter by viewModel.showConverter.collectAsState()
+    val showJalaliToGregorianConverter by viewModel.showJalaliToGregorianConverter.collectAsState()
+    val showGregorianToJalaliConverter by viewModel.showGregorianToJalaliConverter.collectAsState()
+    if (showConverter) {
+        Column {
+            Button(
+                onClick = { viewModel.toggleJalaliToGregorianConverter() },
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
+                Text(
+                    text = if (showJalaliToGregorianConverter)
+                        "Switch to Gregorian to Jalali"
+                    else if (showGregorianToJalaliConverter)
+                        "Switch to Jalali to Gregorian"
+                    else "Something is wrong",
+                    color = Color.White
+                )
+            }
 
-    JalaliToGregorianConverter()
-    GregorianToJalaliConverter()
+            DateConverter(
+                showJalaliToGregorianConverter,
+                showGregorianToJalaliConverter
+            )
+        }
+    }
 }
 
 
@@ -892,6 +958,19 @@ fun SpacerCell(width: Float = 0.5f) {
 }
 
 
+/**
+ * Creates a centered text element within a Box composable.
+ *
+ * This function creates a Box with a fixed height and places a Text composable
+ * inside it. The text is centered both horizontally and vertically by default.
+ *
+ * @param text The string to be displayed in the Text composable.
+ * @param fontSize The size of the font for the text. Defaults to 12.sp.
+ * @param contentAlignment The alignment of the content within the Box.
+ *        Defaults to Alignment.Center.
+ *
+ * @return A composable that displays centered text within a Box.
+ */
 @Composable
 fun CenteredText(
     text: String,
@@ -915,17 +994,31 @@ fun CenteredText(
 
 
 /**
- * Jalali to Gregorian Date Convertor
+ * A composable function that creates a date converter interface for converting between Jalali and Gregorian calendars.
+ *
+ * This function provides a user interface for inputting a date and converting it between the Jalali (Persian)
+ * and Gregorian calendar systems. It displays input fields for year, month, and day, along with a conversion button
+ * and the result of the conversion.
+ *
+ * @param showJalaliToGregorianConverter A boolean flag indicating whether to show the Jalali to Gregorian converter.
+ * @param showGregorianToJalaliConverter A boolean flag indicating whether to show the Gregorian to Jalali converter.
+ *
+ * The function doesn't return a value, but instead creates and displays UI components as part of the Jetpack Compose UI.
  */
-
 @Composable
-fun JalaliToGregorianConverter() {
-    var jalaliYear by remember { mutableStateOf("") }
-    var jalaliMonth by remember { mutableStateOf("") }
-    var jalaliDay by remember { mutableStateOf("") }
-    var gregorianDate by remember { mutableStateOf<LocalDate?>(null) }
+fun DateConverter(
+    showJalaliToGregorianConverter: Boolean,
+    showGregorianToJalaliConverter: Boolean
+) {
+    var year by remember { mutableStateOf("") }
+    var month by remember { mutableStateOf("") }
+    var day by remember { mutableStateOf("") }
+    var convertedDate by remember { mutableStateOf<Any?>(null) }
     val viewModel: CalendarViewModel = viewModel()
     val showConverter by viewModel.showConverter.collectAsState()
+
+    Log.d("DateConverter", "showConverter: $showConverter, $showJalaliToGregorianConverter, $showGregorianToJalaliConverter")
+
 
     if (showConverter) {
         Column(
@@ -934,52 +1027,39 @@ fun JalaliToGregorianConverter() {
                 .padding(16.dp)
         ) {
             Text(
-                "Convert Jalali to Gregorian",
+                if (showJalaliToGregorianConverter) "Convert Jalali to Gregorian"
+                else if (showGregorianToJalaliConverter) "Convert Gregorian to Jalali"
+                else "Something is wrong",
                 style = MaterialTheme.typography.headlineSmall,
-                color = Color.White
+                color = Color.White,
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center
             )
             Spacer(modifier = Modifier.height(8.dp))
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                TextField(
-                    value = jalaliYear,
-                    onValueChange = { jalaliYear = it },
-                    label = { Text("Year") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    modifier = Modifier.weight(1f)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                TextField(
-                    value = jalaliMonth,
-                    onValueChange = { jalaliMonth = it },
-                    label = { Text("Month") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    modifier = Modifier.weight(1f)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                TextField(
-                    value = jalaliDay,
-                    onValueChange = { jalaliDay = it },
-                    label = { Text("Day") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    modifier = Modifier.weight(1f)
-                )
-            }
+            DateInputFields(year, month, day,
+                onYearChange = { year = it },
+                onMonthChange = { month = it },
+                onDayChange = { day = it }
+            )
 
             Spacer(modifier = Modifier.height(16.dp))
 
             Button(
                 onClick = {
-                    try {
-                        val year = jalaliYear.toInt()
-                        val month = jalaliMonth.toInt()
-                        val day = jalaliDay.toInt()
-                        gregorianDate = CalendarConverter.jalaliToGregorian(year, month, day)
+                    convertedDate = try {
+                        val y = year.toInt()
+                        val m = month.toInt()
+                        val d = day.toInt()
+                        if (showJalaliToGregorianConverter) {
+                            CalendarConverter.jalaliToGregorian(y, m, d)
+                        } else if (showGregorianToJalaliConverter) {
+                            CalendarConverter.gregorianToJalali(LocalDate.of(y, m, d))
+                        } else {
+                            throw IllegalArgumentException("Invalid conversion type")
+                        }
                     } catch (e: Exception) {
-                        gregorianDate = null
+                        null
                     }
                 },
                 modifier = Modifier.align(Alignment.CenterHorizontally)
@@ -987,109 +1067,107 @@ fun JalaliToGregorianConverter() {
                 Text("Convert")
             }
 
-            gregorianDate?.let {
-                Text(
-                    "Gregorian Date: ${it.format(DateTimeFormatter.ISO_LOCAL_DATE)}",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = Color.White,
-                    textAlign = TextAlign.Center
-                )
-            } ?: run {
-                Text(
-                    "Enter a valid Jalali date",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = Color.Red
-                )
-            }
+            DisplayConvertedDate(convertedDate)
         }
     }
 }
 
 
+/**
+ * Creates a row of text input fields for entering a date (year, month, day).
+ *
+ * This composable function generates three text fields for inputting year, month, and day values.
+ * It arranges these fields in a horizontal row and provides callbacks for value changes.
+ *
+ * @param year The current value of the year field.
+ * @param month The current value of the month field.
+ * @param day The current value of the day field.
+ * @param onYearChange Callback function invoked when the year value changes.
+ * @param onMonthChange Callback function invoked when the month value changes.
+ * @param onDayChange Callback function invoked when the day value changes.
+ */
 @Composable
-fun GregorianToJalaliConverter() {
-    var gregorianYear by remember { mutableStateOf("") }
-    var gregorianMonth by remember { mutableStateOf("") }
-    var gregorianDay by remember { mutableStateOf("") }
-    var jalaliDate by remember { mutableStateOf<CalendarConverter.Companion.JalaliDate?>(null) }
-    val viewModel: CalendarViewModel = viewModel()
-    val showConverter by viewModel.showConverter.collectAsState()
-
-    if (showConverter) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-            Text(
-                "Convert Gregorian to Jalali",
-                style = MaterialTheme.typography.headlineSmall,
-                color = Color.White
+fun DateInputFields(
+    year: String,
+    month: String,
+    day: String,
+    onYearChange: (String) -> Unit,
+    onMonthChange: (String) -> Unit,
+    onDayChange: (String) -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        listOf(
+            Triple("Year", year, onYearChange),
+            Triple("Month", month, onMonthChange),
+            Triple("Day", day, onDayChange)
+        ).forEach { (label, value, onValueChange) ->
+            TextField(
+                value = value,
+                onValueChange = onValueChange,
+                label = { Text(label) },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                modifier = Modifier.weight(1f)
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            if (label != "Day") Spacer(modifier = Modifier.width(8.dp))
+        }
+    }
+}
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                TextField(
-                    value = gregorianYear,
-                    onValueChange = { gregorianYear = it },
-                    label = { Text("Year") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    modifier = Modifier.weight(1f)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                TextField(
-                    value = gregorianMonth,
-                    onValueChange = { gregorianMonth = it },
-                    label = { Text("Month") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    modifier = Modifier.weight(1f)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                TextField(
-                    value = gregorianDay,
-                    onValueChange = { gregorianDay = it },
-                    label = { Text("Day") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    modifier = Modifier.weight(1f)
-                )
+
+/**
+ * Displays the converted date or an error message in a Text composable.
+ *
+ * This function takes a converted date and a boolean flag indicating the direction of conversion
+ * (Jalali to Gregorian or vice versa). It then displays the converted date in a formatted string
+ * or shows an error message if the conversion was unsuccessful.
+ *
+ * @param convertedDate The result of the date conversion, which can be either a [LocalDate]
+ *                      for Gregorian dates or a [CalendarConverter.Companion.JalaliDate] for
+ *                      Jalali dates. If null, an error message will be displayed.
+ *
+ * @return A composable [Text] element displaying either the converted date or an error message.
+ *         The function doesn't explicitly return a value, but rather emits composable content.
+ */
+@Composable
+fun DisplayConvertedDate(convertedDate: Any?) {
+    val viewModel: CalendarViewModel = viewModel()
+    val showGregorianToJalaliConverter by viewModel.showGregorianToJalaliConverter.collectAsState()
+    val showJalaliToGregorianConverter by viewModel.showJalaliToGregorianConverter.collectAsState()
+
+    Box(
+        modifier = Modifier.fillMaxWidth(),
+        contentAlignment = Alignment.Center
+    ) {
+        convertedDate?.let {
+            val dateString = when (it) {
+                is LocalDate -> it.format(DateTimeFormatter.ISO_LOCAL_DATE)
+                is CalendarConverter.Companion.JalaliDate -> "${it.year}/${it.monthValue}/${it.dayOfMonth}"
+                else -> return@let
             }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Button(
-                onClick = {
-                    try {
-                        val year = gregorianYear.toInt()
-                        val month = gregorianMonth.toInt()
-                        val day = gregorianDay.toInt()
-                        val gregorianDate = LocalDate.of(year, month, day)
-                        jalaliDate = CalendarConverter.gregorianToJalali(gregorianDate)
-                    } catch (e: Exception) {
-                        jalaliDate = null
-                    }
-                },
-                modifier = Modifier.align(Alignment.CenterHorizontally)
-            ) {
-                Text("Convert")
-            }
-
-            jalaliDate?.let {
-                Text(
-                    "Jalali Date: ${it.year}/${it.monthValue}/${it.dayOfMonth}",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = Color.White,
-                    textAlign = TextAlign.Center
-                )
-            } ?: run {
-                Text(
-                    "Enter a valid Gregorian date",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = Color.Red
-                )
-            }
+            Text(
+                "${
+                    if (showJalaliToGregorianConverter) "Gregorian" 
+                    else if (showGregorianToJalaliConverter) "Jalali"
+                    else "something is wrong"
+                } Date: $dateString",
+                style = MaterialTheme.typography.bodyLarge,
+                color = Color.White,
+                textAlign = TextAlign.Center
+            )
+        } ?: run {
+            Text(
+                "Enter a Valid ${
+                    if (showJalaliToGregorianConverter) "Jalali" 
+                    else if (showGregorianToJalaliConverter) "Gregorian"
+                    else "something is wrong"
+                } Date",
+                style = MaterialTheme.typography.bodyLarge,
+                color = Color.Yellow,
+                textAlign = TextAlign.Center
+            )
         }
     }
 }
