@@ -47,6 +47,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.isActive
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
@@ -56,14 +57,20 @@ import androidx.compose.material3.TextField
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInteropFilter
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import utils.DateTimeUtils
+import utils.Strings
+import java.time.Period
 
 
 // Describe the application
@@ -371,7 +378,7 @@ fun DisplayTimeInIran() {
  */
 @Composable
 fun WeekDaysHeader() {
-    val daysOfWeek = remember { listOf("Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat") }
+    val daysOfWeek = remember { Strings.Calendar.DAYS_OF_WEEK }
 
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -407,7 +414,7 @@ fun DayOfWeekBox(day: String) {
             .width(55.dp)
             .height(40.dp)
     ) {
-        val color = if(day != "Sun" && day != "Sat") CalColors.weekday_text else CalColors.weekend_text
+        val color = if(day != Strings.Calendar.SUN && day != Strings.Calendar.SAT) CalColors.weekday_text else CalColors.weekend_text
         Text(
             text = day,
             color = color
@@ -640,7 +647,7 @@ fun CalControls() {
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
-            .absolutePadding(left = 4.dp, top = 1.dp, right = 4.dp, bottom = 0.dp)
+            .absolutePadding(left = 2.dp, top = 1.dp, right = 2.dp, bottom = 0.dp)
     ) {
         TodayButton()
         DateConverterToggleButton()
@@ -675,7 +682,7 @@ fun TodayButton() {
         ) {
             // Set the display text for the button
             Text(
-                text = "Today",
+                text = Strings.Calendar.TODAY,
                 color = CalColors.text,
                 fontWeight = FontWeight.Bold
             )
@@ -714,8 +721,8 @@ fun DateConverterToggleButton() {
         ) {
             Text(
                 text = "Converter",
-                style = MaterialTheme.typography.bodyLarge,
-                color = CalColors.text
+                color = CalColors.text,
+                fontWeight = FontWeight.Bold
             )
         }
     }
@@ -747,7 +754,7 @@ fun CalendarToggleButton() {
 
         ) {
             Text(
-                text = if (isJalaliCalendar) "Gregorian" else "Jalali",
+                text = if (isJalaliCalendar) Strings.Calendar.GREGORIAN else Strings.Calendar.JALALI,
                 color = CalColors.text,
                 fontWeight = FontWeight.Bold
 
@@ -780,11 +787,11 @@ fun CalendarConverterBox() {
                     .fillMaxWidth()
             ) {
                 Text(
-                    text = if (showJalaliToGregorianConverter)
-                        "Switch to Gregorian to Jalali"
-                    else if (showGregorianToJalaliConverter)
-                        "Switch to Jalali to Gregorian"
-                    else "Something is wrong",
+                    text = when {
+                        showJalaliToGregorianConverter -> Strings.Converter.SWITCH_TO_GREGORIAN_TO_JALALI
+                        showGregorianToJalaliConverter -> Strings.Converter.SWITCH_TO_JALALI_TO_GREGORIAN
+                        else -> Strings.Error.WRONG
+                    },
                     color = Color.White
                 )
             }
@@ -824,8 +831,6 @@ fun CrossClickArea(
     val viewModel: CalendarViewModel = viewModel()
     val showConverter by viewModel.showConverter.collectAsState()
 
-    Log.d("CrossClickArea", "showConverter: $showConverter")
-
     if (showConverter){
         return
     }
@@ -837,11 +842,11 @@ fun CrossClickArea(
             SpacerCell(width = 0.2f)
             ClickableCell(
                 onClick = onClickUp, onLongPress = onClickUp, width = 0.75f,
-                icon = Icons.Default.KeyboardArrowUp, contentDescription = "Next year")
+                icon = Icons.Default.KeyboardArrowUp, contentDescription = Strings.Calendar.NEXT_YEAR)
             SpacerCell(width = 1f)
         }
 
-        Text("+Y", modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center, 
+        Text(Strings.Calendar.Controls.NEXT_YEAR, modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center,
             fontWeight = FontWeight.Bold, color = CalColors.text, fontSize = 12.sp)
 
         Row(modifier = Modifier
@@ -854,19 +859,19 @@ fun CrossClickArea(
                 onLongPress = onClickLeft, 
                 width = 0.2f,
                 icon = Icons.Default.KeyboardArrowLeft, 
-                contentDescription = "Previous Month"
+                contentDescription = Strings.Calendar.PREVIOUS_MONTH
             )
-            CenteredText("-M")
+            CenteredText(Strings.Calendar.Controls.PREVIOUS_MONTH)
             SpacerCell(width = 0.67f)  // Optionally, this cell can be interactive or display info.
-            CenteredText("+M")
+            CenteredText(Strings.Calendar.Controls.NEXT_MONTH)
             ClickableCell(
                 onClick = onClickRight, onLongPress = onClickRight, width = 1f,
-                icon = Icons.Default.KeyboardArrowRight, contentDescription = "Next Month"
+                icon = Icons.Default.KeyboardArrowRight, contentDescription = Strings.Calendar.NEXT_MONTH
             )
 
         }
 
-        Text("-Y", modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center, 
+        Text(Strings.Calendar.Controls.PREVIOUS_YEAR, modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center,
             fontWeight = FontWeight.Bold, color = CalColors.text, fontSize = 12.sp)
 
         Row(modifier = Modifier
@@ -874,7 +879,7 @@ fun CrossClickArea(
             .fillMaxWidth()) {
             SpacerCell(0.2f)
             ClickableCell(onClick = onClickDown, onLongPress = onClickDown, width = 0.75f,
-                icon = Icons.Default.KeyboardArrowDown, contentDescription = "Next year")
+                icon = Icons.Default.KeyboardArrowDown, contentDescription = Strings.Calendar.NEXT_YEAR)
             SpacerCell(1f)
         }
     }
@@ -994,16 +999,15 @@ fun CenteredText(
 
 
 /**
- * A composable function that creates a date converter interface for converting between Jalali and Gregorian calendars.
+ * A composable function that creates a date converter interface.
  *
- * This function provides a user interface for inputting a date and converting it between the Jalali (Persian)
- * and Gregorian calendar systems. It displays input fields for year, month, and day, along with a conversion button
- * and the result of the conversion.
+ * This function provides a user interface for converting dates between Jalali and Gregorian calendars.
+ * It includes input fields for year, month, and day, a convert button, and displays the converted date.
  *
  * @param showJalaliToGregorianConverter A boolean flag indicating whether to show the Jalali to Gregorian converter.
  * @param showGregorianToJalaliConverter A boolean flag indicating whether to show the Gregorian to Jalali converter.
  *
- * The function doesn't return a value, but instead creates and displays UI components as part of the Jetpack Compose UI.
+ * @return This function doesn't return a value, but creates and displays a Composable UI for date conversion.
  */
 @Composable
 fun DateConverter(
@@ -1017,9 +1021,6 @@ fun DateConverter(
     val viewModel: CalendarViewModel = viewModel()
     val showConverter by viewModel.showConverter.collectAsState()
 
-    Log.d("DateConverter", "showConverter: $showConverter, $showJalaliToGregorianConverter, $showGregorianToJalaliConverter")
-
-
     if (showConverter) {
         Column(
             modifier = Modifier
@@ -1027,65 +1028,66 @@ fun DateConverter(
                 .padding(16.dp)
         ) {
             Text(
-                if (showJalaliToGregorianConverter) "Convert Jalali to Gregorian"
-                else if (showGregorianToJalaliConverter) "Convert Gregorian to Jalali"
+                if (showJalaliToGregorianConverter) Strings.Converter.ENTER_JALALI_DATE
+                else if (showGregorianToJalaliConverter) Strings.Converter.ENTER_GREGORIAN_DATE
                 else "Something is wrong",
-                style = MaterialTheme.typography.headlineSmall,
+                //style = MaterialTheme.typography.headlineSmall,
                 color = Color.White,
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center
             )
             Spacer(modifier = Modifier.height(8.dp))
 
-            DateInputFields(year, month, day,
+            val focusManager = LocalFocusManager.current
+
+            fun convertDate() {
+                convertedDate = try {
+                    val y = year.toInt()
+                    val m = month.toInt()
+                    val d = day.toInt()
+                    if (showJalaliToGregorianConverter) {
+                        CalendarConverter.jalaliToGregorian(y, m, d)
+                    } else if (showGregorianToJalaliConverter) {
+                        CalendarConverter.gregorianToJalali(LocalDate.of(y, m, d))
+                    } else {
+                        throw IllegalArgumentException("Invalid conversion type")
+                    }
+                } catch (e: Exception) {
+                    null
+                }
+            }
+
+            DateInputFields(
+                year, month, day,
                 onYearChange = { year = it },
                 onMonthChange = { month = it },
-                onDayChange = { day = it }
+                onDayChange = { day = it },
+                onYearDone = { focusManager.moveFocus(FocusDirection.Next) },
+                onMonthDone = { focusManager.moveFocus(FocusDirection.Next) },
+                onDayDone = { convertDate() }
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Button(
-                onClick = {
-                    convertedDate = try {
-                        val y = year.toInt()
-                        val m = month.toInt()
-                        val d = day.toInt()
-                        if (showJalaliToGregorianConverter) {
-                            CalendarConverter.jalaliToGregorian(y, m, d)
-                        } else if (showGregorianToJalaliConverter) {
-                            CalendarConverter.gregorianToJalali(LocalDate.of(y, m, d))
-                        } else {
-                            throw IllegalArgumentException("Invalid conversion type")
-                        }
-                    } catch (e: Exception) {
-                        null
-                    }
-                },
-                modifier = Modifier.align(Alignment.CenterHorizontally)
+            /*Button(
+                onClick = { convertDate() },
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
             ) {
-                Text("Convert")
-            }
+                Text(Strings.Converter.CONVERT)
+            }*/
 
             DisplayConvertedDate(convertedDate)
+
+            if( convertedDate != null) {
+                DisplayPeriodToNow(convertedDate, year, month, day)
+            }
+
         }
     }
 }
 
-
-/**
- * Creates a row of text input fields for entering a date (year, month, day).
- *
- * This composable function generates three text fields for inputting year, month, and day values.
- * It arranges these fields in a horizontal row and provides callbacks for value changes.
- *
- * @param year The current value of the year field.
- * @param month The current value of the month field.
- * @param day The current value of the day field.
- * @param onYearChange Callback function invoked when the year value changes.
- * @param onMonthChange Callback function invoked when the month value changes.
- * @param onDayChange Callback function invoked when the day value changes.
- */
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun DateInputFields(
     year: String,
@@ -1093,29 +1095,76 @@ fun DateInputFields(
     day: String,
     onYearChange: (String) -> Unit,
     onMonthChange: (String) -> Unit,
-    onDayChange: (String) -> Unit
+    onDayChange: (String) -> Unit,
+    onYearDone: () -> Unit,
+    onMonthDone: () -> Unit,
+    onDayDone: () -> Unit
 ) {
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val focusManager = LocalFocusManager.current
+
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         listOf(
-            Triple("Year", year, onYearChange),
-            Triple("Month", month, onMonthChange),
-            Triple("Day", day, onDayChange)
-        ).forEach { (label, value, onValueChange) ->
+            Triple(Strings.Converter.YEAR, year) { input: String ->
+                if (input.isEmpty() || input.length <= 4 && input.all { it.isDigit() }) {
+                    onYearChange(input)
+                }
+            },
+            Triple(Strings.Converter.MONTH, month) { input: String ->
+                val num = input.toIntOrNull()
+                if (input.isEmpty() || input.length <= 2 && num != null && num in 1..12) {
+                    onMonthChange(input)
+                }
+            },
+            Triple(Strings.Converter.DAY, day) { input: String ->
+                val num = input.toIntOrNull()
+                if (input.isEmpty() || input.length <= 2 && num != null && num in 1..31) {
+                    onDayChange(input)
+                }
+            }
+        ).forEachIndexed { index, (label, value, onValueChange) ->
             TextField(
                 value = value,
                 onValueChange = onValueChange,
                 label = { Text(label) },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.weight(1f)
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Number,
+                    imeAction = if (index == 2) ImeAction.Done else ImeAction.Next
+                ),
+                keyboardActions = KeyboardActions(
+                    onNext = {
+                        when (index) {
+                            0 -> {
+                                onYearDone()
+                                focusManager.moveFocus(FocusDirection.Next)
+                            }
+                            1 -> {
+                                onMonthDone()
+                                focusManager.moveFocus(FocusDirection.Next)
+                            }
+                        }
+                    },
+                    onDone = {
+                        keyboardController?.hide() // Close the keyboard
+                        if (index == 2) {
+                            onDayDone()
+                            focusManager.clearFocus()
+                        }
+                    }
+                ),
+
+                modifier = Modifier
+                    .width(100.dp) // Adjust this size for "Year"
+                    .then(if (index > 0) Modifier.width(40.dp) else Modifier), // Adjust sizes for "Month" and "Day"
+                singleLine = true
             )
-            if (label != "Day") Spacer(modifier = Modifier.width(8.dp))
+            if (index < 2) Spacer(modifier = Modifier.width(8.dp))
         }
     }
 }
-
 
 /**
  * Displays the converted date or an error message in a Text composable.
@@ -1149,8 +1198,8 @@ fun DisplayConvertedDate(convertedDate: Any?) {
             }
             Text(
                 "${
-                    if (showJalaliToGregorianConverter) "Gregorian" 
-                    else if (showGregorianToJalaliConverter) "Jalali"
+                    if (showJalaliToGregorianConverter) Strings.Calendar.GREGORIAN 
+                    else if (showGregorianToJalaliConverter) Strings.Calendar.JALALI
                     else "something is wrong"
                 } Date: $dateString",
                 style = MaterialTheme.typography.bodyLarge,
@@ -1160,13 +1209,91 @@ fun DisplayConvertedDate(convertedDate: Any?) {
         } ?: run {
             Text(
                 "Enter a Valid ${
-                    if (showJalaliToGregorianConverter) "Jalali" 
-                    else if (showGregorianToJalaliConverter) "Gregorian"
+                    if (showJalaliToGregorianConverter) Strings.Calendar.JALALI 
+                    else if (showGregorianToJalaliConverter) Strings.Calendar.GREGORIAN
                     else "something is wrong"
                 } Date",
                 style = MaterialTheme.typography.bodyLarge,
                 color = Color.Yellow,
                 textAlign = TextAlign.Center
+            )
+        }
+    }
+}
+
+@Composable
+fun DisplayPeriodToNow(convertedDate: Any?, fromYear: String, fromMonth: String, fromDay: String) {
+
+    Log.d("Calendar", "convertedDate: $convertedDate")
+    if (convertedDate == null) return
+
+    val viewModel: CalendarViewModel = viewModel()
+    val showGregorianToJalaliConverter by viewModel.showGregorianToJalaliConverter.collectAsState()
+    val showJalaliToGregorianConverter by viewModel.showJalaliToGregorianConverter.collectAsState()
+
+    // Determine the date to use
+    val date: LocalDate? = when {
+        showJalaliToGregorianConverter -> {
+            // The convertedDate is already Gregorian (LocalDate)
+            convertedDate as? LocalDate
+        }
+        showGregorianToJalaliConverter -> {
+            // The fromYear, fromMonth, and fromDay are Gregorian and need conversion to LocalDate
+            val year = fromYear.toIntOrNull()
+            val month = fromMonth.toIntOrNull()
+            val day = fromDay.toIntOrNull()
+            if (year != null && month != null && day != null) {
+                try {
+                    LocalDate.of(year, month, day)
+                } catch (e: Exception) {
+                    null
+                }
+            } else {
+                null
+            }
+        }
+        else -> null
+    }
+
+    // Display period regardless of past or future date
+    date?.let { validDate ->
+        val now = LocalDate.now()
+        val isFuture = validDate.isAfter(now)
+        val period = if (isFuture) Period.between(now, validDate) else Period.between(validDate, now)
+        val years = period.years
+        val months = period.months
+        val days = period.days
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                buildString {
+                    if (isFuture) append("In ") else append("Since ")
+                    if (years > 0) append("$years year${if (years > 1) "s" else ""} ")
+                    if (months > 0) append("$months month${if (months > 1) "s" else ""} ")
+                    if (days > 0) append("$days day${if (days > 1) "s" else ""}")
+                }.trim(),
+                style = MaterialTheme.typography.bodyLarge,
+                color = Color.White,
+                fontWeight = FontWeight.Bold
+            )
+        }
+    } ?: run {
+        // Handle invalid or missing date
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                "Invalid or missing date",
+                style = MaterialTheme.typography.bodyLarge,
+                color = Color.Red
             )
         }
     }
