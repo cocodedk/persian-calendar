@@ -3,8 +3,12 @@ package utils
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.ZonedDateTime
+import java.time.temporal.ChronoUnit
 import java.time.temporal.WeekFields
 import java.util.Locale
+import kotlin.math.abs
+import java.time.Period
+
 object DateTimeUtils {
 
     /**
@@ -60,4 +64,66 @@ object DateTimeUtils {
         return date.get(weekFields.weekOfWeekBasedYear())
     }
 
+    /**
+     * Calculates the number of days between a given Gregorian date and the current date.
+     *
+     * @param year The year of the given date.
+     * @param month The month of the given date (1-12).
+     * @param day The day of the given date.
+     * @return A Pair containing:
+     *         - The absolute number of days between the given date and today.
+     *         - A Boolean indicating whether the given date is in the future (true) or past (false).
+     * @throws IllegalArgumentException if the provided date is invalid.
+     */
+    fun daysFromGregorianDateToNow(year: Int, month: Int, day: Int): Pair<Long, Boolean> {
+        val givenDate = try {
+            LocalDate.of(year, month, day)
+        } catch (e: Exception) {
+            throw IllegalArgumentException("Invalid date provided", e)
+        }
+
+        val today = LocalDate.now()
+        val daysBetween = abs(ChronoUnit.DAYS.between(givenDate, today))
+        val isFuture = givenDate.isAfter(today)
+
+        return Pair(daysBetween, isFuture)
+    }
+
+    /**
+     * Calculates the period (years, months, days) between a given Gregorian date and the current date.
+     *
+     * @param year The year of the given date.
+     * @param month The month of the given date (1-12).
+     * @param day The day of the given date.
+     * @return A Triple containing:
+     *         - The number of years between the given date and today.
+     *         - The number of months between the given date and today (excluding years).
+     *         - The number of days between the given date and today (excluding years and months).
+     *         - A Boolean indicating whether the given date is in the future (true) or past (false).
+     * @throws IllegalArgumentException if the provided date is invalid.
+     */
+    fun periodFromGregorianDateToNow(year: Int, month: Int, day: Int): Pair<Triple<Int, Int, Int>, Boolean> {
+        val givenDate = try {
+            LocalDate.of(year, month, day)
+        } catch (e: Exception) {
+            throw IllegalArgumentException("Invalid date provided", e)
+        }
+
+        val today = LocalDate.now()
+        val period = if (givenDate.isBefore(today)) {
+            Period.between(givenDate, today)
+        } else {
+            Period.between(today, givenDate)
+        }
+
+        val isFuture = givenDate.isAfter(today)
+
+        return Pair( Triple(
+            period.years,
+            period.months,
+            period.days
+            ),
+            isFuture
+        )
+    }
 }
