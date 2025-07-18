@@ -7,22 +7,31 @@ import androidx.compose.ui.graphics.Color
  * Each color is defined as a constant with a hexadecimal color code.
  */
 class CalColors {
-    companion object{
-        val background = Color(0xFF025842)
-        val text = Color(0xFFFFFFFF)
-        val prev_month_background = Color(0xFF019A64) // previously not_current_month_background
-        val prev_month_text = Color(0xFFFFFFFF) // previously not_current_month_text
-        val next_month_background = Color(0xFFA4D3B3) // new color
-        val next_month_text = Color(0xFFFFFFFF)
-        val day_background = Color(0xFFFFFFFF)
-        val current_day_background = Color(0xFF43C7F9)
-        val current_day_text = Color(0xFFFFFFFF)
-
-        val weekday_text = Color(0xFF43C7F9)
-        val weekend_text = Color(0xFFF05066)
-        val day_border = Color(0xFF025842)
-        val button_background = Color(0xFF019A64)
-        var active_text = Color(0xFFFFFFFF)
-        var inactive_text = Color(0xFFA4D3B3)
+    companion object {
+        // Base colors
+        private val Green = Color(0xFF025842)
+        private val DarkGreen = Color(0xFF019A64)
+        private val LightGreen = Color(0xFFA4D3B3)
+        private val White = Color(0xFFFFFFFF)
+        private val Blue = Color(0xFF43C7F9)
+        private val Red = Color(0xFFF05066)
+    
+        // Assign colors to variables
+        val background = Green
+        val text = White
+        val prev_month_background = DarkGreen
+        val prev_month_text = White
+        val next_month_background = LightGreen
+        val next_month_text = White
+        val day_background = White
+        val current_day_background = Blue
+        val current_day_text = White
+        val weekday_text = Blue
+        val weekend_text = Red
+        val day_border = Green
+        val button_background = DarkGreen
+        var active_text = White
+        var inactive_text = LightGreen
+        var active_button_background = Blue
     }
 }
