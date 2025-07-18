@@ -71,6 +71,14 @@ import kotlinx.coroutines.flow.asStateFlow
 import utils.DateTimeUtils
 import utils.Strings
 import java.time.Period
+import androidx.compose.foundation.text.ClickableText
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withStyle
+import android.content.Intent
+import android.net.Uri
+import androidx.compose.ui.platform.LocalContext
 
 
 // Describe the application
@@ -130,7 +138,7 @@ class CalendarViewModel : ViewModel() {
     val gregorianDate = _gregorianDate.asLiveData()
     // Expose an immutable LiveData for observers to observe the current calendar mode
     val isJalaliCalendar = _isJalaliCalendar.asLiveData()
-    
+
     private val _showConverter = MutableStateFlow(false)
     val showConverter: StateFlow<Boolean> = _showConverter.asStateFlow()
 
@@ -156,7 +164,7 @@ class CalendarViewModel : ViewModel() {
     fun toggleIsJalaliCalendar() {
         _isJalaliCalendar.value = !_isJalaliCalendar.value
     }
-    
+
     fun toggleConverter() {
         _showConverter.value =!_showConverter.value
     }
@@ -260,6 +268,9 @@ fun CalendarScreen() {
                 .height(150.dp)
                 .fillMaxWidth()
         )
+
+        // Footer with name and company
+        FooterInfo()
     }
 }
 
@@ -855,10 +866,10 @@ fun CrossClickArea(
 
         ) {
             ClickableCell(
-                onClick = onClickLeft, 
-                onLongPress = onClickLeft, 
+                onClick = onClickLeft,
+                onLongPress = onClickLeft,
                 width = 0.2f,
-                icon = Icons.Default.KeyboardArrowLeft, 
+                icon = Icons.Default.KeyboardArrowLeft,
                 contentDescription = Strings.Calendar.PREVIOUS_MONTH
             )
             CenteredText(Strings.Calendar.Controls.PREVIOUS_MONTH)
@@ -905,10 +916,10 @@ fun CrossClickArea(
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun ClickableCell(
-    onClick: () -> Unit, 
-    onLongPress: () -> Unit, 
-    width: Float= 0.5f, 
-    icon: ImageVector, 
+    onClick: () -> Unit,
+    onLongPress: () -> Unit,
+    width: Float= 0.5f,
+    icon: ImageVector,
     contentDescription: String? = null
 ) {
     var holding by remember { mutableStateOf(false) }
@@ -1198,7 +1209,7 @@ fun DisplayConvertedDate(convertedDate: Any?) {
             }
             Text(
                 "${
-                    if (showJalaliToGregorianConverter) Strings.Calendar.GREGORIAN 
+                    if (showJalaliToGregorianConverter) Strings.Calendar.GREGORIAN
                     else if (showGregorianToJalaliConverter) Strings.Calendar.JALALI
                     else "something is wrong"
                 } Date: $dateString",
@@ -1209,7 +1220,7 @@ fun DisplayConvertedDate(convertedDate: Any?) {
         } ?: run {
             Text(
                 "Enter a Valid ${
-                    if (showJalaliToGregorianConverter) Strings.Calendar.JALALI 
+                    if (showJalaliToGregorianConverter) Strings.Calendar.JALALI
                     else if (showGregorianToJalaliConverter) Strings.Calendar.GREGORIAN
                     else "something is wrong"
                 } Date",
@@ -1296,5 +1307,68 @@ fun DisplayPeriodToNow(convertedDate: Any?, fromYear: String, fromMonth: String,
                 color = Color.Red
             )
         }
+    }
+}
+
+/**
+ * This Composable function displays the footer information with the developer name and company.
+ * It shows "Babak Bandpey" and "cocode.dk" at the bottom of the screen.
+ *
+ * @Composable This annotation indicates that this function is a Composable function in Jetpack Compose.
+ */
+@Composable
+fun FooterInfo() {
+    val context = LocalContext.current
+
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp)
+    ) {
+        val annotatedString = buildAnnotatedString {
+            pushStringAnnotation(tag = "URL", annotation = "https://www.linkedin.com/in/babakbandpey/")
+            withStyle(
+                style = SpanStyle(
+                    color = CalColors.active_text,
+                    textDecoration = TextDecoration.Underline
+                )
+            ) {
+                append("Babak Bandpey")
+            }
+            pop()
+            withStyle(
+                style = SpanStyle(
+                    color = CalColors.inactive_text
+                )
+            ) {
+                append(" - ")
+            }
+            pushStringAnnotation(tag = "URL", annotation = "https://cocode.dk")
+            withStyle(
+                style = SpanStyle(
+                    color = CalColors.active_text,
+                    textDecoration = TextDecoration.Underline
+                )
+            ) {
+                append("cocode.dk")
+            }
+            pop()
+        }
+
+        ClickableText(
+            text = annotatedString,
+            style = MaterialTheme.typography.bodyMedium.copy(
+                textAlign = TextAlign.Center,
+                fontSize = 12.sp
+            ),
+            onClick = { offset ->
+                annotatedString.getStringAnnotations(tag = "URL", start = offset, end = offset)
+                    .firstOrNull()?.let { annotation ->
+                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(annotation.item))
+                        context.startActivity(intent)
+                    }
+            }
+        )
     }
 }
