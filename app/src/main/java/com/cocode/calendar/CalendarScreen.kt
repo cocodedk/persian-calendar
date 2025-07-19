@@ -77,8 +77,6 @@ fun CalendarScreen() {
             // The controls for the calendar view, including a button to navigate to today's date
             CalControls()
 
-            CalendarConverterBox()
-
             CrossClickArea(
                 onClickRight = { viewModel.changeMonth(YearMonth.from(gregorianDate).plusMonths(1)) },
                 onClickLeft = { viewModel.changeMonth(YearMonth.from(gregorianDate).minusMonths(1)) },
@@ -88,9 +86,10 @@ fun CalendarScreen() {
                     .height(150.dp)
                     .fillMaxWidth()
             )
-
-
         }
+
+        // Date converter overlay - positioned on top of everything
+        CalendarConverterBox()
 
         // Footer positioned at the bottom
         FooterInfo(
