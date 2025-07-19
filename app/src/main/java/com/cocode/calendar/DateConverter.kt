@@ -2,6 +2,7 @@ package com.cocode.calendar
 
 import CalendarConverter
 import android.util.Log
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -47,6 +48,11 @@ fun CalendarConverterBox() {
     val showGregorianToJalaliConverter by viewModel.showGregorianToJalaliConverter.collectAsState()
 
     if (showConverter) {
+        // Handle Android back button press to close converter
+        BackHandler {
+            viewModel.toggleConverter()
+        }
+
         // Semi-transparent overlay background
         Box(
             modifier = Modifier
