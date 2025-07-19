@@ -32,13 +32,13 @@ object Strings {
         const val JALALI = "Jalali"
         const val GREGORIAN = "Gregorian"
         object Controls {
-            const val NEXT_MONTH = "+M"
-            const val NEXT_YEAR = "+Y"
-            const val PREVIOUS_MONTH = "M-"
-            const val PREVIOUS_YEAR = "-Y"
+            const val NEXT_MONTH = "Next Month"
+            const val NEXT_YEAR = "Next Year"
+            const val PREVIOUS_MONTH = "Previous Month"
+            const val PREVIOUS_YEAR = "Previous Year"
         }
     }
-    
+
     object DateFormat {
         const val TIME_FORMAT = "HH:mm:ss"
         const val MONTH_YEAR_FORMAT = "MMMM yyyy"
@@ -64,9 +64,22 @@ object Strings {
             "Farvardin", "Ordibehesht", "Khordad", "Tir", "Mordad", "Shahrivar",
             "Mehr", "Aban", "Azar", "Dey", "Bahman", "Esfand"
         )
+        val JALALI_ABBREVIATED = listOf(
+            "Far", "Ord", "Kho", "Tir", "Mor", "Sha",
+            "Meh", "Aba", "Aza", "Dey", "Bah", "Esf"
+        )
+        val JALALI_PERSIAN = listOf(
+            "فروردین", "اردیبهشت", "خرداد", "تیر",
+            "مرداد", "شهریور", "مهر", "آبان",
+            "آذر", "دی", "بهمن", "اسفند"
+        )
         val GREGORIAN = listOf(
             "January", "February", "March", "April", "May", "June",
             "July", "August", "September", "October", "November", "December"
+        )
+        val GREGORIAN_ABBREVIATED = listOf(
+            "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+            "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
         )
     }
 
