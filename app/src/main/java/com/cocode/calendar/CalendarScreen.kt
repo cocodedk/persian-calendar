@@ -49,38 +49,46 @@ fun CalendarScreen() {
     val viewModel: CalendarViewModel = viewModel()
     val gregorianDate by viewModel.gregorianDate.observeAsState(initial = LocalDate.now())
 
-    // This Composable function is the main screen of the app.
-    Column {
-        // The header of the calendar view, which includes the current month and year,
-        // and buttons to navigate to the next and previous months.
-        CalendarHeader()
+    // Use Box to allow absolute positioning
+    Box(modifier = Modifier.fillMaxSize()) {
+        // Main content in a Column
+        Column(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            // The header of the calendar view, which includes the current month and year,
+            // and buttons to navigate to the next and previous months.
+            CalendarHeader()
 
-        // A Composable function that displays the current time in Iran.
-        DisplayTimeInIran()
+            // A Composable function that displays the current time in Iran.
+            DisplayTimeInIran()
 
-        // The header of the calendar view that displays the days of the week.
-        WeekDaysHeader()
+            // The header of the calendar view that displays the days of the week.
+            WeekDaysHeader()
 
-        // The grid of the calendar view that displays the dates.
-        CalendarGrid()
+            // The grid of the calendar view that displays the dates.
+            CalendarGrid()
 
-        // The controls for the calendar view, including a button to navigate to today's date
-        CalControls()
+            // The controls for the calendar view, including a button to navigate to today's date
+            CalControls()
 
-        CalendarConverterBox()
+            CalendarConverterBox()
 
-        CrossClickArea(
-            onClickRight = { viewModel.changeMonth(YearMonth.from(gregorianDate).plusMonths(1)) },
-            onClickLeft = { viewModel.changeMonth(YearMonth.from(gregorianDate).minusMonths(1)) },
-            onClickUp = { viewModel.changeYear(gregorianDate.year + 1) },
-            onClickDown = { viewModel.changeYear(gregorianDate.year - 1) },
-            modifier = Modifier
-                .height(150.dp)
-                .fillMaxWidth()
-        )
+            CrossClickArea(
+                onClickRight = { viewModel.changeMonth(YearMonth.from(gregorianDate).plusMonths(1)) },
+                onClickLeft = { viewModel.changeMonth(YearMonth.from(gregorianDate).minusMonths(1)) },
+                onClickUp = { viewModel.changeYear(gregorianDate.year + 1) },
+                onClickDown = { viewModel.changeYear(gregorianDate.year - 1) },
+                modifier = Modifier
+                    .height(150.dp)
+                    .fillMaxWidth()
+            )
 
-        // Footer with name and company
-        FooterInfo()
+            // Add spacer to push content above footer
+            Spacer(modifier = Modifier.weight(1f))
+        }
+
+        // Footer positioned at absolute bottom
+        FooterInfo(modifier = Modifier.align(Alignment.BottomCenter))
     }
 }
 
@@ -88,15 +96,16 @@ fun CalendarScreen() {
  * This Composable function displays the footer information with the developer name and company.
  * It shows "Babak Bandpey" and "cocode.dk" at the bottom of the screen.
  *
+ * @param modifier Modifier to be applied to the footer container
  * @Composable This annotation indicates that this function is a Composable function in Jetpack Compose.
  */
 @Composable
-fun FooterInfo() {
+fun FooterInfo(modifier: Modifier = Modifier) {
     val context = LocalContext.current
 
     Box(
         contentAlignment = Alignment.Center,
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp)
     ) {
