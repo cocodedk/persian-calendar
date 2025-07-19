@@ -368,14 +368,39 @@ fun DayBox(
         currentDate.dayOfMonth.toString()
     }
 
-    // Create a Box Composable for the date
+    // Check if this is the current day for 3D border effect
+    val isCurrentDay = if (isJalaliCalendar) {
+        currentDate.isEqual(DateTimeUtils.adjustDateForDeviceTimeZone())
+    } else {
+        currentDate.isEqual(LocalDate.now())
+    }
+
+    // Create a Box Composable for the date with 3D border effect for current day
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
             .width(55.dp)
             .height(60.dp)
             .background(backgroundColor)
-            .border(width = 0.dp, color = CalColors.day_border)
+            .then(
+                if (isCurrentDay) {
+                    // 3D border effect for current day
+                    Modifier
+                        .border(
+                            width = 2.dp,
+                            color = Color(0xFF4CAF50), // Main green border
+                            shape = RoundedCornerShape(4.dp)
+                        )
+                        .padding(1.dp)
+                        .border(
+                            width = 1.dp,
+                            color = Color(0xFF81C784), // Lighter green inner border for 3D effect
+                            shape = RoundedCornerShape(3.dp)
+                        )
+                } else {
+                    Modifier.border(width = 0.dp, color = CalColors.day_border)
+                }
+            )
             .clickable(enabled = isInCurrentMonth) {} // Add a click listener to the box
     ) {
         // Create a Text Composable to display the date number
