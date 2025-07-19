@@ -408,7 +408,8 @@ fun DayBox(
             text = text,
             style = MaterialTheme.typography.bodyMedium,
             color = fontColor,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
+            textDecoration = if (isCurrentDay) androidx.compose.ui.text.style.TextDecoration.Underline else null
         )
     }
 }
