@@ -199,6 +199,7 @@ fun DayOfWeekBox(day: String) {
  * It observes the current Gregorian date from the ViewModel and generates a grid of dates for the current month.
  * The grid includes dates from the previous month and the next month to fill the entire grid.
  * Each date in the grid is a Composable function that represents a day in the calendar.
+ * The grid is always exactly 6 rows (42 days) for consistent layout.
  *
  * @Composable This annotation indicates that this function is a Composable function in Jetpack Compose, a modern toolkit for building native Android UI.
  */
@@ -213,30 +214,25 @@ fun CalendarGrid() {
     val yearMonth = YearMonth.from(gregorianDate)
     // Get the maximum number of days in a week
     val daysInWeek = WeekFields.of(Locale.getDefault()).dayOfWeek().range().maximum.toInt()
-    // Get the first and last day of the current month
+    // Get the first day of the current month
     val firstDayOfMonth = yearMonth.atDay(1)
-    val lastDayOfMonth = yearMonth.atEndOfMonth()
 
-    // Determine the start and end day for the calendar grid to include days from the previous month and the next month
+    // Calculate the start day to ensure exactly 6 weeks (42 days) are always displayed
     val startDayOfWeek = firstDayOfMonth.with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY))
-    val endDayOfWeek = lastDayOfMonth.with(TemporalAdjusters.nextOrSame(DayOfWeek.SATURDAY))
-
-    // Initialize the current day to the start day
-    var currentDay = startDayOfWeek
 
     // Create a Column Composable for the calendar grid
     Column {
-        // Loop through each week in the month
-        while (currentDay <= endDayOfWeek) {
+        // Always display exactly 6 weeks (6 rows)
+        repeat(6) { weekIndex ->
+            // Calculate the start date for each week directly (no mutable state)
+            val weekStartDate = startDayOfWeek.plusDays((weekIndex * 7).toLong())
+
             // Create a WeekRow Composable for each week
             WeekRow(
-                startDate = currentDay,
+                startDate = weekStartDate,
                 daysInWeek = daysInWeek,
                 yearMonth = yearMonth
-            ) {
-                // Update the current day to the start day of the next week
-                currentDay = currentDay.plusDays(7)
-            }
+            )
         }
     }
 }
@@ -249,7 +245,6 @@ fun CalendarGrid() {
  * @param startDate The start date of the week.
  * @param daysInWeek The number of days in a week.
  * @param yearMonth The YearMonth of the current month.
- * @param updateDay A lambda function that is invoked to update the current day to the start day of the next week.
  *
  * @Composable This annotation indicates that this function is a Composable function in Jetpack Compose, a modern toolkit for building native Android UI.
  */
@@ -257,8 +252,7 @@ fun CalendarGrid() {
 fun WeekRow(
     startDate: LocalDate,
     daysInWeek: Int,
-    yearMonth: YearMonth,
-    updateDay: (LocalDate) -> Unit
+    yearMonth: YearMonth
 ) {
     // Create a Row Composable for the week
     Row(
@@ -271,22 +265,19 @@ fun WeekRow(
             .fillMaxWidth()
             .padding(horizontal = 4.dp, vertical = 0.dp)
     ) {
-        // Initialize the current date to the start date
-        var currentDate = startDate
         // Loop through each day in the week
         for (day in 1..daysInWeek) {
+            // Calculate the current date for this day
+            val currentDate = startDate.plusDays((day - 1).toLong())
             val jalaliDate = CalendarConverter.gregorianToJalali(currentDate)
+
             // Create a DayBox Composable for each day
             DayBox(
                 currentDate = currentDate,
                 jalaliDate = jalaliDate,
                 isInCurrentMonth = currentDate.month == yearMonth.month
             )
-            // Update the current date to the next day
-            currentDate = currentDate.plusDays(1)
         }
-        // Update the current day to the start day of the next week
-        updateDay(currentDate)
     }
 }
 
