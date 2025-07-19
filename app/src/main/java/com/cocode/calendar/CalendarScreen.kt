@@ -49,10 +49,6 @@ fun CalendarApp() {
 @Composable
 fun CalendarScreen() {
 
-    // Get an instance of the CalendarViewModel
-    val viewModel: CalendarViewModel = viewModel()
-    val gregorianDate by viewModel.gregorianDate.observeAsState(initial = LocalDate.now())
-
     // Use Box to allow absolute positioning
     Box(modifier = Modifier.fillMaxSize()) {
         // Main content in a Column
@@ -77,15 +73,8 @@ fun CalendarScreen() {
             // The controls for the calendar view, including a button to navigate to today's date
             CalControls()
 
-            CrossClickArea(
-                onClickRight = { viewModel.changeMonth(YearMonth.from(gregorianDate).plusMonths(1)) },
-                onClickLeft = { viewModel.changeMonth(YearMonth.from(gregorianDate).minusMonths(1)) },
-                onClickUp = { viewModel.changeYear(gregorianDate.year + 1) },
-                onClickDown = { viewModel.changeYear(gregorianDate.year - 1) },
-                modifier = Modifier
-                    .height(150.dp)
-                    .fillMaxWidth()
-            )
+            // Month and Year selection navigation
+            CalendarNavigation()
         }
 
         // Date converter overlay - positioned on top of everything
