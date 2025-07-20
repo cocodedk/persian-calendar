@@ -772,15 +772,33 @@ fun YearPickerDialog(
 ) {
     val viewModel: CalendarViewModel = viewModel()
     val currentDate by viewModel.gregorianDate.observeAsState(LocalDate.now())
-    val currentYear = currentDate?.year ?: LocalDate.now().year
+    val isJalaliCalendar by viewModel.isJalaliCalendar.observeAsState(false)
+
+    val currentGregorianYear = currentDate?.year ?: LocalDate.now().year
 
     // Year range (can be adjusted as needed)
-    val startYear = 1900
-    val endYear = 2100
-    val years = (startYear..endYear).toList()
+    val startGregorianYear = 1900
+    val endGregorianYear = 2100
+    val gregorianYears = (startGregorianYear..endGregorianYear).toList()
 
-    // Calculate the index of the current year in the list
-    val currentYearIndex = years.indexOf(currentYear)
+    // Convert to display years and current year based on calendar mode
+    val (displayYears, currentDisplayYear) = if (isJalaliCalendar) {
+        // Convert Gregorian years to Jalali years for display
+        val jalaliYears = gregorianYears.map { gregorianYear ->
+            val tempDate = LocalDate.of(gregorianYear, 6, 15) // Use middle of year for conversion
+            CalendarConverter.gregorianToJalali(tempDate).year
+        }
+
+        // Get current Jalali year
+        val currentJalaliYear = CalendarConverter.gregorianToJalali(currentDate ?: LocalDate.now()).year
+
+        jalaliYears to currentJalaliYear
+    } else {
+        gregorianYears to currentGregorianYear
+    }
+
+    // Calculate the index of the current year in the display list
+    val currentYearIndex = displayYears.indexOf(currentDisplayYear)
 
     // Remember the LazyColumn state for scrolling control
     val listState = androidx.compose.foundation.lazy.rememberLazyListState()
@@ -816,10 +834,16 @@ fun YearPickerDialog(
                 modifier = Modifier.weight(1f),
                 contentPadding = PaddingValues(vertical = 8.dp)
             ) {
-                items(years) { year ->
-                    val isSelected = year == currentYear
+                items(displayYears.indices.toList()) { index ->
+                    val displayYear = displayYears[index]
+                    val gregorianYear = gregorianYears[index]
+                    val isSelected = displayYear == currentDisplayYear
+
                     Button(
-                        onClick = { onYearSelected(year) },
+                        onClick = {
+                            // Always pass the Gregorian year to maintain internal consistency
+                            onYearSelected(gregorianYear)
+                        },
                         colors = ButtonDefaults.buttonColors(
                             containerColor = if (isSelected)
                                 CalColors.active_button_background
@@ -832,7 +856,7 @@ fun YearPickerDialog(
                             .height(52.dp)
                     ) {
                         Text(
-                            text = year.toString(),
+                            text = displayYear.toString(),
                             color = CalColors.text,
                             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
                             fontSize = 18.sp
