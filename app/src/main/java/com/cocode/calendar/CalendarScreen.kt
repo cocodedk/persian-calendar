@@ -24,8 +24,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.cocode.calendar.components.CalendarHeader
-import com.cocode.calendar.components.DisplayTimeInIran
+import com.cocode.calendar.components.HeaderSection
 import com.cocode.calendar.components.WeekDaysHeader
 import com.cocode.calendar.components.CalendarGrid
 import com.cocode.calendar.components.CalControls
@@ -64,12 +63,8 @@ fun CalendarScreen() {
                 .fillMaxSize()
                 .padding(bottom = 80.dp) // Leave space for footer
         ) {
-            // The header of the calendar view, which includes the current month and year,
-            // and buttons to navigate to the next and previous months.
-            CalendarHeader()
-
-            // A Composable function that displays the current time in Iran.
-            DisplayTimeInIran()
+            // The header section with gradient background, calendar info, and Iran time
+            HeaderSection()
 
             // The header of the calendar view that displays the days of the week.
             WeekDaysHeader()
