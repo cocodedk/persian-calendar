@@ -11,11 +11,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shadow
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
@@ -95,14 +91,6 @@ fun HeaderSection() {
                 .fillMaxWidth()
                 .padding(vertical = 24.dp, horizontal = 16.dp)
         ) {
-                    Box(
-            modifier = Modifier
-                .shadow(
-                    elevation = 0.8.dp,
-                    shape = RoundedCornerShape(4.dp),
-                    spotColor = Color.Red.copy(alpha = 0.08f)
-                )
-        ) {
                 Text(
                     text = primaryText,
                     fontSize = 26.sp,
@@ -110,18 +98,9 @@ fun HeaderSection() {
                     color = CalColors.active_text,
                     textAlign = TextAlign.Center
                 )
-            }
 
             Spacer(modifier = Modifier.height(6.dp))
 
-                    Box(
-            modifier = Modifier
-                .shadow(
-                    elevation = 0.5.dp,
-                    shape = RoundedCornerShape(2.dp),
-                    spotColor = Color.Red.copy(alpha = 0.05f)
-                )
-        ) {
                 Text(
                     text = secondaryText,
                     fontSize = 17.sp,
@@ -129,18 +108,9 @@ fun HeaderSection() {
                     color = CalColors.inactive_text,
                     textAlign = TextAlign.Center
                 )
-            }
 
             Spacer(modifier = Modifier.height(6.dp))
 
-                    Box(
-            modifier = Modifier
-                .shadow(
-                    elevation = 0.2.dp,
-                    shape = RoundedCornerShape(1.dp),
-                    spotColor = Color.Red.copy(alpha = 0.03f)
-                )
-        ) {
                 Text(
                     text = "Iran time: ${currentTime.value}",
                     fontSize = 15.sp,
@@ -148,7 +118,6 @@ fun HeaderSection() {
                     color = CalColors.text,
                     textAlign = TextAlign.Center
                 )
-            }
         }
     }
 }
