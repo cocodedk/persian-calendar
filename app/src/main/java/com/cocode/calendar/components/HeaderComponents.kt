@@ -4,7 +4,9 @@ import CalendarConverter
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -46,21 +48,20 @@ fun HeaderSection() {
     val gregorianDate by viewModel.gregorianDate.observeAsState(initial = LocalDate.now())
     val isJalaliCalendar by viewModel.isJalaliCalendar.observeAsState(initial = false)
 
+    /* ---------- build title strings (unchanged) ---------- */
     val (primaryText, secondaryText) = remember(gregorianDate, isJalaliCalendar) {
         val jalaliMonths = CalendarConverter.gregorianToJalaliMonths(gregorianDate)
         val jalaliDate = CalendarConverter.gregorianToJalali(gregorianDate)
-        val jalaliWeekNumber = CalendarConverter.getJalaliWeekNumber(jalaliDate)
+        val jalaliWeek = CalendarConverter.getJalaliWeekNumber(jalaliDate)
 
         val jalaliText = buildAnnotatedString {
-            withStyle(style = SpanStyle(fontSize = 18.sp)) {
-                append("week $jalaliWeekNumber")
-            }
+            withStyle(SpanStyle(fontSize = 18.sp)) { append("week $jalaliWeek") }
             append(" - ${jalaliMonths["left"]?.monthName} - ${jalaliMonths["right"]?.monthName} ${jalaliMonths["right"]?.year}")
         }
 
         val gregorianText = buildAnnotatedString {
             append("${gregorianDate.format(DateTimeFormatter.ofPattern("MMMM yyyy"))} - ")
-            withStyle(style = SpanStyle(fontSize = 18.sp)) {
+            withStyle(SpanStyle(fontSize = 18.sp)) {
                 append("week ${DateTimeUtils.getCurrentWeekNumber(gregorianDate)}")
             }
         }
@@ -68,57 +69,57 @@ fun HeaderSection() {
         if (isJalaliCalendar) jalaliText to gregorianText else gregorianText to jalaliText
     }
 
+    /* ---------- ticking clock (unchanged) ---------- */
     val currentTime = remember { mutableStateOf("") }
-
-    LaunchedEffect(key1 = Unit) {
+    LaunchedEffect(Unit) {
         while (currentCoroutineContext().isActive) {
-            val iranTime = DateTimeUtils.getCurrentTimeInIran()
-            val formatter = DateTimeFormatter.ofPattern("HH:mm:ss")
-            currentTime.value = iranTime.format(formatter)
-            delay(1000)
+            currentTime.value = DateTimeUtils
+                .getCurrentTimeInIran()
+                .format(DateTimeFormatter.ofPattern("HH:mm:ss"))
+            delay(1_000)
         }
     }
 
-    Box(
+    /* ---------- Header with top and bottom dividers ---------- */
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp)
+            .padding(vertical = 24.dp, horizontal = 16.dp)
     ) {
-        // Main content layer
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 24.dp, horizontal = 16.dp)
-        ) {
-                Text(
-                    text = primaryText,
-                    fontSize = 26.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = CalColors.active_text,
-                    textAlign = TextAlign.Center
-                )
-
-            Spacer(modifier = Modifier.height(6.dp))
-
-                Text(
-                    text = secondaryText,
-                    fontSize = 17.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = CalColors.inactive_text,
-                    textAlign = TextAlign.Center
-                )
-
-            Spacer(modifier = Modifier.height(6.dp))
-
-                Text(
-                    text = "Iran time: ${currentTime.value}",
-                    fontSize = 15.sp,
-                    fontFamily = FontFamily.Monospace,
-                    color = CalColors.text,
-                    textAlign = TextAlign.Center
-                )
-        }
+        Divider(
+            color = CalColors.weekend_text,
+            thickness = 1.dp
+        )
+        Spacer(Modifier.height(12.dp))
+        Text(
+            text = primaryText,
+            fontSize = 26.sp,
+            fontWeight = FontWeight.Bold,
+            color = CalColors.active_text,
+            textAlign = TextAlign.Center
+        )
+        Spacer(Modifier.height(6.dp))
+        Text(
+            text = secondaryText,
+            fontSize = 17.sp,
+            fontWeight = FontWeight.Medium,
+            color = CalColors.inactive_text,
+            textAlign = TextAlign.Center
+        )
+        Spacer(Modifier.height(6.dp))
+        Text(
+            text = "Iran time: ${currentTime.value}",
+            fontSize = 15.sp,
+            fontFamily = FontFamily.Monospace,
+            color = CalColors.text,
+            textAlign = TextAlign.Center
+        )
+        Spacer(Modifier.height(12.dp))
+        Divider(
+            color = CalColors.weekend_text,
+            thickness = 1.dp
+        )
     }
 }
 
