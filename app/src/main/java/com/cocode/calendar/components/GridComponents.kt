@@ -1,140 +1,33 @@
-package com.cocode.calendar
+package com.cocode.calendar.components
 
 import CalendarConverter
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import kotlinx.coroutines.currentCoroutineContext
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
+import com.cocode.calendar.CalColors
+import com.cocode.calendar.CalendarViewModel
 import utils.DateTimeUtils
 import utils.Strings
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
-import java.time.format.DateTimeFormatter
 import java.time.temporal.TemporalAdjusters
 import java.time.temporal.WeekFields
 import java.util.*
-
-/**
- * This Composable function represents the header of the calendar application.
- * It displays the current month and year, and buttons to navigate to the next and previous months.
- * The displayed month and year can be in either Gregorian or Persian (Jalali) format, depending on the current calendar mode.
- *
- * @Composable This annotation indicates that this function is a Composable function
- * in Jetpack Compose, a modern toolkit for building native Android UI.
- */
-@Composable
-fun CalendarHeader() {
-    val viewModel: CalendarViewModel = viewModel()
-    val gregorianDate by viewModel.gregorianDate.observeAsState(initial = LocalDate.now())
-    val isJalaliCalendar by viewModel.isJalaliCalendar.observeAsState(initial = false)
-
-    val (primaryText, secondaryText) = remember(gregorianDate, isJalaliCalendar) {
-        val jalaliMonths = CalendarConverter.gregorianToJalaliMonths(gregorianDate)
-        val jalaliDate = CalendarConverter.gregorianToJalali(gregorianDate)
-        val jalaliWeekNumber = CalendarConverter.getJalaliWeekNumber(jalaliDate)
-
-        val jalaliText = "week $jalaliWeekNumber - ${jalaliMonths["left"]?.monthName} - ${jalaliMonths["right"]?.monthName} ${jalaliMonths["right"]?.year}"
-        val gregorianText = "${gregorianDate.format(DateTimeFormatter.ofPattern("MMMM yyyy"))} - week ${DateTimeUtils.getCurrentWeekNumber(gregorianDate)}"
-
-        if (isJalaliCalendar) jalaliText to gregorianText else gregorianText to jalaliText
-    }
-
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp)
-    ) {
-        Text(
-            text = primaryText,
-            style = MaterialTheme.typography.headlineSmall,
-            textAlign = TextAlign.Center,
-            color = CalColors.active_text
-        )
-
-        Spacer(modifier = Modifier.height(4.dp))
-
-        Text(
-            text = secondaryText,
-            style = MaterialTheme.typography.headlineSmall,
-            textAlign = TextAlign.Center,
-            color = CalColors.inactive_text,
-            fontSize = 12.sp
-        )
-    }
-}
-
-/**
- * This Composable function displays the current time in Iran.
- *
- * It first creates a mutable state to hold the current time. This state is remembered across recompositions.
- * Then, it launches a coroutine that continuously updates the current time every second.
- * The current time is retrieved by calling the getCurrentTimeInIran function, which returns the current date and time in Iran.
- * The retrieved time is then formatted to a string of "HH:mm:ss Z" and stored in the mutable state.
- * Finally, it displays the current time in a Text Composable that is centered in a Box Composable.
- *
- * @Composable This annotation indicates that this function is a Composable function in Jetpack Compose, a modern toolkit for building native Android UI.
- */
-@Composable
-fun DisplayTimeInIran() {
-
-    // This composable function displays the current time in Iran.
-    // This state is remembered across recompositions
-    val currentTime = remember {
-        mutableStateOf("")
-    }
-
-    LaunchedEffect(key1 = Unit){
-        while (currentCoroutineContext().isActive){
-            val iranTime = DateTimeUtils.getCurrentTimeInIran()
-            val formatter = DateTimeFormatter.ofPattern("HH:mm:ss")
-            val formattedIranTime = iranTime.format(formatter)
-            currentTime.value = formattedIranTime
-            delay(1000)
-        }
-    }
-    Row(
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(bottom = 10.dp)
-    ) {
-        // put the text in a row and center it
-        Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxWidth()) {
-            Text(
-                text = "Iran time: ${currentTime.value}",
-                style = MaterialTheme.typography.bodyLarge,
-                color = CalColors.text
-            )
-        }
-    }
-
-}
 
 /**
  * Displays a header row containing the days of the week.
@@ -201,6 +94,10 @@ fun DayOfWeekBox(day: String) {
  * Each date in the grid is a Composable function that represents a day in the calendar.
  * The grid is always exactly 6 rows (42 days) for consistent layout.
  *
+ * Features swipe gestures for intuitive month navigation:
+ * - Swipe left to go to next month
+ * - Swipe right to go to previous month
+ *
  * @Composable This annotation indicates that this function is a Composable function in Jetpack Compose, a modern toolkit for building native Android UI.
  */
 @Composable
@@ -220,8 +117,36 @@ fun CalendarGrid() {
     // Calculate the start day to ensure exactly 6 weeks (42 days) are always displayed
     val startDayOfWeek = firstDayOfMonth.with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY))
 
-    // Create a Column Composable for the calendar grid
-    Column {
+        // Swipe threshold for month navigation (minimum pixels to trigger navigation)
+    val swipeThreshold = 100f
+
+    // Track total drag distance for proper swipe detection
+    var totalDragDistance by remember { mutableStateOf(0f) }
+
+    // Create a Column Composable for the calendar grid with swipe gesture support
+    Column(
+        modifier = Modifier.pointerInput(yearMonth) {
+            detectHorizontalDragGestures(
+                onDragStart = {
+                    totalDragDistance = 0f
+                },
+                onDragEnd = {
+                    // Only trigger navigation if the total drag distance exceeds threshold
+                    if (totalDragDistance > swipeThreshold) {
+                        // Swipe right - go to previous month
+                        viewModel.changeMonth(yearMonth.minusMonths(1))
+                    } else if (totalDragDistance < -swipeThreshold) {
+                        // Swipe left - go to next month
+                        viewModel.changeMonth(yearMonth.plusMonths(1))
+                    }
+                    totalDragDistance = 0f
+                }
+            ) { _, dragAmount ->
+                // Accumulate drag distance
+                totalDragDistance += dragAmount
+            }
+        }
+    ) {
         // Always display exactly 6 weeks (6 rows)
         repeat(6) { weekIndex ->
             // Calculate the start date for each week directly (no mutable state)
@@ -368,14 +293,39 @@ fun DayBox(
         currentDate.dayOfMonth.toString()
     }
 
-    // Create a Box Composable for the date
+    // Check if this is the current day for 3D border effect
+    val isCurrentDay = if (isJalaliCalendar) {
+        currentDate.isEqual(DateTimeUtils.adjustDateForDeviceTimeZone())
+    } else {
+        currentDate.isEqual(LocalDate.now())
+    }
+
+    // Create a Box Composable for the date with 3D border effect for current day
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
             .width(55.dp)
             .height(60.dp)
             .background(backgroundColor)
-            .border(width = 0.dp, color = CalColors.day_border)
+            .then(
+                if (isCurrentDay) {
+                    // 3D border effect for current day
+                    Modifier
+                        .border(
+                            width = 2.dp,
+                            color = Color(0xFF4CAF50), // Main green border
+                            shape = RoundedCornerShape(4.dp)
+                        )
+                        .padding(1.dp)
+                        .border(
+                            width = 1.dp,
+                            color = Color(0xFF81C784), // Lighter green inner border for 3D effect
+                            shape = RoundedCornerShape(3.dp)
+                        )
+                } else {
+                    Modifier.border(width = 0.dp, color = CalColors.day_border)
+                }
+            )
             .clickable(enabled = isInCurrentMonth) {} // Add a click listener to the box
     ) {
         // Create a Text Composable to display the date number
@@ -383,140 +333,8 @@ fun DayBox(
             text = text,
             style = MaterialTheme.typography.bodyMedium,
             color = fontColor,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
+            textDecoration = if (isCurrentDay) androidx.compose.ui.text.style.TextDecoration.Underline else null
         )
-    }
-}
-
-/**
- * Displays the control buttons for the calendar application.
- *
- * This composable function creates a row containing three buttons:
- * - A "Today" button to reset the calendar to the current date
- * - A toggle button for the date converter
- * - A toggle button to switch between Gregorian and Jalali calendars
- *
- * The buttons are arranged with space between them and vertically centered.
- *
- * @Composable This function is a Jetpack Compose composable.
- */
-@Composable
-fun CalControls() {
-    Row(
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .fillMaxWidth()
-            .absolutePadding(left = 2.dp, top = 1.dp, right = 2.dp, bottom = 0.dp)
-    ) {
-        TodayButton()
-        DateConverterToggleButton()
-        CalendarToggleButton()
-    }
-}
-
-/**
- * This Composable function represents a button that updates the current date to today's date.
- *
- * @Composable This annotation indicates that this function is a Composable function in Jetpack Compose,
- * a modern toolkit for building native Android UI.
- */
-@Composable
-fun TodayButton() {
-    // Get an instance of the CalendarViewModel
-    val viewModel: CalendarViewModel = viewModel()
-
-    // Center the button in the row
-    Box {
-        // Create a Button Composable
-        Button(
-            // Set the click event handler for the button
-            // When the button is clicked, it calls the updateGregorianDate function of the CalendarViewModel with today's date
-            onClick = { viewModel.updateGregorianDate(LocalDate.now()) },
-            colors = ButtonDefaults.buttonColors(containerColor = CalColors.button_background),
-            shape = RoundedCornerShape(0.dp, 0.dp, 0.dp, 10.dp),
-            modifier = Modifier
-                .width(130.dp)
-                .height(52.dp)
-        ) {
-            // Set the display text for the button
-            Text(
-                text = Strings.Calendar.TODAY,
-                color = CalColors.text,
-                fontWeight = FontWeight.Bold
-            )
-        }
-    }
-
-}
-
-/**
- * A composable function that creates a toggle button for the date converter.
- *
- * This button allows users to show or hide the date converter interface. The button's appearance
- * changes based on whether the converter is currently visible or not.
- *
- * The function doesn't explicitly return a value, but it creates and displays a Button composable
- * as part of the Jetpack Compose UI.
- */
-@Composable
-fun DateConverterToggleButton() {
-    val viewModel: CalendarViewModel = viewModel()
-    val showConverter by viewModel.showConverter.collectAsState()
-    Box {
-        Button(
-            onClick = {
-                viewModel.toggleConverter()
-            },
-            colors = ButtonDefaults.buttonColors(
-                containerColor = if (showConverter)
-                    CalColors.active_button_background
-                else CalColors.button_background
-            ),
-            shape = RoundedCornerShape(0.dp, 0.dp, 0.dp, 0.dp),
-            modifier = Modifier
-                .width(130.dp)
-                .height(52.dp)
-        ) {
-            Text(
-                text = "Converter",
-                color = CalColors.text,
-                fontWeight = FontWeight.Bold
-            )
-        }
-    }
-}
-
-/**
- * This Composable function represents a button that toggles
- * the calendar view between Gregorian and Persian (Jalali) modes.
- *
- * @Composable This annotation indicates that this function is a
- * Composable function in Jetpack Compose, a modern toolkit for building native Android UI.
- */
-@Composable
-fun CalendarToggleButton() {
-
-    val viewModel: CalendarViewModel = viewModel()
-    val isJalaliCalendar by viewModel.isJalaliCalendar.observeAsState(initial = false)
-
-    // This composable function is a button to toggle between Gregorian and Persian (Jalali) calendars.
-    Box {
-        Button(
-            onClick = {viewModel.toggleIsJalaliCalendar()},
-            colors = ButtonDefaults.buttonColors(containerColor = CalColors.button_background),
-            shape = RoundedCornerShape(0.dp, 0.dp, 10.dp, 0.dp),
-            modifier = Modifier
-                .width(192.dp)
-                .height(52.dp)
-
-        ) {
-            Text(
-                text = if (isJalaliCalendar) Strings.Calendar.GREGORIAN else Strings.Calendar.JALALI,
-                color = CalColors.text,
-                fontWeight = FontWeight.Bold
-
-            )
-        }
     }
 }

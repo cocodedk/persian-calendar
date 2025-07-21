@@ -1,4 +1,5 @@
 import java.time.LocalDate
+import utils.Strings
 
 /**
  * This class provides methods to convert Gregorian dates to Jalali (Persian) dates and vice versa.
@@ -6,11 +7,6 @@ import java.time.LocalDate
 class CalendarConverter {
     companion object {
         private val gregorianMonthDays = arrayOf(0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334)
-        private val persianMonthNames = arrayOf(
-            "فروردین", "اردیبهشت", "خرداد", "تیر",
-            "مرداد", "شهریور", "مهر", "آبان",
-            "آذر", "دی", "بهمن", "اسفند"
-        )
 
         private val gregorianDaysInMonth = arrayOf(31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)
         private val jalaliDaysInMonth = arrayOf(31, 31, 31, 31, 31, 31, 30, 30, 30, 30, 30, 29)
@@ -49,33 +45,33 @@ class CalendarConverter {
             val gregorianYear = date.year
             val gregorianMonth = date.monthValue
             val gregorianDay = date.dayOfMonth
-            
+
             val (jalaliYear, adjustedGregorianYear) = if (gregorianYear > 1600) {
                 979 to gregorianYear - 1600
             } else {
                 0 to gregorianYear - 621
             }
-        
+
             val adjustedGregorianYear2 = adjustedGregorianYear + if (gregorianMonth > 2) 1 else 0
-            var days = (365 * adjustedGregorianYear) + 
-                       ((adjustedGregorianYear2 + 3) / 4) - 
-                       ((adjustedGregorianYear2 + 99) / 100) + 
-                       ((adjustedGregorianYear2 + 399) / 400) - 
+            var days = (365 * adjustedGregorianYear) +
+                       ((adjustedGregorianYear2 + 3) / 4) -
+                       ((adjustedGregorianYear2 + 99) / 100) +
+                       ((adjustedGregorianYear2 + 399) / 400) -
                        80 + gregorianDay + gregorianMonthDays[gregorianMonth - 1]
-            
+
             var finalJalaliYear = jalaliYear + 33 * (days / 12053)
             days %= 12053
             finalJalaliYear += 4 * (days / 1461)
             days %= 1461
-        
+
             if (days > 365) {
                 finalJalaliYear += (days - 1) / 365
                 days = (days - 1) % 365
             }
-        
+
             val monthValue = if (days < 186) 1 + days / 31 else 7 + (days - 186) / 30
             val dayOfMonth = 1 + if (days < 186) days % 31 else (days - 186) % 30
-        
+
             return JalaliDate(finalJalaliYear, monthValue, dayOfMonth)
         }
 
@@ -144,9 +140,9 @@ class CalendarConverter {
          */
         private fun toJalaliMonth(gregorianDate: LocalDate): JalaliMonth {
             val jalaliDate = gregorianToJalali(gregorianDate)
-            // 'month' is the Jalali month number. Use it to get the month name from the array.
+            // 'month' is the Jalali month number. Use it to get the month name from the centralized Strings object.
             // Adjust for zero-based index
-            val monthName = persianMonthNames[jalaliDate.monthValue - 1]
+            val monthName = Strings.Months.JALALI_PERSIAN[jalaliDate.monthValue - 1]
 
             return JalaliMonth(monthName, jalaliDate.monthValue, jalaliDate.year)
         }
