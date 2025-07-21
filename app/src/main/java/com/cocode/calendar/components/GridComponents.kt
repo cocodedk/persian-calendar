@@ -337,7 +337,11 @@ fun DayBox(
                 }
             )
             .clickable(enabled = isInCurrentMonth) {
-                viewModel.showEventCreationDialog(currentDate)
+                if (events.isNotEmpty()) {
+                    viewModel.showEventListDialog(currentDate)
+                } else {
+                    viewModel.showEventCreationDialog(currentDate)
+                }
             } // Add a click listener to the box
     ) {
         Column(

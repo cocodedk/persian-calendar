@@ -41,6 +41,13 @@ class CalendarViewModel(
     private val _selectedDate = kotlinx.coroutines.flow.MutableStateFlow<LocalDate?>(null)
     val selectedDate: StateFlow<LocalDate?> = _selectedDate.stateIn(viewModelScope, SharingStarted.Lazily, null)
 
+    // Event list dialog state
+    private val _showEventListDialog = kotlinx.coroutines.flow.MutableStateFlow(false)
+    val showEventListDialog: StateFlow<Boolean> = _showEventListDialog.stateIn(viewModelScope, SharingStarted.Lazily, false)
+
+    private val _eventListSelectedDate = kotlinx.coroutines.flow.MutableStateFlow<LocalDate?>(null)
+    val eventListSelectedDate: StateFlow<LocalDate?> = _eventListSelectedDate.stateIn(viewModelScope, SharingStarted.Lazily, null)
+
     // Expose events as a StateFlow from the DAO
     val events = eventDao.getAllEvents().stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
@@ -70,6 +77,26 @@ class CalendarViewModel(
     fun hideEventCreationDialog() {
         _showEventCreationDialog.value = false
         _selectedDate.value = null
+    }
+
+    fun showEventListDialog(date: LocalDate) {
+        _eventListSelectedDate.value = date
+        _showEventListDialog.value = true
+    }
+
+    fun hideEventListDialog() {
+        _showEventListDialog.value = false
+        _eventListSelectedDate.value = null
+    }
+
+    fun showEventCreationFromEventList(date: LocalDate) {
+        _showEventListDialog.value = false
+        _eventListSelectedDate.value = null
+        showEventCreationDialog(date)
+    }
+
+    fun getEventsForDateOnly(date: LocalDate): StateFlow<List<Event>> {
+        return eventDao.getEventsForDate(date.toString()).stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
     }
 
     fun changeMonth(newYearMonth: YearMonth) {
