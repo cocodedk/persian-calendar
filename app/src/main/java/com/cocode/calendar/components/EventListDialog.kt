@@ -1,6 +1,7 @@
 package com.cocode.calendar.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -8,6 +9,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -38,7 +40,12 @@ fun EventListDialog() {
                 modifier = Modifier
                     .fillMaxWidth()
                     .fillMaxHeight(0.7f)
-                    .padding(16.dp),
+                    .padding(16.dp)
+                    .border(
+                        width = 2.dp,
+                        color = CalColors.background,
+                        shape = RoundedCornerShape(16.dp)
+                    ),
                 shape = RoundedCornerShape(16.dp),
                 colors = CardDefaults.cardColors(containerColor = Color.White)
             ) {
@@ -117,6 +124,7 @@ fun EventListDialog() {
                             items(eventsForDate) { event ->
                                 EventItemCard(
                                     event = event,
+                                    onEditEvent = { viewModel.showEventEditDialog(it) },
                                     onDeleteEvent = { viewModel.showDeleteConfirmationDialog(it) }
                                 )
                             }
@@ -136,7 +144,12 @@ fun EventListDialog() {
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
+                    .padding(16.dp)
+                    .border(
+                        width = 2.dp,
+                        color = CalColors.background,
+                        shape = RoundedCornerShape(16.dp)
+                    ),
                 shape = RoundedCornerShape(16.dp),
                 colors = CardDefaults.cardColors(containerColor = Color.White)
             ) {
@@ -203,6 +216,7 @@ fun EventListDialog() {
 @Composable
 fun EventItemCard(
     event: Event,
+    onEditEvent: (Event) -> Unit,
     onDeleteEvent: (Event) -> Unit
 ) {
     Card(
@@ -249,19 +263,50 @@ fun EventItemCard(
                         fontWeight = FontWeight.Medium
                     )
                 }
+
+                // Show repetition info
+                if (event.isRepeating && event.repetitionType == "YEARLY") {
+                    Text(
+                        text = if (event.repetitionEndDate != null) {
+                            "Repeats yearly until ${LocalDate.parse(event.repetitionEndDate!!).year}"
+                        } else {
+                            "Repeats yearly"
+                        },
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color(0xFF2196F3),
+                        fontWeight = FontWeight.Medium
+                    )
+                }
             }
 
-            // Delete button
-            IconButton(
-                onClick = { onDeleteEvent(event) },
-                modifier = Modifier.size(32.dp)
+            // Edit and Delete buttons
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(
-                    Icons.Default.Delete,
-                    contentDescription = "Delete Event",
-                    tint = Color.Red.copy(alpha = 0.7f),
-                    modifier = Modifier.size(20.dp)
-                )
+                IconButton(
+                    onClick = { onEditEvent(event) },
+                    modifier = Modifier.size(32.dp)
+                ) {
+                    Icon(
+                        Icons.Default.Edit,
+                        contentDescription = "Edit Event",
+                        tint = CalColors.button_background,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+
+                IconButton(
+                    onClick = { onDeleteEvent(event) },
+                    modifier = Modifier.size(32.dp)
+                ) {
+                    Icon(
+                        Icons.Default.Delete,
+                        contentDescription = "Delete Event",
+                        tint = Color.Red.copy(alpha = 0.7f),
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
             }
         }
     }

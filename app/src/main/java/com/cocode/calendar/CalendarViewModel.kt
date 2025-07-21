@@ -55,6 +55,13 @@ class CalendarViewModel(
     private val _eventToDelete = kotlinx.coroutines.flow.MutableStateFlow<Event?>(null)
     val eventToDelete: StateFlow<Event?> = _eventToDelete.stateIn(viewModelScope, SharingStarted.Lazily, null)
 
+    // Event editing dialog state
+    private val _showEventEditDialog = kotlinx.coroutines.flow.MutableStateFlow(false)
+    val showEventEditDialog: StateFlow<Boolean> = _showEventEditDialog.stateIn(viewModelScope, SharingStarted.Lazily, false)
+
+    private val _eventToEdit = kotlinx.coroutines.flow.MutableStateFlow<Event?>(null)
+    val eventToEdit: StateFlow<Event?> = _eventToEdit.stateIn(viewModelScope, SharingStarted.Lazily, null)
+
     // Expose events as a StateFlow from the DAO
     val events = eventDao.getAllEvents().stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
@@ -102,6 +109,16 @@ class CalendarViewModel(
         showEventCreationDialog(date)
     }
 
+    fun showEventEditDialog(event: Event) {
+        _eventToEdit.value = event
+        _showEventEditDialog.value = true
+    }
+
+    fun hideEventEditDialog() {
+        _showEventEditDialog.value = false
+        _eventToEdit.value = null
+    }
+
     fun showDeleteConfirmationDialog(event: Event) {
         _eventToDelete.value = event
         _showDeleteConfirmationDialog.value = true
@@ -145,7 +162,10 @@ class CalendarViewModel(
         startDate: LocalDate,
         endDate: LocalDate = startDate,
         color: String = "BLUE",
-        isAllDay: Boolean = true
+        isAllDay: Boolean = true,
+        isRepeating: Boolean = false,
+        repetitionType: String = "NONE",
+        repetitionEndDate: LocalDate? = null
     ) {
         val event = Event(
             id = UUID.randomUUID().toString(),
@@ -154,10 +174,43 @@ class CalendarViewModel(
             startDate = startDate.toString(),
             endDate = endDate.toString(),
             color = color,
-            isAllDay = isAllDay
+            isAllDay = isAllDay,
+            isRepeating = isRepeating,
+            repetitionType = repetitionType,
+            originalDate = if (isRepeating) startDate.toString() else null,
+            repetitionEndDate = repetitionEndDate?.toString()
         )
         viewModelScope.launch {
             eventDao.insertEvent(event)
+        }
+    }
+
+    fun updateEvent(
+        event: Event,
+        title: String,
+        description: String? = null,
+        startDate: LocalDate,
+        endDate: LocalDate = startDate,
+        color: String = "BLUE",
+        isAllDay: Boolean = true,
+        isRepeating: Boolean = false,
+        repetitionType: String = "NONE",
+        repetitionEndDate: LocalDate? = null
+    ) {
+        val updatedEvent = event.copy(
+            title = title,
+            description = description,
+            startDate = startDate.toString(),
+            endDate = endDate.toString(),
+            color = color,
+            isAllDay = isAllDay,
+            isRepeating = isRepeating,
+            repetitionType = repetitionType,
+            originalDate = if (isRepeating && event.originalDate == null) startDate.toString() else event.originalDate,
+            repetitionEndDate = repetitionEndDate?.toString()
+        )
+        viewModelScope.launch {
+            eventDao.updateEvent(updatedEvent)
         }
     }
 
