@@ -48,6 +48,13 @@ class CalendarViewModel(
     private val _eventListSelectedDate = kotlinx.coroutines.flow.MutableStateFlow<LocalDate?>(null)
     val eventListSelectedDate: StateFlow<LocalDate?> = _eventListSelectedDate.stateIn(viewModelScope, SharingStarted.Lazily, null)
 
+    // Delete confirmation dialog state
+    private val _showDeleteConfirmationDialog = kotlinx.coroutines.flow.MutableStateFlow(false)
+    val showDeleteConfirmationDialog: StateFlow<Boolean> = _showDeleteConfirmationDialog.stateIn(viewModelScope, SharingStarted.Lazily, false)
+
+    private val _eventToDelete = kotlinx.coroutines.flow.MutableStateFlow<Event?>(null)
+    val eventToDelete: StateFlow<Event?> = _eventToDelete.stateIn(viewModelScope, SharingStarted.Lazily, null)
+
     // Expose events as a StateFlow from the DAO
     val events = eventDao.getAllEvents().stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
@@ -95,6 +102,25 @@ class CalendarViewModel(
         showEventCreationDialog(date)
     }
 
+    fun showDeleteConfirmationDialog(event: Event) {
+        _eventToDelete.value = event
+        _showDeleteConfirmationDialog.value = true
+    }
+
+    fun hideDeleteConfirmationDialog() {
+        _showDeleteConfirmationDialog.value = false
+        _eventToDelete.value = null
+    }
+
+    fun confirmDeleteEvent() {
+        _eventToDelete.value?.let { event ->
+            viewModelScope.launch {
+                eventDao.deleteEvent(event)
+            }
+        }
+        hideDeleteConfirmationDialog()
+    }
+
     fun getEventsForDateOnly(date: LocalDate): StateFlow<List<Event>> {
         return eventDao.getEventsForDate(date.toString()).stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
     }
@@ -135,11 +161,6 @@ class CalendarViewModel(
         }
     }
 
-    fun removeEvent(event: Event) {
-        viewModelScope.launch {
-            eventDao.deleteEvent(event)
-        }
-    }
 
     fun getEventsForDate(date: LocalDate): StateFlow<List<Event>> {
         return eventDao.getEventsForDate(date.toString()).stateIn(viewModelScope, SharingStarted.Lazily, emptyList())

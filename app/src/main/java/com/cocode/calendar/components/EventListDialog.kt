@@ -117,9 +117,81 @@ fun EventListDialog() {
                             items(eventsForDate) { event ->
                                 EventItemCard(
                                     event = event,
-                                    onDeleteEvent = { viewModel.removeEvent(it) }
+                                    onDeleteEvent = { viewModel.showDeleteConfirmationDialog(it) }
                                 )
                             }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Delete confirmation dialog
+    val showDeleteDialog by viewModel.showDeleteConfirmationDialog.collectAsState()
+    val eventToDelete by viewModel.eventToDelete.collectAsState()
+
+    if (showDeleteDialog && eventToDelete != null) {
+        Dialog(onDismissRequest = { viewModel.hideDeleteConfirmationDialog() }) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White)
+            ) {
+                Column(
+                    modifier = Modifier.padding(20.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    // Header
+                    Text(
+                        text = "Delete Event",
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = CalColors.active_text
+                    )
+
+                    // Confirmation message
+                    Text(
+                        text = "Are you sure you want to delete \"${eventToDelete!!.title}\"?",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = CalColors.inactive_text
+                    )
+
+                    Text(
+                        text = "This action cannot be undone.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color.Red.copy(alpha = 0.7f)
+                    )
+
+                    // Buttons
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        // Cancel button
+                        Button(
+                            onClick = { viewModel.hideDeleteConfirmationDialog() },
+                            modifier = Modifier.weight(1f),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color.Gray
+                            ),
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Text("Cancel", color = Color.White)
+                        }
+
+                        // Delete button
+                        Button(
+                            onClick = { viewModel.confirmDeleteEvent() },
+                            modifier = Modifier.weight(1f),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color.Red
+                            ),
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Text("Delete", color = Color.White)
                         }
                     }
                 }
