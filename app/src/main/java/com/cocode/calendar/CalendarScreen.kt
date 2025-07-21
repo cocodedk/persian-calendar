@@ -24,6 +24,12 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.cocode.calendar.components.HeaderSection
+import com.cocode.calendar.components.WeekDaysHeader
+import com.cocode.calendar.components.CalendarGrid
+import com.cocode.calendar.components.CalControls
+import com.cocode.calendar.components.CalendarNavigation
+import com.cocode.calendar.converter.CalendarConverterBox
 import java.time.LocalDate
 import java.time.YearMonth
 
@@ -49,10 +55,6 @@ fun CalendarApp() {
 @Composable
 fun CalendarScreen() {
 
-    // Get an instance of the CalendarViewModel
-    val viewModel: CalendarViewModel = viewModel()
-    val gregorianDate by viewModel.gregorianDate.observeAsState(initial = LocalDate.now())
-
     // Use Box to allow absolute positioning
     Box(modifier = Modifier.fillMaxSize()) {
         // Main content in a Column
@@ -61,12 +63,8 @@ fun CalendarScreen() {
                 .fillMaxSize()
                 .padding(bottom = 80.dp) // Leave space for footer
         ) {
-            // The header of the calendar view, which includes the current month and year,
-            // and buttons to navigate to the next and previous months.
-            CalendarHeader()
-
-            // A Composable function that displays the current time in Iran.
-            DisplayTimeInIran()
+            // The header section with gradient background, calendar info, and Iran time
+            HeaderSection()
 
             // The header of the calendar view that displays the days of the week.
             WeekDaysHeader()
@@ -77,20 +75,12 @@ fun CalendarScreen() {
             // The controls for the calendar view, including a button to navigate to today's date
             CalControls()
 
-            CalendarConverterBox()
-
-            CrossClickArea(
-                onClickRight = { viewModel.changeMonth(YearMonth.from(gregorianDate).plusMonths(1)) },
-                onClickLeft = { viewModel.changeMonth(YearMonth.from(gregorianDate).minusMonths(1)) },
-                onClickUp = { viewModel.changeYear(gregorianDate.year + 1) },
-                onClickDown = { viewModel.changeYear(gregorianDate.year - 1) },
-                modifier = Modifier
-                    .height(150.dp)
-                    .fillMaxWidth()
-            )
-
-
+            // Month and Year selection navigation
+            CalendarNavigation()
         }
+
+        // Date converter overlay - positioned on top of everything
+        CalendarConverterBox()
 
         // Footer positioned at the bottom
         FooterInfo(
