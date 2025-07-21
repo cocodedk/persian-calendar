@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.cocode.calendar.CalColors
 import com.cocode.calendar.CalendarViewModel
+import com.cocode.calendar.Event
 import utils.DateTimeUtils
 import utils.Strings
 import java.time.DayOfWeek
@@ -106,6 +107,8 @@ fun CalendarGrid() {
     val viewModel: CalendarViewModel = viewModel()
     // Observe the gregorianDate LiveData from the ViewModel
     val gregorianDate by viewModel.gregorianDate.observeAsState(initial = LocalDate.now())
+    // Observe events from the ViewModel
+    val events by viewModel.events.collectAsState()
 
     // Get the YearMonth from the observed gregorianDate
     val yearMonth = YearMonth.from(gregorianDate)
@@ -156,7 +159,8 @@ fun CalendarGrid() {
             WeekRow(
                 startDate = weekStartDate,
                 daysInWeek = daysInWeek,
-                yearMonth = yearMonth
+                yearMonth = yearMonth,
+                allEvents = events
             )
         }
     }
@@ -177,7 +181,8 @@ fun CalendarGrid() {
 fun WeekRow(
     startDate: LocalDate,
     daysInWeek: Int,
-    yearMonth: YearMonth
+    yearMonth: YearMonth,
+    allEvents: List<Event> = emptyList()
 ) {
     // Create a Row Composable for the week
     Row(
@@ -196,11 +201,15 @@ fun WeekRow(
             val currentDate = startDate.plusDays((day - 1).toLong())
             val jalaliDate = CalendarConverter.gregorianToJalali(currentDate)
 
+            // Filter events for this specific date
+            val dayEvents = allEvents.filter { event -> event.occursOn(currentDate) }
+
             // Create a DayBox Composable for each day
             DayBox(
                 currentDate = currentDate,
                 jalaliDate = jalaliDate,
-                isInCurrentMonth = currentDate.month == yearMonth.month
+                isInCurrentMonth = currentDate.month == yearMonth.month,
+                events = dayEvents
             )
         }
     }
@@ -222,6 +231,7 @@ fun DayBox(
     currentDate: LocalDate,
     isInCurrentMonth: Boolean,
     jalaliDate: CalendarConverter.Companion.JalaliDate,
+    events: List<Event> = emptyList()
 ) {
     // Get an instance of the CalendarViewModel
     val viewModel: CalendarViewModel = viewModel()
@@ -300,7 +310,7 @@ fun DayBox(
         currentDate.isEqual(LocalDate.now())
     }
 
-    // Create a Box Composable for the date with 3D border effect for current day
+        // Create a Box Composable for the date with 3D border effect for current day
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
@@ -326,15 +336,34 @@ fun DayBox(
                     Modifier.border(width = 0.dp, color = CalColors.day_border)
                 }
             )
-            .clickable(enabled = isInCurrentMonth) {} // Add a click listener to the box
+            .clickable(enabled = isInCurrentMonth) {
+                viewModel.showEventCreationDialog(currentDate)
+            } // Add a click listener to the box
     ) {
-        // Create a Text Composable to display the date number
-        Text(
-            text = text,
-            style = MaterialTheme.typography.bodyMedium,
-            color = fontColor,
-            fontWeight = FontWeight.Bold,
-            textDecoration = if (isCurrentDay) androidx.compose.ui.text.style.TextDecoration.Underline else null
-        )
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            // Create a Text Composable to display the date number
+            Text(
+                text = text,
+                style = MaterialTheme.typography.bodyMedium,
+                color = fontColor,
+                fontWeight = FontWeight.Bold,
+                textDecoration = if (isCurrentDay) androidx.compose.ui.text.style.TextDecoration.Underline else null
+            )
+
+            // Show event indicator if there are events on this date
+            if (events.isNotEmpty()) {
+                Box(
+                    modifier = Modifier
+                        .size(6.dp)
+                        .background(
+                            color = Color(0xFF2196F3), // Blue dot for events
+                            shape = androidx.compose.foundation.shape.CircleShape
+                        )
+                )
+            }
+        }
     }
 }
