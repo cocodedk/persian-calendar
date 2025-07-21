@@ -30,6 +30,7 @@ import com.cocode.calendar.components.CalendarGrid
 import com.cocode.calendar.components.CalControls
 import com.cocode.calendar.components.CalendarNavigation
 import com.cocode.calendar.components.EventCreationDialog
+import com.cocode.calendar.components.EventListDialog
 import com.cocode.calendar.converter.CalendarConverterBox
 import java.time.LocalDate
 import java.time.YearMonth
@@ -101,6 +102,9 @@ fun CalendarScreen() {
 
         // Event creation dialog
         EventCreationDialog()
+
+        // Event list dialog
+        EventListDialog()
 
         // Footer positioned at the bottom
         FooterInfo(
