@@ -46,6 +46,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            setProperty("archivesBaseName", "Calendar-v${defaultConfig.versionName}")
         }
     }
     buildFeatures {
@@ -59,6 +60,8 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+
+    
 }
 
 dependencies {
