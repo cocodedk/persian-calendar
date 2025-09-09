@@ -29,9 +29,15 @@ import com.cocode.calendar.components.WeekDaysHeader
 import com.cocode.calendar.components.CalendarGrid
 import com.cocode.calendar.components.CalControls
 import com.cocode.calendar.components.CalendarNavigation
+import com.cocode.calendar.components.EventCreationDialog
+import com.cocode.calendar.components.EventListDialog
 import com.cocode.calendar.converter.CalendarConverterBox
 import java.time.LocalDate
 import java.time.YearMonth
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.runtime.remember
 
 /**
  * This Composable function represents the main application for the calendar.
@@ -40,9 +46,21 @@ import java.time.YearMonth
  */
 @Composable
 fun CalendarApp() {
-    val viewModel: CalendarViewModel = viewModel()
+    val context = LocalContext.current
+    val eventDao = remember { AppDatabase.getDatabase(context).eventDao() }
+    val viewModel: CalendarViewModel = androidx.lifecycle.viewmodel.compose.viewModel(
+        factory = object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                if (modelClass.isAssignableFrom(CalendarViewModel::class.java)) {
+                    @Suppress("UNCHECKED_CAST")
+                    return CalendarViewModel(eventDao) as T
+                }
+                throw IllegalArgumentException("Unknown ViewModel class")
+            }
+        }
+    )
     viewModel.isJalaliCalendar.observeAsState(initial = false)
-    viewModel.gregorianDate.observeAsState(initial = LocalDate.now())
+    viewModel.gregorianDate.observeAsState(initial = java.time.LocalDate.now())
 
     CalendarScreen()
 }
@@ -81,6 +99,12 @@ fun CalendarScreen() {
 
         // Date converter overlay - positioned on top of everything
         CalendarConverterBox()
+
+        // Event creation dialog
+        EventCreationDialog()
+
+        // Event list dialog
+        EventListDialog()
 
         // Footer positioned at the bottom
         FooterInfo(
