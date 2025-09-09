@@ -98,10 +98,52 @@ The app uses a custom green-based color scheme:
 
 ## Installation
 
+### Installing the Release Build
+
+To install the release version of the app on an Android device from the generated `app-release.aab` file, you will need to use `bundletool`.
+
+**Prerequisites**
+
+1.  **Android SDK:** Make sure you have the Android SDK installed and the `adb` command-line tool is in your system's PATH.
+2.  **bundletool:** Download `bundletool` from the official [Android Developer website](https://developer.android.com/studio/command-line/bundletool).
+
+**Steps**
+
+1.  **Generate a universal APK from the AAB:**
+
+    Use `bundletool` to generate a set of APKs from the `.aab` file. You will need the release keystore to sign the APKs. The keystore for this project is located at `keystore/1-release-key.jks`.
+
+    ```sh
+    java -jar /path/to/bundletool.jar build-apks \
+      --bundle=release/app-release.aab \
+      --output=release/app.apks \
+      --mode=universal \
+      --ks=keystore/1-release-key.jks \
+      --ks-pass=pass:your_keystore_password \
+      --ks-key-alias=your_key_alias \
+      --key-pass=pass:your_key_password
+    ```
+
+    **Note:** Replace `/path/to/bundletool.jar` with the actual path to your `bundletool.jar` file. You will also need to provide the correct passwords for the keystore.
+
+2.  **Install the APKs on your device:**
+
+    With a device connected via `adb`, use `bundletool` to install the generated `.apks` file.
+
+    ```sh
+    java -jar /path/to/bundletool.jar install-apks \
+      --apks=release/app.apks
+    ```
+
+    The application will then be installed on your device.
+
+### For Developers
+
 1. Clone the repository
 2. Open the project in Android Studio
 3. Sync Gradle files
 4. Build and run the application
+
 
 ## Usage
 
