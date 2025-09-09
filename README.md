@@ -197,4 +197,4 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ---
 
-**Note**: This calendar app is designed to be lightweight, fast, and user-friendly while providing comprehensive calendar functionality for both international and Persian users.
+**Note**: This calendar app is designed to be lightweight, fast, and user-friendly while providing comprehensive calendar functionality for both international and Persian users. It does not read any data from the mobile device except its time, and it does not transmit any data to anyone.
