@@ -21,6 +21,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.cocode.calendar.CalColors
 import com.cocode.calendar.CalendarViewModel
 import com.cocode.calendar.Event
+import com.cocode.calendar.models.JalaliDate
 import utils.DateTimeUtils
 import utils.Strings
 import java.time.DayOfWeek
@@ -230,7 +231,7 @@ fun WeekRow(
 fun DayBox(
     currentDate: LocalDate,
     isInCurrentMonth: Boolean,
-    jalaliDate: CalendarConverter.Companion.JalaliDate,
+    jalaliDate: JalaliDate,
     events: List<Event> = emptyList()
 ) {
     // Get an instance of the CalendarViewModel
