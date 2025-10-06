@@ -13,6 +13,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.cocode.calendar.CalendarViewModel
+import com.cocode.calendar.models.JalaliDate
 import java.time.LocalDate
 import java.time.Period
 import java.time.format.DateTimeFormatter
@@ -24,7 +25,7 @@ import java.time.format.DateTimeFormatter
  * or shows an error message if the conversion was unsuccessful (only when input values are provided).
  *
  * @param convertedDate The result of the date conversion, which can be either a [LocalDate]
- *                      for Gregorian dates or a [CalendarConverter.Companion.JalaliDate] for
+ *                      for Gregorian dates or a [JalaliDate] for
  *                      Jalali dates. If null, an error message will be displayed only if input is provided.
  * @param year The year input value
  * @param month The month input value
@@ -62,7 +63,7 @@ fun DisplayConvertedDate(convertedDate: Any?, year: String, month: String, day: 
                 convertedDate?.let {
                     val dateString = when (it) {
                         is LocalDate -> it.format(DateTimeFormatter.ISO_LOCAL_DATE)
-                        is CalendarConverter.Companion.JalaliDate -> "${it.year}/${it.monthValue}/${it.dayOfMonth}"
+                        is JalaliDate -> "${it.year}/${it.monthValue}/${it.dayOfMonth}"
                         else -> return@let
                     }
                     Column(
