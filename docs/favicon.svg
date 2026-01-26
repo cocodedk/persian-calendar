@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" role="img" aria-label="Calendar">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#019a64"/>
+      <stop offset="1" stop-color="#025842"/>
+    </linearGradient>
+  </defs>
+  <rect x="6" y="6" width="52" height="52" rx="14" fill="url(#g)"/>
+  <rect x="16" y="16" width="32" height="8" rx="4" fill="#ffffff" opacity="0.85"/>
+  <path d="M42 32c-2.4-4-7.1-6.3-12.2-5.2-5.3 1.2-9 6.1-8.7 11.6.3 5.6 4.7 10.1 10.3 10.6 4.3.4 8.3-1.4 10.6-4.7l-4.1-2.3c-1.3 1.8-3.6 2.8-5.9 2.5-2.8-.3-5-2.7-5.1-5.5-.2-2.9 1.8-5.5 4.6-6.1 2.2-.5 4.2.4 5.3 2.2L42 32z" fill="#ffffff"/>
+</svg>
