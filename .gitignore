@@ -10,3 +10,4 @@
 local.properties
 /release
 keystore/*.jks
+keystore/1-release-key.jks
