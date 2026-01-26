@@ -111,7 +111,13 @@ To install the release version of the app on an Android device from the generate
 
 1.  **Generate a universal APK from the AAB:**
 
-    Use `bundletool` to generate a set of APKs from the `.aab` file. You will need the release keystore to sign the APKs. The keystore for this project is located at `keystore/1-release-key.jks`.
+    Use `bundletool` to generate a set of APKs from the `.aab` file. You will need the release keystore to sign the APKs. Create it with:
+
+    ```sh
+    ./keystore/create-release-keystore.sh
+    ```
+
+    The script defaults to `keystore/1-release-key.jks` and will prompt for passwords.
 
     ```sh
     java -jar /path/to/bundletool.jar build-apks \
@@ -209,6 +215,12 @@ For a signed APK, add these repository secrets:
 - `ANDROID_KEYSTORE_PASSWORD`
 - `ANDROID_KEY_ALIAS`
 - `ANDROID_KEY_PASSWORD`
+
+Generate the base64 value from your keystore:
+
+```sh
+base64 -w 0 keystore/1-release-key.jks
+```
 
 If the secrets are not set, the workflow produces an unsigned release APK.
 
