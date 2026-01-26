@@ -52,7 +52,7 @@ fun CalendarGrid() {
     val swipeThreshold = 100f
 
     // Track total drag distance for proper swipe detection
-    var totalDragDistance by remember { mutableStateOf(0f) }
+    var totalDragDistance by remember { mutableFloatStateOf(0f) }
 
     // Create a Column Composable for the calendar grid with swipe gesture support
     Column(

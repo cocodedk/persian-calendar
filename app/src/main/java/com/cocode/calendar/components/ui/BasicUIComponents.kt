@@ -61,12 +61,12 @@ fun SpacerCell(
 @Composable
 fun CenteredText(
     text: String,
+    modifier: Modifier = Modifier,
     fontSize: TextUnit = 12.sp,
     fontWeight: FontWeight = FontWeight.Bold,
     color: Color = CalColors.text,
     textAlign: TextAlign = TextAlign.Center,
     contentAlignment: Alignment = Alignment.Center,
-    modifier: Modifier = Modifier,
     width: androidx.compose.ui.unit.Dp = 20.dp
 ) {
     Box(

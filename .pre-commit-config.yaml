@@ -1,0 +1,15 @@
+repos:
+  - repo: local
+    hooks:
+      - id: gradle-test
+        name: gradle test
+        entry: ./gradlew test
+        language: system
+        pass_filenames: false
+        stages: [pre-commit]
+      - id: gradle-lint
+        name: gradle lint
+        entry: ./gradlew lint
+        language: system
+        pass_filenames: false
+        stages: [pre-commit]

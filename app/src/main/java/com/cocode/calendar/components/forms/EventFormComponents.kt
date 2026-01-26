@@ -10,9 +10,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.cocode.calendar.CalColors
-import com.cocode.calendar.CalendarViewModel
 import com.cocode.calendar.Event
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -29,8 +27,6 @@ fun EventFormFields(
     onSaveEvent: (EventFormData) -> Unit,
     onCancel: () -> Unit
 ) {
-    val viewModel: CalendarViewModel = viewModel()
-
     var title by remember { mutableStateOf(if (isEditMode) eventToEdit?.title ?: "" else "") }
     var description by remember { mutableStateOf(if (isEditMode) eventToEdit?.description ?: "" else "") }
     var isRepeating by remember { mutableStateOf(if (isEditMode) eventToEdit?.isRepeating ?: false else false) }

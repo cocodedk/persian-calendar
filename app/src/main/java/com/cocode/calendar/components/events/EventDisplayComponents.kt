@@ -52,9 +52,10 @@ fun EventItemCard(
                     overflow = TextOverflow.Ellipsis
                 )
 
-                if (!event.description.isNullOrBlank()) {
+                val description = event.description
+                if (!description.isNullOrBlank()) {
                     Text(
-                        text = event.description!!,
+                        text = description,
                         style = MaterialTheme.typography.bodyMedium,
                         color = CalColors.inactive_text,
                         maxLines = 3,
@@ -73,9 +74,10 @@ fun EventItemCard(
 
                 // Show repetition info
                 if (event.isRepeating && event.repetitionType == "YEARLY") {
+                    val repetitionEndDate = event.repetitionEndDate
                     Text(
-                        text = if (event.repetitionEndDate != null) {
-                            "Repeats yearly until ${LocalDate.parse(event.repetitionEndDate!!).year}"
+                        text = if (repetitionEndDate != null) {
+                            "Repeats yearly until ${LocalDate.parse(repetitionEndDate).year}"
                         } else {
                             "Repeats yearly"
                         },

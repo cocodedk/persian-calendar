@@ -1,7 +1,6 @@
 package com.cocode.calendar.components.footer
 
 import android.content.Intent
-import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -21,6 +20,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
 import com.cocode.calendar.CalColors
 
 /**
@@ -96,7 +96,7 @@ fun FooterInfo(modifier: Modifier = Modifier) {
                 onClick = { offset ->
                     annotatedString.getStringAnnotations(tag = "URL", start = offset, end = offset)
                         .firstOrNull()?.let { annotation ->
-                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(annotation.item))
+                            val intent = Intent(Intent.ACTION_VIEW, annotation.item.toUri())
                             context.startActivity(intent)
                         }
                 }
