@@ -1,0 +1,467 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Calendar App | Persian + Gregorian</title>
+  <meta name="description" content="A modern Android calendar app with Gregorian and Persian (Jalali) support, plus real-time date conversion." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=Sora:wght@300;400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #e8f4ef;
+      --bg-2: #d7eee5;
+      --ink: #0b2d25;
+      --muted: #55706a;
+      --primary: #019a64;
+      --primary-2: #025842;
+      --accent: #43c7f9;
+      --alert: #f05066;
+      --card: #ffffff;
+      --shadow: 0 20px 60px rgba(2, 88, 66, 0.2);
+      --radius: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Sora", system-ui, -apple-system, "Segoe UI", sans-serif;
+      color: var(--ink);
+      background: radial-gradient(1200px 700px at 20% -10%, #ffffff 0%, var(--bg) 55%, var(--bg-2) 100%);
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        linear-gradient(120deg, rgba(1, 154, 100, 0.08), rgba(67, 199, 249, 0.08)),
+        repeating-linear-gradient(0deg, rgba(2, 88, 66, 0.05), rgba(2, 88, 66, 0.05) 1px, transparent 1px, transparent 24px),
+        repeating-linear-gradient(90deg, rgba(2, 88, 66, 0.05), rgba(2, 88, 66, 0.05) 1px, transparent 1px, transparent 24px);
+      pointer-events: none;
+      mix-blend-mode: multiply;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .container {
+      width: min(1100px, 92vw);
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    header {
+      padding: 36px 0 80px;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+    }
+
+    .logo-mark {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-weight: 800;
+      box-shadow: var(--shadow);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 16px;
+      font-size: 0.95rem;
+    }
+
+    .nav-links a {
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.6);
+      border: 1px solid rgba(2, 88, 66, 0.15);
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 48px;
+      margin-top: 50px;
+      align-items: center;
+    }
+
+    h1 {
+      font-family: "Fraunces", "Times New Roman", serif;
+      font-size: clamp(2.6rem, 4vw, 3.6rem);
+      margin: 0 0 18px;
+      color: var(--primary-2);
+    }
+
+    .lead {
+      font-size: 1.05rem;
+      line-height: 1.7;
+      color: var(--muted);
+      margin-bottom: 26px;
+    }
+
+    .cta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 22px;
+    }
+
+    .btn {
+      padding: 12px 20px;
+      border-radius: 999px;
+      font-weight: 600;
+      border: 1px solid transparent;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .btn.primary {
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      color: #fff;
+      box-shadow: 0 16px 30px rgba(1, 154, 100, 0.25);
+    }
+
+    .btn.ghost {
+      background: #fff;
+      border-color: rgba(2, 88, 66, 0.2);
+      color: var(--primary-2);
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 18px 34px rgba(2, 88, 66, 0.22);
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .chip {
+      background: rgba(1, 154, 100, 0.12);
+      color: var(--primary-2);
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .phone {
+      background: var(--card);
+      border-radius: 32px;
+      padding: 24px;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .phone::before {
+      content: "";
+      position: absolute;
+      inset: -40% 30% auto auto;
+      width: 220px;
+      height: 220px;
+      background: radial-gradient(circle, rgba(67, 199, 249, 0.4), transparent 70%);
+    }
+
+    .status-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 14px;
+    }
+
+    .calendar-card {
+      background: #f7fbf9;
+      border-radius: 22px;
+      padding: 18px;
+      border: 1px solid rgba(2, 88, 66, 0.08);
+    }
+
+    .month {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      font-weight: 600;
+    }
+
+    .pill {
+      background: rgba(1, 154, 100, 0.14);
+      color: var(--primary-2);
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+      text-align: center;
+      font-size: 0.8rem;
+    }
+
+    .grid span {
+      padding: 8px 0;
+      border-radius: 10px;
+      background: #fff;
+      border: 1px solid rgba(2, 88, 66, 0.06);
+    }
+
+    .grid .muted {
+      color: #9bb4ad;
+      background: transparent;
+      border-color: transparent;
+    }
+
+    .grid .today {
+      background: var(--primary);
+      color: #fff;
+      font-weight: 700;
+      box-shadow: 0 8px 16px rgba(1, 154, 100, 0.2);
+    }
+
+    .grid .weekend {
+      color: var(--alert);
+      font-weight: 600;
+    }
+
+    .section {
+      padding: 70px 0 20px;
+    }
+
+    .section h2 {
+      font-family: "Fraunces", "Times New Roman", serif;
+      font-size: clamp(2rem, 3vw, 2.6rem);
+      margin-bottom: 20px;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 18px;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: 0 10px 30px rgba(2, 88, 66, 0.12);
+      border: 1px solid rgba(2, 88, 66, 0.08);
+    }
+
+    .card h3 {
+      margin: 8px 0 6px;
+    }
+
+    .icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      background: rgba(67, 199, 249, 0.2);
+      color: var(--primary-2);
+      font-weight: 700;
+    }
+
+    .split {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .stack {
+      background: linear-gradient(135deg, #ffffff, #f1faf6);
+      border-radius: var(--radius);
+      padding: 22px;
+      border: 1px solid rgba(2, 88, 66, 0.08);
+    }
+
+    .stack code {
+      display: block;
+      background: #0b2d25;
+      color: #d7f7eb;
+      padding: 12px;
+      border-radius: 12px;
+      margin-top: 12px;
+      font-size: 0.85rem;
+      overflow-x: auto;
+    }
+
+    footer {
+      padding: 60px 0 40px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .btn,
+      .reveal {
+        transition: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <nav class="nav">
+        <div class="logo">
+          <div class="logo-mark">C</div>
+          <span>Calendar App</span>
+        </div>
+        <div class="nav-links">
+          <a href="https://github.com/cocodedk/persian-calendar">GitHub</a>
+          <a href="https://github.com/cocodedk/persian-calendar/blob/brand-name/privacy.md">Privacy</a>
+        </div>
+      </nav>
+
+      <div class="hero">
+        <div class="reveal" data-reveal>
+          <h1>Persian + Gregorian, beautifully in sync.</h1>
+          <p class="lead">
+            A modern Android calendar that makes it effortless to switch between Jalali and Gregorian
+            dates, plan monthly views, and convert dates in real time.
+          </p>
+          <div class="cta">
+            <a class="btn primary" href="https://github.com/cocodedk/persian-calendar">View on GitHub</a>
+            <a class="btn ghost" href="https://github.com/cocodedk/persian-calendar/releases">Releases</a>
+          </div>
+          <div class="chips">
+            <span class="chip">Dual Calendar</span>
+            <span class="chip">Real-time Converter</span>
+            <span class="chip">Yearly Events</span>
+          </div>
+        </div>
+
+        <div class="phone reveal" data-reveal>
+          <div class="status-row">
+            <span>Tehran</span>
+            <span class="pill">Today</span>
+          </div>
+          <div class="calendar-card">
+            <div class="month">
+              <span>Farvardin 1403</span>
+              <span class="pill">Jalali</span>
+            </div>
+            <div class="grid">
+              <span>Sa</span><span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span>
+              <span class="muted">29</span><span class="muted">30</span><span>1</span><span>2</span><span>3</span><span>4</span><span class="weekend">5</span>
+              <span>6</span><span>7</span><span>8</span><span class="today">9</span><span>10</span><span>11</span><span class="weekend">12</span>
+              <span>13</span><span>14</span><span>15</span><span>16</span><span>17</span><span>18</span><span class="weekend">19</span>
+              <span>20</span><span>21</span><span>22</span><span>23</span><span>24</span><span>25</span><span class="weekend">26</span>
+              <span>27</span><span>28</span><span>29</span><span>30</span><span>31</span><span class="muted">1</span><span class="muted">2</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="section">
+      <div class="container">
+        <h2 class="reveal" data-reveal>Core experience</h2>
+        <div class="cards">
+          <div class="card reveal" data-reveal>
+            <div class="icon">01</div>
+            <h3>Calendar modes</h3>
+            <p>Switch between Gregorian and Jalali views without losing context or events.</p>
+          </div>
+          <div class="card reveal" data-reveal>
+            <div class="icon">02</div>
+            <h3>Date conversion</h3>
+            <p>Convert dates instantly with input validation and real-time output.</p>
+          </div>
+          <div class="card reveal" data-reveal>
+            <div class="icon">03</div>
+            <h3>Event rhythm</h3>
+            <p>Create events that repeat yearly and keep track of what matters.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container split">
+        <div class="stack reveal" data-reveal>
+          <h2>Build the app</h2>
+          <p>Everything is Gradle-first, designed for Android Studio or CLI workflows.</p>
+          <code>./gradlew assembleDebug
+./gradlew test
+./gradlew lint</code>
+        </div>
+        <div class="stack reveal" data-reveal>
+          <h2>Tech stack</h2>
+          <p>Jetpack Compose UI, Room persistence, MVVM state, and Material 3 design.</p>
+          <code>Compose + Kotlin
+Room + LiveData
+Material 3 + MVVM</code>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>Calendar App is built to be fast, private, and focused on the daily rhythm of Persian and Gregorian dates.</p>
+    </div>
+  </footer>
+
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("visible");
+        }
+      });
+    }, { threshold: 0.2 });
+
+    document.querySelectorAll("[data-reveal]").forEach((el) => observer.observe(el));
+  </script>
+</body>
+</html>

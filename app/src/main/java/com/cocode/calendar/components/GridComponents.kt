@@ -49,6 +49,7 @@ fun WeekRow(
 
 // Re-export cell components for backward compatibility
 @Composable
+@Suppress("UNUSED_PARAMETER")
 fun DayBox(
     currentDate: java.time.LocalDate,
     isInCurrentMonth: Boolean,

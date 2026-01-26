@@ -92,9 +92,8 @@ class EventManagementViewModel(
         return eventDao.getEventsForDate(date.toString()).stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
     }
 
+    @Suppress("UNUSED_PARAMETER")
     fun getEventsForMonth(yearMonth: YearMonth): StateFlow<List<Event>> {
-        val startOfMonth = yearMonth.atDay(1).toString()
-        val endOfMonth = yearMonth.atEndOfMonth().toString()
         // This is a simplified version; for more complex queries, add a DAO method
         return eventDao.getAllEvents().stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
     }

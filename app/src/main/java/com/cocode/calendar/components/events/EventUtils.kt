@@ -65,8 +65,9 @@ object EventUtils {
             event.repetitionType == "WEEKLY" -> "Repeats weekly"
             event.repetitionType == "MONTHLY" -> "Repeats monthly"
             event.repetitionType == "YEARLY" -> {
-                if (event.repetitionEndDate != null) {
-                    "Repeats yearly until ${LocalDate.parse(event.repetitionEndDate!!).year}"
+                val repetitionEndDate = event.repetitionEndDate
+                if (repetitionEndDate != null) {
+                    "Repeats yearly until ${LocalDate.parse(repetitionEndDate).year}"
                 } else {
                     "Repeats yearly"
                 }
