@@ -8,7 +8,7 @@ import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
-@Database(entities = [Event::class], version = 2)
+@Database(entities = [Event::class], version = 2, exportSchema = false)
 @TypeConverters(EventConverters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun eventDao(): EventDao
@@ -17,12 +17,12 @@ abstract class AppDatabase : RoomDatabase() {
         @Volatile private var INSTANCE: AppDatabase? = null
 
         val MIGRATION_1_2 = object : Migration(1, 2) {
-            override fun migrate(database: SupportSQLiteDatabase) {
+            override fun migrate(db: SupportSQLiteDatabase) {
                 // Add new columns for repetition features
-                database.execSQL("ALTER TABLE event ADD COLUMN isRepeating INTEGER NOT NULL DEFAULT 0")
-                database.execSQL("ALTER TABLE event ADD COLUMN repetitionType TEXT NOT NULL DEFAULT 'NONE'")
-                database.execSQL("ALTER TABLE event ADD COLUMN originalDate TEXT")
-                database.execSQL("ALTER TABLE event ADD COLUMN repetitionEndDate TEXT")
+                db.execSQL("ALTER TABLE event ADD COLUMN isRepeating INTEGER NOT NULL DEFAULT 0")
+                db.execSQL("ALTER TABLE event ADD COLUMN repetitionType TEXT NOT NULL DEFAULT 'NONE'")
+                db.execSQL("ALTER TABLE event ADD COLUMN originalDate TEXT")
+                db.execSQL("ALTER TABLE event ADD COLUMN repetitionEndDate TEXT")
             }
         }
 

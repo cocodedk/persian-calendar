@@ -98,10 +98,52 @@ The app uses a custom green-based color scheme:
 
 ## Installation
 
+### Installing the Release Build
+
+To install the release version of the app on an Android device from the generated `app-release.aab` file, you will need to use `bundletool`.
+
+**Prerequisites**
+
+1.  **Android SDK:** Make sure you have the Android SDK installed and the `adb` command-line tool is in your system's PATH.
+2.  **bundletool:** Download `bundletool` from the official [Android Developer website](https://developer.android.com/studio/command-line/bundletool).
+
+**Steps**
+
+1.  **Generate a universal APK from the AAB:**
+
+    Use `bundletool` to generate a set of APKs from the `.aab` file. You will need the release keystore to sign the APKs. The keystore for this project is located at `keystore/1-release-key.jks`.
+
+    ```sh
+    java -jar /path/to/bundletool.jar build-apks \
+      --bundle=release/app-release.aab \
+      --output=release/app.apks \
+      --mode=universal \
+      --ks=keystore/1-release-key.jks \
+      --ks-pass=pass:your_keystore_password \
+      --ks-key-alias=your_key_alias \
+      --key-pass=pass:your_key_password
+    ```
+
+    **Note:** Replace `/path/to/bundletool.jar` with the actual path to your `bundletool.jar` file. You will also need to provide the correct passwords for the keystore.
+
+2.  **Install the APKs on your device:**
+
+    With a device connected via `adb`, use `bundletool` to install the generated `.apks` file.
+
+    ```sh
+    java -jar /path/to/bundletool.jar install-apks \
+      --apks=release/app.apks
+    ```
+
+    The application will then be installed on your device.
+
+### For Developers
+
 1. Clone the repository
 2. Open the project in Android Studio
 3. Sync Gradle files
 4. Build and run the application
+
 
 ## Usage
 
@@ -142,6 +184,34 @@ The app includes release configuration with:
 4. Add tests for new functionality
 5. Submit a pull request
 
+### Pre-commit Hooks (Optional)
+
+This repo includes pre-commit hooks to run `./gradlew test` and `./gradlew lint` before committing.
+
+```sh
+pre-commit install
+```
+
+To skip a hook once, use `SKIP=gradle-test,gradle-lint git commit`.
+
+
+## Documentation
+
+The GitHub Pages site is published from the `docs/` directory on the `brand-name` branch:
+https://cocodedk.github.io/persian-calendar/
+
+## Release APK (CI)
+
+GitHub Actions builds a release APK on push to `brand-name` and on manual runs.
+For a signed APK, add these repository secrets:
+
+- `ANDROID_KEYSTORE_BASE64`
+- `ANDROID_KEYSTORE_PASSWORD`
+- `ANDROID_KEY_ALIAS`
+- `ANDROID_KEY_PASSWORD`
+
+If the secrets are not set, the workflow produces an unsigned release APK.
+
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
@@ -155,4 +225,4 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ---
 
-**Note**: This calendar app is designed to be lightweight, fast, and user-friendly while providing comprehensive calendar functionality for both international and Persian users.
+**Note**: This calendar app is designed to be lightweight, fast, and user-friendly while providing comprehensive calendar functionality for both international and Persian users. It does not read any data from the mobile device except its time, and it does not transmit any data to anyone.
