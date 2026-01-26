@@ -1,7 +1,7 @@
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
-    id("com.google.devtools.ksp") version "1.9.0-1.0.13"
+    id("com.google.devtools.ksp") version "1.9.24-1.0.20"
 }
 
 android {
@@ -68,7 +68,6 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            setProperty("archivesBaseName", "Calendar-v${defaultConfig.versionName}")
             if (hasSigningConfig) {
                 signingConfig = signingConfigs.getByName("release")
             }
@@ -78,7 +77,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
+        kotlinCompilerExtensionVersion = "1.5.14"
     }
     packaging {
         resources {
@@ -90,6 +89,10 @@ android {
     }
 
     
+}
+
+base {
+    archivesName.set("Calendar-v${android.defaultConfig.versionName}")
 }
 
 dependencies {
