@@ -184,6 +184,34 @@ The app includes release configuration with:
 4. Add tests for new functionality
 5. Submit a pull request
 
+### Pre-commit Hooks (Optional)
+
+This repo includes pre-commit hooks to run `./gradlew test` and `./gradlew lint` before committing.
+
+```sh
+pre-commit install
+```
+
+To skip a hook once, use `SKIP=gradle-test,gradle-lint git commit`.
+
+
+## Documentation
+
+The GitHub Pages site is published from the `docs/` directory on the `brand-name` branch:
+https://cocodedk.github.io/persian-calendar/
+
+## Release APK (CI)
+
+GitHub Actions builds a release APK on push to `brand-name` and on manual runs.
+For a signed APK, add these repository secrets:
+
+- `ANDROID_KEYSTORE_BASE64`
+- `ANDROID_KEYSTORE_PASSWORD`
+- `ANDROID_KEY_ALIAS`
+- `ANDROID_KEY_PASSWORD`
+
+If the secrets are not set, the workflow produces an unsigned release APK.
+
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
