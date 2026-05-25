@@ -10,7 +10,7 @@ lifecycleLiveDataKtx = "2.10.0"
 activityCompose = "1.8.2"
 composeBom = "2023.08.00"
 lifecycleViewmodelCompose = "2.7.0"
-room = "2.6.1"
+room = "2.8.4"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
