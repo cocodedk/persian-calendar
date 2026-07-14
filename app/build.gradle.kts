@@ -4,6 +4,9 @@ plugins {
     id("com.google.devtools.ksp") version "1.9.0-1.0.13"
 }
 
+// Single source of truth for the app version — the release workflow tags from the same file.
+val appVersionName = rootProject.file("version.txt").readText().trim()
+
 android {
     val signingStoreFile = System.getenv("SIGNING_STORE_FILE")
     val signingStorePassword = System.getenv("SIGNING_STORE_PASSWORD")
@@ -23,8 +26,8 @@ android {
         applicationId = "com.cocode.calendar"
         minSdk = 26
         targetSdk = 36
-        versionCode = 3
-        versionName = "1.2"
+        versionCode = 4          // bump by 1 for every release uploaded to Play
+        versionName = appVersionName
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
