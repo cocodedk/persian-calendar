@@ -38,8 +38,7 @@ Calendar/
 │   └── src/androidTest/  ← Instrumentation tests
 ├── gradle/               ← Version catalog (libs.versions.toml)
 ├── build.gradle.kts      ← Root build config
-├── settings.gradle.kts   ← Module/repo settings
-└── version.txt           ← Semantic version (MAJOR.MINOR.PATCH)
+└── settings.gradle.kts   ← Module/repo settings
 ```
 
 ### Layer Rules
@@ -99,7 +98,6 @@ Calendar/
 | File | Purpose |
 |------|---------|
 | `CLAUDE.md` | This file — project conventions and session startup |
-| `version.txt` | Semantic version (MAJOR.MINOR.PATCH) |
 | `.github/workflows/ci.yml` | CI on PRs and non-main branches |
 | `.github/workflows/release-apk.yml` | Signed release APK build and GitHub Release |
 | `.github/workflows/pages.yml` | GitHub Pages deployment |
