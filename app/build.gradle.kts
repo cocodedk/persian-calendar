@@ -4,21 +4,24 @@ plugins {
     id("com.google.devtools.ksp") version "1.9.0-1.0.13"
 }
 
-// Single source of truth for the app version — the release workflow tags from the same file.
-val appVersionName = rootProject.file("version.txt").readText().trim()
+// Version: the git tag (vMAJOR.MINOR.PATCH) is the single source of truth; the release
+// workflow passes it in as VERSION_NAME. Local/debug builds fall back to a dev version.
+val appVersionName: String =
+    (System.getenv("VERSION_NAME")?.takeIf { it.isNotBlank() } ?: "0.1.0").removePrefix("v")
+val semver: List<String> = appVersionName.split(".")
+val appVersionCode: Int = (semver.getOrNull(0)?.toIntOrNull() ?: 0) * 1_000_000 +
+    (semver.getOrNull(1)?.toIntOrNull() ?: 0) * 1_000 +
+    (semver.getOrNull(2)?.toIntOrNull() ?: 0)
+
+// Optional release signing — supplied via env in CI; absent locally so debug still builds.
+val ksFile = System.getenv("KEYSTORE_PATH")?.takeIf { it.isNotBlank() }
+    ?.let { rootProject.file(it).absoluteFile }?.takeIf { it.isFile }
+val ksPassword = System.getenv("KEYSTORE_PASSWORD")?.takeIf { it.isNotBlank() }
+val ksAlias = System.getenv("KEY_ALIAS")?.takeIf { it.isNotBlank() }
+val ksKeyPassword = System.getenv("KEY_PASSWORD")?.takeIf { it.isNotBlank() }
+val hasSigning = ksFile != null && ksPassword != null && ksAlias != null && ksKeyPassword != null
 
 android {
-    val signingStoreFile = System.getenv("SIGNING_STORE_FILE")
-    val signingStorePassword = System.getenv("SIGNING_STORE_PASSWORD")
-    val signingKeyAlias = System.getenv("SIGNING_KEY_ALIAS")
-    val signingKeyPassword = System.getenv("SIGNING_KEY_PASSWORD")
-    val hasSigningConfig = listOf(
-        signingStoreFile,
-        signingStorePassword,
-        signingKeyAlias,
-        signingKeyPassword
-    ).all { !it.isNullOrBlank() }
-
     namespace = "com.cocode.calendar"
     compileSdk = 36
 
@@ -26,7 +29,7 @@ android {
         applicationId = "com.cocode.calendar"
         minSdk = 26
         targetSdk = 36
-        versionCode = 4          // bump by 1 for every release uploaded to Play
+        versionCode = appVersionCode
         versionName = appVersionName
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -54,12 +57,12 @@ android {
     }
 
     signingConfigs {
-        if (hasSigningConfig) {
+        if (hasSigning) {
             create("release") {
-                storeFile = file(signingStoreFile!!)
-                storePassword = signingStorePassword
-                keyAlias = signingKeyAlias
-                keyPassword = signingKeyPassword
+                storeFile = ksFile
+                storePassword = ksPassword
+                keyAlias = ksAlias
+                keyPassword = ksKeyPassword
             }
         }
     }
@@ -72,7 +75,7 @@ android {
                 "proguard-rules.pro"
             )
             setProperty("archivesBaseName", "Calendar-v${defaultConfig.versionName}")
-            if (hasSigningConfig) {
+            if (hasSigning) {
                 signingConfig = signingConfigs.getByName("release")
             }
         }
@@ -91,8 +94,6 @@ android {
     lint {
         lintConfig = file("lint.xml")
     }
-
-    
 }
 
 dependencies {
