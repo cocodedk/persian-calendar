@@ -1,0 +1,1 @@
+No user-facing changes. This release updates how the app is built and versioned so F-Droid can update it automatically.
