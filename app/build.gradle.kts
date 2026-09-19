@@ -73,7 +73,11 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            // F-Droid's reviewer rejects a release build with minification off for no reason
+            // (fdroiddata !49432); it also shrinks unused resources pulled in by the AndroidX
+            // and Compose dependencies.
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"

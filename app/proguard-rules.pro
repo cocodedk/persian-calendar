@@ -19,3 +19,14 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# No app-specific keep rules: the only reflection in this app is Room's own
+# Class.forName lookup of "AppDatabase_Impl" (androidx.room:room-runtime), and
+# its consumer rule `-keep class * extends androidx.room.RoomDatabase`
+# (bundled in the AAR, applied automatically) already covers it, since
+# AppDatabase_Impl extends AppDatabase which extends RoomDatabase. The Event
+# entity, EventDao and EventConverters are reached directly by Room's
+# KSP-generated code, not by reflection, so R8 keeps them naturally. There is
+# no Gson/Moshi/Retrofit, no JNI, and the Jalali date converter
+# (converter/GregorianToJalaliConverter.kt, JalaliToGregorianConverter.kt) is
+# plain arithmetic with no name-based lookups.
