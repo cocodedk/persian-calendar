@@ -4,18 +4,10 @@ plugins {
     id("com.google.devtools.ksp") version "1.9.0-1.0.13"
 }
 
-// Version: the git tag (vMAJOR.MINOR.PATCH) is the single source of truth; the release
-// workflow passes it in as VERSION_NAME. F-Droid's build passes it as a Gradle property
-// instead, so that is checked first; the env var stays as the CI path; local/debug builds
-// fall back to a dev version.
-val appVersionName: String =
-    (providers.gradleProperty("VERSION_NAME").orNull?.takeIf { it.isNotBlank() }
-        ?: System.getenv("VERSION_NAME")?.takeIf { it.isNotBlank() }
-        ?: "0.1.0").removePrefix("v")
-val semver: List<String> = appVersionName.split(".")
-val appVersionCode: Int = (semver.getOrNull(0)?.toIntOrNull() ?: 0) * 1_000_000 +
-    (semver.getOrNull(1)?.toIntOrNull() ?: 0) * 1_000 +
-    (semver.getOrNull(2)?.toIntOrNull() ?: 0)
+// The version lives in gradle.properties, where the release workflow and F-Droid's
+// checkupdates both read it. See the comment there before bumping it.
+val appVersionName: String = providers.gradleProperty("VERSION_NAME").get()
+val appVersionCode: Int = providers.gradleProperty("VERSION_CODE").get().toInt()
 
 // Optional release signing — supplied via env in CI; absent locally so debug still builds.
 val ksFile = System.getenv("KEYSTORE_PATH")?.takeIf { it.isNotBlank() }
@@ -48,16 +40,6 @@ android {
     }
     kotlinOptions {
         jvmTarget = "17"
-    }
-
-    kotlin {
-        jvmToolchain(17)
-    }
-
-    java {
-        toolchain {
-            languageVersion.set(JavaLanguageVersion.of(17))
-        }
     }
 
     signingConfigs {
