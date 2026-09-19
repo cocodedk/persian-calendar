@@ -1,0 +1,1 @@
+Prepares the app for F-Droid: drops dependency metadata from release builds, reads the version from a Gradle property, and adds store listing metadata. No functional changes.

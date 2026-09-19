@@ -9,5 +9,8 @@
 .cxx
 local.properties
 /release
+
+# Built release artifacts — F-Droid's source scanner rejects committed APKs/AABs
+/app/release/
 keystore/*.jks
 keystore/1-release-key.jks

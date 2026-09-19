@@ -5,9 +5,13 @@ plugins {
 }
 
 // Version: the git tag (vMAJOR.MINOR.PATCH) is the single source of truth; the release
-// workflow passes it in as VERSION_NAME. Local/debug builds fall back to a dev version.
+// workflow passes it in as VERSION_NAME. F-Droid's build passes it as a Gradle property
+// instead, so that is checked first; the env var stays as the CI path; local/debug builds
+// fall back to a dev version.
 val appVersionName: String =
-    (System.getenv("VERSION_NAME")?.takeIf { it.isNotBlank() } ?: "0.1.0").removePrefix("v")
+    (providers.gradleProperty("VERSION_NAME").orNull?.takeIf { it.isNotBlank() }
+        ?: System.getenv("VERSION_NAME")?.takeIf { it.isNotBlank() }
+        ?: "0.1.0").removePrefix("v")
 val semver: List<String> = appVersionName.split(".")
 val appVersionCode: Int = (semver.getOrNull(0)?.toIntOrNull() ?: 0) * 1_000_000 +
     (semver.getOrNull(1)?.toIntOrNull() ?: 0) * 1_000 +
@@ -69,7 +73,11 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            // F-Droid's reviewer rejects a release build with minification off for no reason
+            // (fdroiddata !49432); it also shrinks unused resources pulled in by the AndroidX
+            // and Compose dependencies.
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -93,6 +101,14 @@ android {
     }
     lint {
         lintConfig = file("lint.xml")
+    }
+
+    // AGP otherwise adds a "Dependency metadata" block to the APK signing block,
+    // encrypted with a key only Google Play holds. F-Droid rejects APKs that carry
+    // it, and it lands in the published release APK that F-Droid verifies against.
+    dependenciesInfo {
+        includeInApk = false
+        includeInBundle = false
     }
 }
 
