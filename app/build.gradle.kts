@@ -80,6 +80,14 @@ android {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
+        jniLibs {
+            // The only .so file in the APK is a prebuilt from AndroidX (graphics-path). AGP
+            // strips it with whatever NDK it finds, so a rebuild without that exact NDK
+            // produces different bytes — F-Droid's builder has none unless its recipe pins one.
+            // Keeping the symbols leaves the library exactly as its AAR ships it, which
+            // rebuilds identically anywhere, and costs a few kB.
+            keepDebugSymbols += "**/*.so"
+        }
     }
     lint {
         lintConfig = file("lint.xml")
