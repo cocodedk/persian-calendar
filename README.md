@@ -1,4 +1,4 @@
-# Calendar App
+# Persian Calendar
 
 A modern Android calendar application built with Jetpack Compose that supports both Gregorian and Persian (Jalali) calendar systems. The app provides a clean, intuitive interface for viewing dates and converting between different calendar formats.
 
