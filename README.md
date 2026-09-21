@@ -204,7 +204,7 @@ To skip a hook once, use `SKIP=gradle-test,gradle-lint git commit`.
 ## Documentation
 
 The GitHub Pages site is published from the `docs/` directory on the `brand-name` branch:
-https://cocodedk.github.io/persian-calendar/
+https://calendar.cocode.dk/
 
 ## Release APK (CI)
 
