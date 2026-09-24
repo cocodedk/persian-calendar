@@ -21,6 +21,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=Sora:wght@300;400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://brand.cocode.dk/v1.css">
+  <script type="module" src="https://brand.cocode.dk/v1.js"></script>
   <style>
     :root {
       color-scheme: light;
@@ -73,48 +75,17 @@
       z-index: 1;
     }
 
+    /* The cocode.dk frame lines up with .container's fluid column, and sits
+       above the fixed decorative grid (body::before) like .container does. */
+    cocode-head, cocode-foot {
+      --cocode-max: calc(1100px + 8vw);
+      --cocode-gutter: 4vw;
+      position: relative;
+      z-index: 1;
+    }
+
     header {
       padding: 36px 0 80px;
-    }
-
-    .nav {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 24px;
-    }
-
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-weight: 700;
-      letter-spacing: 0.3px;
-    }
-
-    .logo-mark {
-      width: 44px;
-      height: 44px;
-      border-radius: 12px;
-      background: linear-gradient(135deg, var(--primary), var(--primary-2));
-      display: grid;
-      place-items: center;
-      color: #fff;
-      font-weight: 800;
-      box-shadow: var(--shadow);
-    }
-
-    .nav-links {
-      display: flex;
-      gap: 16px;
-      font-size: 0.95rem;
-    }
-
-    .nav-links a {
-      padding: 8px 14px;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.6);
-      border: 1px solid rgba(2, 88, 66, 0.15);
     }
 
     .hero {
@@ -365,19 +336,17 @@
   </style>
 </head>
 <body>
+
+<!-- The cocode.dk family frame. Without JavaScript its child shows instead: a
+     way home. The old nav's GitHub link is carried via links= so it isn't
+     lost; #privacy was an in-page anchor and stays reachable by scrolling. -->
+<cocode-head project="Calendar App" accent="#019a64" on-accent="#ffffff"
+              links="GitHub:https://github.com/cocodedk/persian-calendar">
+  <a href="https://cocode.dk">cocode.dk</a>
+</cocode-head>
+
   <header>
     <div class="container">
-      <nav class="nav">
-        <div class="logo">
-          <div class="logo-mark">C</div>
-          <span>Calendar App</span>
-        </div>
-        <div class="nav-links">
-          <a href="https://github.com/cocodedk/persian-calendar">GitHub</a>
-          <a href="#privacy">Privacy</a>
-        </div>
-      </nav>
-
       <div class="hero">
         <div class="reveal" data-reveal>
           <h1>Persian + Gregorian, beautifully in sync.</h1>
@@ -503,6 +472,10 @@ Material 3 + MVVM</code>
       <p><a href="./privacy.html">Privacy Policy</a></p>
     </div>
   </footer>
+
+<cocode-foot repo="cocodedk/persian-calendar">
+  <a href="https://cocode.dk">cocode.dk</a>
+</cocode-foot>
 
   <script>
     const observer = new IntersectionObserver((entries) => {
