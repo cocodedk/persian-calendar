@@ -11,6 +11,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=Sora:wght@300;400;600;700&family=Vazirmatn:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://brand.cocode.dk/v1.css">
+  <script type="module" src="https://brand.cocode.dk/v1.js"></script>
   <style>
     :root {
       color-scheme: light;
@@ -43,9 +45,20 @@
     section[dir="rtl"] { font-family: "Vazirmatn", "Sora", system-ui, sans-serif; text-align: right; }
     section[dir="rtl"] h1, section[dir="rtl"] h2 { font-family: "Vazirmatn", "Fraunces", serif; }
     footer { color: var(--muted); font-size: 0.85rem; margin-top: 40px; text-align: center; }
+    /* This page has no fixed side padding on .container (it uses
+       min(760px, 92vw)); these values reproduce that same left edge at both
+       the phone and desktop widths the frame is checked at. */
+    cocode-head, cocode-foot { --cocode-max: calc(760px + 8vw); --cocode-gutter: 4vw; }
   </style>
 </head>
 <body>
+
+<!-- The cocode.dk family frame. Without JavaScript its child shows instead: a
+     way home. -->
+<cocode-head project="Persian Pro Calendar" accent="#019a64" on-accent="#ffffff">
+  <a href="https://cocode.dk">cocode.dk</a>
+</cocode-head>
+
   <div class="container">
     <a class="back" href="./index.html">&larr; Persian Pro Calendar</a>
     <div class="card">
@@ -139,7 +152,10 @@
       </section>
 
     </div>
-    <footer>© 2026 CoCode.dk — Babak Bandpey</footer>
   </div>
+
+<cocode-foot repo="cocodedk/persian-calendar">
+  <a href="https://cocode.dk">cocode.dk</a>
+</cocode-foot>
 </body>
 </html>
