@@ -64,10 +64,10 @@ object DateFormattingUtils {
      * @param year The year input value
      * @param month The month input value
      * @param day The day input value
-     * @return true if any field has content
+     * @return true if every field has content
      */
-    fun hasAnyInput(year: String, month: String, day: String): Boolean {
-        return year.isNotEmpty() || month.isNotEmpty() || day.isNotEmpty()
+    fun hasCompleteInput(year: String, month: String, day: String): Boolean {
+        return year.isNotEmpty() && month.isNotEmpty() && day.isNotEmpty()
     }
 
     /**
