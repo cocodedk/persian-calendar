@@ -32,8 +32,8 @@ import java.time.format.DateTimeFormatter
 fun DisplayConvertedDate(convertedDate: Any?, year: String, month: String, day: String) {
     val viewModel: CalendarViewModel = viewModel()
 
-    // Check if any input has been provided
-    val hasInput = DateFormattingUtils.hasAnyInput(year, month, day)
+    // An error only makes sense once every field is filled; before that the user is still typing
+    val hasInput = DateFormattingUtils.hasCompleteInput(year, month, day)
 
     // Only show the result section if there's a converted date or if there's input but conversion failed
     if (convertedDate != null || hasInput) {
@@ -73,7 +73,7 @@ fun DisplayConvertedDate(convertedDate: Any?, year: String, month: String, day: 
                         )
                     }
                 } ?: run {
-                    // Only show invalid date message if there's actual input
+                    // Only show invalid date message once the input is complete
                     if (hasInput) {
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,

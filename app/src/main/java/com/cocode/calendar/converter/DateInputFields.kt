@@ -27,8 +27,7 @@ fun DateInputFields(
     onMonthChange: (String) -> Unit,
     onDayChange: (String) -> Unit,
     onYearDone: () -> Unit,
-    onMonthDone: () -> Unit,
-    onDayDone: () -> Unit
+    onMonthDone: () -> Unit
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
@@ -91,7 +90,6 @@ fun DateInputFields(
                     onDone = {
                         keyboardController?.hide()
                         if (index == 2) {
-                            onDayDone()
                             focusManager.clearFocus()
                         }
                     }
