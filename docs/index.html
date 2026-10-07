@@ -6,6 +6,8 @@
   <title>Calendar App | Persian + Gregorian</title>
   <meta name="description" content="A modern Android calendar app with Gregorian and Persian (Jalali) support, plus real-time date conversion." />
   <link rel="canonical" href="https://calendar.cocode.dk/" />
+  <link rel="alternate" hreflang="en" href="https://calendar.cocode.dk/" />
+  <link rel="alternate" hreflang="x-default" href="https://calendar.cocode.dk/" />
   <meta property="og:title" content="Calendar App | Persian + Gregorian" />
   <meta property="og:description" content="A modern Android calendar app with Gregorian and Persian (Jalali) support, plus real-time date conversion." />
   <meta property="og:type" content="website" />
@@ -22,6 +24,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=Sora:wght@300;400;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://brand.cocode.dk/v1.css">
+  <link rel="stylesheet" href="/css/site-blocks.css">
   <script type="module" src="https://brand.cocode.dk/v1.js"></script>
   <style>
     :root {
@@ -310,12 +313,6 @@
       text-align: right;
     }
 
-    footer {
-      padding: 60px 0 40px;
-      color: var(--muted);
-      font-size: 0.9rem;
-    }
-
     .reveal {
       opacity: 0;
       transform: translateY(18px);
@@ -345,6 +342,20 @@
   <a href="https://cocode.dk">cocode.dk</a>
 </cocode-head>
 
+  <div class="site-nav">
+    <!-- cocode-apps:nav:start -->
+<link rel="stylesheet" href="/css/cocode-nav.css">
+<a class="skip" href="#main">Skip to content</a>
+<nav class="cocode-nav" aria-label="Persian Calendar">
+  <a class="brand" href="/" data-nav="home" aria-current="page"><img src="/img/icon.png" alt="" width="32" height="32">Persian Calendar</a>
+  <a href="/#how" data-nav="how">How it works</a>
+  <a href="/#install" data-nav="install">Install</a>
+  <a href="/privacy/" data-nav="privacy">Privacy</a>
+  <a href="https://cocode.dk/" data-nav="more">More apps</a>
+</nav>
+<!-- cocode-apps:nav:end -->
+  </div>
+
   <header>
     <div class="container">
       <div class="hero">
@@ -355,9 +366,8 @@
             dates, plan monthly views, and convert dates in real time.
           </p>
           <div class="cta">
-            <a class="btn primary" href="https://github.com/cocodedk/persian-calendar">View on GitHub</a>
-            <a class="btn ghost" href="https://github.com/cocodedk/persian-calendar/releases">Releases</a>
-            <a class="btn ghost" href="https://github.com/cocodedk/persian-calendar/releases/latest">Latest release</a>
+            <a class="btn primary" href="#install">Get the app</a>
+            <a class="btn ghost" href="https://github.com/cocodedk/persian-calendar">View on GitHub</a>
           </div>
           <div class="chips">
             <span class="chip">Dual Calendar</span>
@@ -390,8 +400,8 @@
     </div>
   </header>
 
-  <main>
-    <section class="section">
+  <main id="main" tabindex="-1">
+    <section class="section" id="how">
       <div class="container">
         <h2 class="reveal" data-reveal>Core experience</h2>
         <div class="cards">
@@ -410,6 +420,24 @@
             <h3>Event rhythm</h3>
             <p>Create events that repeat yearly and keep track of what matters.</p>
           </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="install">
+      <div class="container">
+        <h2 class="reveal" data-reveal>Install</h2>
+        <p class="lead reveal" data-reveal>
+          Persian Calendar is free software under the MIT license. It needs no account and no network connection.
+        </p>
+        <div class="reveal" data-reveal>
+          <!-- cocode-apps:install:start -->
+<ul class="install" role="list">
+  <li><p class="fdroid-soon">Coming to F-Droid</p></li>
+  <li><a href="https://github.com/cocodedk/persian-calendar/releases/latest/download/persian-calendar.apk">Download the APK from GitHub</a></li>
+  <li><a href="https://apps.obtainium.imranr.dev/redirect?r=obtainium://add/https://github.com/cocodedk/persian-calendar">Auto-update the GitHub APK with Obtainium</a></li>
+</ul>
+<!-- cocode-apps:install:end -->
         </div>
       </div>
     </section>
@@ -466,12 +494,16 @@ Material 3 + MVVM</code>
     </section>
   </main>
 
-  <footer>
-    <div class="container">
-      <p>Calendar App is built to be fast, private, and focused on the daily rhythm of Persian and Gregorian dates.</p>
-      <p><a href="./privacy.html">Privacy Policy</a></p>
-    </div>
-  </footer>
+  <div class="site-footer">
+    <!-- cocode-apps:footer:start -->
+<footer class="cocode-footer">
+  <a href="https://github.com/cocodedk/persian-calendar">Source code</a> ·
+  <a href="/privacy/">Privacy</a> ·
+  License: MIT ·
+  <a href="https://cocode.dk/">Made by Cocode (cocode.dk)</a>
+</footer>
+<!-- cocode-apps:footer:end -->
+  </div>
 
 <cocode-foot repo="cocodedk/persian-calendar">
   <a href="https://cocode.dk">cocode.dk</a>
