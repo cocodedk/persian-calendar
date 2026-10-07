@@ -1,52 +1,54 @@
-# Persian Calendar
+# Jalali Persian Calendar
 
-A modern Android calendar application built with Jetpack Compose that supports both Gregorian and Persian (Jalali) calendar systems. The app provides a clean, intuitive interface for viewing dates and converting between different calendar formats.
+Jalali Persian Calendar is an Android app that displays Gregorian and Persian (Jalali) dates, stores calendar events on your phone, and converts dates between the two calendars. It is free software, works without an account or a network connection, and is built with Jetpack Compose.
 
 ## Download
 
 <!-- cocode-apps:install:start -->
 - Coming to F-Droid
-- [Download the APK from GitHub](https://github.com/cocodedk/persian-calendar/releases/latest/download/persian-calendar.apk)
-- [Auto-update the GitHub APK with Obtainium](https://apps.obtainium.imranr.dev/redirect?r=obtainium://add/https://github.com/cocodedk/persian-calendar)
+- [Download the Android installation file (APK) from GitHub](https://github.com/cocodedk/persian-calendar/releases/latest/download/persian-calendar.apk)
+- [Add the app to Obtainium, an app that keeps it up to date](https://apps.obtainium.imranr.dev/redirect?r=obtainium://add/https://github.com/cocodedk/persian-calendar)
 <!-- cocode-apps:install:end -->
 
 ## Features
 
-### 🌍 Dual Calendar Support
-- **Gregorian Calendar**: Standard international calendar system
-- **Persian (Jalali) Calendar**: Traditional Persian calendar system with Persian month names
-- Seamless switching between calendar modes
-- Real-time conversion between Gregorian and Jalali dates
+### 🌍 Two calendars
+- **Gregorian calendar**: the calendar used around the world
+- **Persian (Jalali) calendar**: Jalali day numbers on the grid, and the Jalali year and month names (in Persian script) in the header
+- Tap "Show Jalali dates" or "Show Gregorian dates" to switch
+- The month grid always covers a Gregorian month; Jalali mode changes the day numbers
 
-### 📅 Calendar Functionality
-- Monthly calendar view with intuitive navigation
-- Current date highlighting
-- Previous/next month navigation
-- Today's date quick access
-- Week day headers in both calendar systems
-- Visual distinction between weekdays and weekends
+### 📅 Calendar
+- Swipe left or right to change months
+- Today's date is highlighted; the "Today" button returns to it
+- "Select Month" and "Select Year" list the Jalali or the Gregorian months and years, matching the calendar on screen
+- Week day headers, Sunday first, with weekend days in a different colour
+
+### 📝 Events
+- Tap a day to add an event or see that day's events
+- An event can repeat every year on the same Gregorian date, with an optional last year
+- Events are stored in a database on your phone
 
 ### 🔄 Date Converter
-- Built-in date converter tool
-- Convert from Jalali to Gregorian dates
-- Convert from Gregorian to Jalali dates
-- Real-time conversion as you type
-- User-friendly input fields with validation
+- Convert from Jalali to Gregorian dates, or the other way round
+- The result updates as you type
+- Numeric date fields that reject a date that does not exist, Gregorian or Jalali (for example 30 February, or day 30 of Esfand in a year that is not a leap year)
+- Shows the time until or since the date
 
-### 🎨 Modern UI/UX
-- Material Design 3 components
-- Custom color scheme with green theme
-- Responsive layout that adapts to different screen sizes
-- Smooth animations and transitions
-- Intuitive touch interactions
+### 🎨 Look
+- Material Design 3 components with a green colour scheme
+- A six-row calendar grid with month and year selectors
 
 ### ⏰ Time Display
-- Real-time display of current time in Iran
-- Updates automatically
+- Shows the current time in Iran, updated every second
+
+### ℹ️ About screen
+- Opens from the "About this app" button at the bottom of the calendar screen
+- Shows the version, a privacy summary, links to the website, the source code and the issue tracker, and the credits and licenses
 
 ## Privacy
 
-The app does not collect, transmit or share any personal data. It requests no internet permission and no runtime permissions, and it uses no analytics, crash reporting or advertising. The events you add are stored only in a database on your own device. If you have enabled Android Auto Backup or Google account backup, the operating system may include this data in your own personal Google backup. That is controlled entirely by you and Google, and we have no access to it.
+The app does not collect, transmit or share any personal data. It requests no internet permission and no runtime permissions, and it uses no analytics, crash reporting or advertising. The events you add are stored in a private database on your own device and are not sent anywhere. Deleting the app or clearing its data removes that copy. If you have enabled Android Auto Backup or Google account backup, the operating system may include this data in your own personal Google backup, which can be restored later. That is controlled entirely by you and Google, and we have no access to it. The About screen has buttons that open web pages (the website, the source code, the privacy policy); the app hands the address to your browser only when you tap one, and makes no network connection itself.
 
 Read the full [privacy policy](https://calendar.cocode.dk/privacy/).
 
@@ -65,7 +67,7 @@ Read the full [privacy policy](https://calendar.cocode.dk/privacy/).
 app/src/main/
 ├── java/
 │   ├── com/cocode/calendar/
-│   │   ├── MainActivity.kt          # Main activity and UI components
+│   │   ├── MainActivity.kt          # Applies the theme and opens CalendarApp
 │   │   ├── CalColors.kt            # Color scheme definitions
 │   │   └── ui/theme/               # Theme and styling
 │   ├── CalendarConverter.kt        # Date conversion utilities
@@ -78,9 +80,9 @@ app/src/main/
 
 #### MainActivity.kt
 - Main entry point of the application
-- Contains the primary UI composables
-- Implements the calendar grid and navigation
-- Handles user interactions and state management
+- Applies the theme and opens `CalendarApp`
+- Screen components in `screens/` and `components/` implement the interface (calendar grid, navigation, dialogs, About screen)
+- `CalendarViewModel` coordinates state
 
 #### CalendarConverter.kt
 - Core date conversion logic
@@ -106,27 +108,32 @@ The app uses a custom green-based color scheme:
 ## Requirements
 
 - **Minimum SDK**: API 26 (Android 8.0)
-- **Target SDK**: API 34 (Android 14)
-- **Kotlin**: 1.8+
-- **Jetpack Compose**: 1.5.1+
+- **Target SDK**: API 36 (Android 16)
+- **Kotlin**: 1.9.0
+- **Jetpack Compose**: 1.9.0 (Compose BOM 2025.08.00)
 
 ## Usage
 
 ### Viewing Calendar
-1. Launch the app to see the current month in Gregorian calendar
-2. Use the arrow buttons to navigate between months
+1. Launch the app to see the current month with Gregorian day numbers
+2. Swipe left for the next month or right for the previous month, or tap "Select Month" to choose a month
 3. Tap the "Today" button to return to the current date
 
 ### Switching Calendar Systems
-1. Tap the calendar mode toggle button
-2. The view will switch between Gregorian and Jalali calendars
-3. All dates and month names will update accordingly
+1. Tap "Show Jalali dates" (or "Show Gregorian dates")
+2. The day numbers and the header change to the other calendar
+3. "Select Month" and "Select Year" now list the months and years of that calendar
 
 ### Using the Date Converter
-1. Tap the converter button to open the date converter
-2. Choose conversion direction (Jalali to Gregorian or vice versa)
-3. Enter the date in the input fields
-4. View the converted date in real-time
+1. Tap "Converter" to open the date converter
+2. Tap the ⇄ button to choose the direction (Jalali to Gregorian or the other way)
+3. Enter the date in the Year, Month and Day fields
+4. The converted date appears as you type
+
+### Adding an Event
+1. Tap a day
+2. Fill in the title, and optionally a description and a yearly repeat
+3. Tap "Create"
 
 ## Build
 
@@ -190,14 +197,13 @@ The app includes release configuration with:
 - Optimized APK/AAB generation
 
 ### Testing
-- Unit tests for core functionality
-- Instrumented tests for UI components
-- Test coverage for date conversion logic
+- Unit tests for core functionality, including date conversion logic
+- An instrumented test checks the application package name; UI components are not covered by instrumentation tests
 
 ### Release APK (CI)
 
-GitHub Actions builds a release APK on push to `brand-name` and on manual runs.
-For a signed APK, add these repository secrets:
+Run the "Release APK" GitHub Actions workflow manually to build and publish a signed release APK.
+It needs these four repository secrets:
 
 - `ANDROID_KEYSTORE_BASE64`
 - `ANDROID_KEYSTORE_PASSWORD`
@@ -210,7 +216,7 @@ Generate the base64 value from your keystore:
 base64 -w 0 keystore/1-release-key.jks
 ```
 
-If the secrets are not set, the workflow produces an unsigned release APK.
+The release workflow fails if any of the four signing secrets is missing.
 
 ## Contributing
 
@@ -235,7 +241,7 @@ To skip a hook once, use `SKIP=gradle-test,gradle-lint git commit`.
 
 ## Documentation
 
-The GitHub Pages site is published from the `docs/` directory on the `brand-name` branch:
+The GitHub Pages site is deployed from the `docs/` directory on the `main` branch:
 https://calendar.cocode.dk/
 
 ## License
@@ -251,4 +257,4 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ---
 
-**Note**: This calendar app is designed to be lightweight, fast, and user-friendly while providing comprehensive calendar functionality for both international and Persian users. It does not read any data from the mobile device except its time, and it does not transmit any data to anyone.
+**Note**: The app uses your device's clock and reads the events you save in its local database. It makes no network connections of its own, and Android may include its data in your device backup.
