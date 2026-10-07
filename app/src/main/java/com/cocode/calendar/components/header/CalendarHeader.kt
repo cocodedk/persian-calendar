@@ -53,17 +53,20 @@ fun WeekDaysHeader() {
  * The text color is different for weekdays and weekends.
  *
  * @param day The string representation of the day of the week (e.g., "Mon", "Tue").
- * @param isWeekend Whether the day is shown in the weekend colour.
+ * @param isWeekend Whether the day is shown in the weekend colour. When left out, the first
+ * and last day of `weekday_short` (Sunday and Saturday) count as the weekend, as before.
  */
 @Composable
-fun DayOfWeekBox(day: String, isWeekend: Boolean = false) {
+fun DayOfWeekBox(day: String, isWeekend: Boolean? = null) {
+    val weekDays = stringArrayResource(R.array.weekday_short)
+    val weekend = isWeekend ?: (day == weekDays.first() || day == weekDays.last())
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
             .width(55.dp)
             .height(40.dp)
     ) {
-        val color = if (isWeekend) CalColors.weekend_text else CalColors.weekday_text
+        val color = if (weekend) CalColors.weekend_text else CalColors.weekday_text
         Text(
             text = day,
             color = color
