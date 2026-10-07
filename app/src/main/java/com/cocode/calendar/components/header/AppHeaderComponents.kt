@@ -29,7 +29,10 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import utils.DateTimeUtils
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
+import com.cocode.calendar.components.date.currentLocale
+import com.cocode.calendar.components.date.deviceBestPattern
+import com.cocode.calendar.components.date.phoneUses24HourClock
+import utils.DateFormats
 
 /**
  * This Composable function represents the header section of the calendar application.
@@ -47,8 +50,9 @@ fun HeaderSection() {
 
     /* ---------- build title strings ---------- */
     val resources = LocalResources.current
+    val locale = currentLocale()
     val persianMonths = stringArrayResource(R.array.jalali_months_persian)
-    val (primaryText, secondaryText) = remember(gregorianDate, isJalaliCalendar, resources, persianMonths) {
+    val (primaryText, secondaryText) = remember(gregorianDate, isJalaliCalendar, resources, persianMonths, locale) {
         val jalaliMonths = CalendarConverter.gregorianToJalaliMonths(gregorianDate)
         val jalaliDate = CalendarConverter.gregorianToJalali(gregorianDate)
         val jalaliWeek = CalendarConverter.getJalaliWeekNumber(jalaliDate)
@@ -63,7 +67,7 @@ fun HeaderSection() {
         }
 
         val gregorianText = buildAnnotatedString {
-            append("${gregorianDate.format(DateTimeFormatter.ofPattern("MMMM yyyy"))} - ")
+            append("${DateFormats.monthYear(gregorianDate, locale, deviceBestPattern)} - ")
             withStyle(SpanStyle(fontSize = 18.sp)) {
                 append(weekLabel(DateTimeUtils.getCurrentWeekNumber(gregorianDate)))
             }
@@ -74,11 +78,12 @@ fun HeaderSection() {
 
     /* ---------- ticking clock (unchanged) ---------- */
     val currentTime = remember { mutableStateOf("") }
-    LaunchedEffect(Unit) {
+    val is24Hour = phoneUses24HourClock()
+    LaunchedEffect(locale, is24Hour) {
         while (currentCoroutineContext().isActive) {
-            currentTime.value = DateTimeUtils
-                .getCurrentTimeInIran()
-                .format(DateTimeFormatter.ofPattern("HH:mm:ss"))
+            currentTime.value = DateFormats.time(
+                DateTimeUtils.getCurrentTimeInIran(), locale, is24Hour, deviceBestPattern
+            )
             delay(1_000)
         }
     }

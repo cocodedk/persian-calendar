@@ -15,7 +15,8 @@ import com.cocode.calendar.CalColors
 import com.cocode.calendar.Event
 import com.cocode.calendar.R
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
+import com.cocode.calendar.components.date.currentLocale
+import utils.DateFormats
 
 /**
  * Form components for event creation and editing.
@@ -78,7 +79,7 @@ fun EventFormFields(
         Text(
             text = stringResource(
                 R.string.event_form_date,
-                dialogDate.format(DateTimeFormatter.ofPattern("MMM dd, yyyy"))
+                DateFormats.mediumDate(dialogDate, currentLocale())
             ),
             style = MaterialTheme.typography.bodyMedium,
             color = Color.DarkGray

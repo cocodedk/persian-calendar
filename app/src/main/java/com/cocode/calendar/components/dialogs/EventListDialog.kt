@@ -23,7 +23,8 @@ import com.cocode.calendar.CalendarViewModel
 import com.cocode.calendar.Event
 import com.cocode.calendar.R
 import com.cocode.calendar.components.events.EventItemCard
-import java.time.format.DateTimeFormatter
+import com.cocode.calendar.components.date.currentLocale
+import utils.DateFormats
 
 /**
  * Dialog component for displaying and managing events for a specific date.
@@ -70,7 +71,7 @@ fun EventListDialog() {
                                 color = CalColors.background
                             )
                             Text(
-                                text = selectedDate!!.format(DateTimeFormatter.ofPattern("MMM dd, yyyy")),
+                                text = DateFormats.mediumDate(selectedDate!!, currentLocale()),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = Color.DarkGray
                             )

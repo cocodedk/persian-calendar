@@ -16,7 +16,10 @@ import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import utils.DateTimeUtils
-import java.time.format.DateTimeFormatter
+import com.cocode.calendar.components.date.currentLocale
+import com.cocode.calendar.components.date.deviceBestPattern
+import com.cocode.calendar.components.date.phoneUses24HourClock
+import utils.DateFormats
 
 /**
  * Component for displaying the current time in Iran timezone.
@@ -30,11 +33,12 @@ fun DisplayTimeInIran() {
         mutableStateOf("")
     }
 
-    LaunchedEffect(key1 = Unit) {
+    val locale = currentLocale()
+    val is24Hour = phoneUses24HourClock()
+    LaunchedEffect(locale, is24Hour) {
         while (currentCoroutineContext().isActive) {
             val iranTime = DateTimeUtils.getCurrentTimeInIran()
-            val formatter = DateTimeFormatter.ofPattern("HH:mm:ss")
-            val formattedIranTime = iranTime.format(formatter)
+            val formattedIranTime = DateFormats.time(iranTime, locale, is24Hour, deviceBestPattern)
             currentTime.value = formattedIranTime
             delay(1000)
         }

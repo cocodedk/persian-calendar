@@ -20,7 +20,9 @@ import com.cocode.calendar.R
 import com.cocode.calendar.models.JalaliMonth
 import utils.DateTimeUtils
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
+import com.cocode.calendar.components.date.currentLocale
+import com.cocode.calendar.components.date.deviceBestPattern
+import utils.DateFormats
 
 /**
  * Calendar-specific header component that displays calendar information.
@@ -33,8 +35,9 @@ fun CalendarHeader() {
     val isJalaliCalendar by viewModel.isJalaliCalendar.observeAsState(initial = false)
 
     val resources = LocalResources.current
+    val locale = currentLocale()
     val persianMonths = stringArrayResource(R.array.jalali_months_persian)
-    val (primaryText, secondaryText) = remember(gregorianDate, isJalaliCalendar, resources, persianMonths) {
+    val (primaryText, secondaryText) = remember(gregorianDate, isJalaliCalendar, resources, persianMonths, locale) {
         val jalaliMonths = CalendarConverter.gregorianToJalaliMonths(gregorianDate)
         val jalaliDate = CalendarConverter.gregorianToJalali(gregorianDate)
         val jalaliWeekNumber = CalendarConverter.getJalaliWeekNumber(jalaliDate)
@@ -43,7 +46,7 @@ fun CalendarHeader() {
 
         val right = jalaliMonths["right"]
         val jalaliText = "${weekLabel(jalaliWeekNumber)} - ${monthName(jalaliMonths["left"])} - ${monthName(right)} ${right?.year}"
-        val gregorianText = "${gregorianDate.format(DateTimeFormatter.ofPattern("MMMM yyyy"))} - ${weekLabel(DateTimeUtils.getCurrentWeekNumber(gregorianDate))}"
+        val gregorianText = "${DateFormats.monthYear(gregorianDate, locale, deviceBestPattern)} - ${weekLabel(DateTimeUtils.getCurrentWeekNumber(gregorianDate))}"
 
         if (isJalaliCalendar) jalaliText to gregorianText else gregorianText to jalaliText
     }
