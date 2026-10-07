@@ -142,7 +142,7 @@
     <string name="about_version">Version %1$s</string>
     <string name="about_check_updates">Se den nyeste version</string>
     <string name="about_what_title">Hvad appen kan</string>
-    <string name="about_what_body">Persian Calendar viser hver måned som et gitter af dage. Dagstallene kan være gregorianske, den kalender, der bruges i det meste af verden, eller jalali, den persiske kalender. Appen omregner en dato fra den ene kalender til den anden og viser klokkeslættet i Iran. Tryk på en dag for at tilføje en begivenhed eller se dagens begivenheder.</string>
+    <string name="about_what_body">Persian Calendar viser hver måned som et gitter af dage. Dagstallene følger enten den gregorianske kalender, som bruges over hele verden, eller den persiske kalender (jalali). Appen omregner en dato fra den ene kalender til den anden og viser klokkeslættet i Iran. Tryk på en dag for at tilføje en begivenhed eller se dagens begivenheder.</string>
     <string name="about_privacy_title">Privatliv</string>
     <string name="about_privacy_no_data">Appen indsamler, sender og deler ingen personoplysninger.</string>
     <string name="about_privacy_events">Begivenheder, du tilføjer, gemmes i en privat database på din telefon, og appen sender dem ikke nogen steder hen. Hvis du sletter appen eller rydder dens data, forsvinder denne kopi.</string>
