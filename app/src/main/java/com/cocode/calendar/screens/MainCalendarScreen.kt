@@ -60,9 +60,6 @@ fun CalendarScreen() {
             CalendarNavigation()
         }
 
-        // Date converter overlay - positioned on top of everything
-        CalendarConverterBox()
-
         // Event creation dialog
         EventCreationDialog()
 
@@ -79,6 +76,10 @@ fun CalendarScreen() {
             AboutEntryButton(onClick = { showAbout = true })
             FooterInfo()
         }
+
+        // Date converter overlay, drawn over the content and the About button and footer, so they
+        // cannot ride up over it when the window shrinks for the keyboard
+        CalendarConverterBox()
 
         // About screen, drawn over everything else
         if (showAbout) {

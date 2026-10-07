@@ -3,6 +3,8 @@ package com.cocode.calendar.converter
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -46,7 +48,9 @@ fun CalendarConverterBox() {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(MaterialTheme.colorScheme.scrim.copy(alpha = 0.5f)),
+                .background(MaterialTheme.colorScheme.scrim.copy(alpha = 0.5f))
+                // Keeps the card clear of the keyboard and the system bars
+                .safeDrawingPadding(),
             contentAlignment = Alignment.Center
         ) {
             Card(
@@ -60,8 +64,12 @@ fun CalendarConverterBox() {
                 ),
                 shape = RoundedCornerShape(20.dp)
             ) {
+                // The card is as tall as its content, up to the room above the keyboard; beyond
+                // that it scrolls, so every part can be reached at any text size.
                 Column(
-                    modifier = Modifier.padding(24.dp),
+                    modifier = Modifier
+                        .verticalScroll(rememberScrollState())
+                        .padding(24.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     // Header with title, toggle button, and close button

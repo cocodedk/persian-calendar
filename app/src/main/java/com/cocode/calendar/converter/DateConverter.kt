@@ -1,6 +1,9 @@
 package com.cocode.calendar.converter
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -13,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.cocode.calendar.CalendarViewModel
 import com.cocode.calendar.R
+import com.cocode.calendar.components.date.DateFormattingUtils
 
 /**
  * A composable function that creates a date converter interface.
@@ -25,6 +29,7 @@ import com.cocode.calendar.R
  *
  * @return This function doesn't return a value, but creates and displays a Composable UI for date conversion.
  */
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun DateConverter(
     showJalaliToGregorianConverter: Boolean,
@@ -36,6 +41,17 @@ fun DateConverter(
     val convertedDate = DateConversion.convert(showJalaliToGregorianConverter, year, month, day)
     val viewModel: CalendarViewModel = viewModel()
     val showConverter by viewModel.showConverter.collectAsState()
+
+    // The result (or the invalid-date message) is scrolled into view when it appears or changes,
+    // so the keyboard and a large text size cannot hide it.
+    val resultRequester = remember { BringIntoViewRequester() }
+    val resultShown = convertedDate != null || DateFormattingUtils.hasCompleteInput(year, month, day)
+    LaunchedEffect(resultShown, convertedDate) {
+        if (resultShown) {
+            withFrameNanos { }
+            resultRequester.bringIntoView()
+        }
+    }
 
     if (showConverter) {
         Column(
@@ -68,14 +84,14 @@ fun DateConverter(
                         year, month, day,
                         onYearChange = { newYear ->
                             year = newYear
-                            if (newYear.length == 4) {
+                            if (newYear.length == FieldAdvance.YEAR_DIGITS) {
                                 focusManager.moveFocus(FocusDirection.Next)
                             }
                         },
                         onMonthChange = { newMonth ->
                             month = newMonth
-                            val monthNum = newMonth.toIntOrNull()
-                            if (monthNum != null && monthNum in 1..12) {
+                            // Move on only when no other digit could follow: a "1" may become 10-12
+                            if (FieldAdvance.isFull(newMonth, FieldAdvance.MONTH_MAX)) {
                                 focusManager.moveFocus(FocusDirection.Next)
                             }
                         },
@@ -87,7 +103,10 @@ fun DateConverter(
             }
 
             // Result section
-            DisplayConvertedDate(convertedDate, year, month, day)
+            DisplayConvertedDate(
+                convertedDate, year, month, day,
+                modifier = Modifier.bringIntoViewRequester(resultRequester)
+            )
 
             if (convertedDate != null) {
                 DisplayPeriodToNow(convertedDate, year, month, day)
