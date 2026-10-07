@@ -2,7 +2,7 @@
 
 ## Local Setup
 
-1. Install Android Studio Hedgehog or later
+1. Install Android Studio Narwhal 3 Feature Drop (2025.1.3), or a newer release that supports Android Gradle plugin 8.13.2
 2. Install JDK 17 (temurin distribution recommended)
 3. Clone the repository: `git clone https://github.com/cocodedk/persian-calendar.git`
 4. Open in Android Studio and sync Gradle

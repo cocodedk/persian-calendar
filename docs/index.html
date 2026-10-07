@@ -3,22 +3,22 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Calendar App | Persian + Gregorian</title>
-  <meta name="description" content="A modern Android calendar app with Gregorian and Persian (Jalali) support, plus real-time date conversion." />
+  <title>Persian Calendar | Gregorian and Jalali</title>
+  <meta name="description" content="An Android calendar that shows Gregorian and Persian (Jalali) dates and converts dates between them as you type." />
   <link rel="canonical" href="https://calendar.cocode.dk/" />
   <link rel="alternate" hreflang="en" href="https://calendar.cocode.dk/" />
   <link rel="alternate" hreflang="da" href="https://calendar.cocode.dk/da/" />
   <link rel="alternate" hreflang="x-default" href="https://calendar.cocode.dk/" />
-  <meta property="og:title" content="Calendar App | Persian + Gregorian" />
-  <meta property="og:description" content="A modern Android calendar app with Gregorian and Persian (Jalali) support, plus real-time date conversion." />
+  <meta property="og:title" content="Persian Calendar | Gregorian and Jalali" />
+  <meta property="og:description" content="An Android calendar that shows Gregorian and Persian (Jalali) dates and converts dates between them as you type." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://calendar.cocode.dk/" />
   <meta property="og:image" content="https://calendar.cocode.dk/og.png" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Calendar App | Persian + Gregorian" />
-  <meta name="twitter:description" content="A modern Android calendar app with Gregorian and Persian (Jalali) support, plus real-time date conversion." />
+  <meta name="twitter:title" content="Persian Calendar | Gregorian and Jalali" />
+  <meta name="twitter:description" content="An Android calendar that shows Gregorian and Persian (Jalali) dates and converts dates between them as you type." />
   <meta name="twitter:image" content="https://calendar.cocode.dk/og.png" />
   <link rel="icon" href="favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -338,7 +338,7 @@
 <!-- The cocode.dk family frame. Without JavaScript its child shows instead: a
      way home. The old nav's GitHub link is carried via links= so it isn't
      lost; #privacy was an in-page anchor and stays reachable by scrolling. -->
-<cocode-head project="Calendar App" accent="#019a64" on-accent="#ffffff"
+<cocode-head project="Persian Calendar" accent="#019a64" on-accent="#ffffff"
               links="GitHub:https://github.com/cocodedk/persian-calendar">
   <a href="https://cocode.dk">cocode.dk</a>
 </cocode-head>
@@ -361,10 +361,9 @@
     <div class="container">
       <div class="hero">
         <div class="reveal" data-reveal>
-          <h1>Persian + Gregorian, beautifully in sync.</h1>
+          <h1>Gregorian and Persian dates in one Android calendar.</h1>
           <p class="lead">
-            A modern Android calendar that makes it effortless to switch between Jalali and Gregorian
-            dates, plan monthly views, and convert dates in real time.
+            Switch between Gregorian and Jalali dates, browse months, add events, and convert dates as you type.
           </p>
           <div class="cta">
             <a class="btn primary" href="#install">Get the app</a>
@@ -389,11 +388,11 @@
             </div>
             <div class="grid">
               <span>Sa</span><span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span>
-              <span class="muted">29</span><span class="muted">30</span><span>1</span><span>2</span><span>3</span><span>4</span><span class="weekend">5</span>
-              <span>6</span><span>7</span><span>8</span><span class="today">9</span><span>10</span><span>11</span><span class="weekend">12</span>
-              <span>13</span><span>14</span><span>15</span><span>16</span><span>17</span><span>18</span><span class="weekend">19</span>
-              <span>20</span><span>21</span><span>22</span><span>23</span><span>24</span><span>25</span><span class="weekend">26</span>
-              <span>27</span><span>28</span><span>29</span><span>30</span><span>31</span><span class="muted">1</span><span class="muted">2</span>
+              <span class="muted">26</span><span class="muted">27</span><span class="muted">28</span><span class="muted">29</span><span>1</span><span>2</span><span class="weekend">3</span>
+              <span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span class="today">9</span><span class="weekend">10</span>
+              <span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span><span class="weekend">17</span>
+              <span>18</span><span>19</span><span>20</span><span>21</span><span>22</span><span>23</span><span class="weekend">24</span>
+              <span>25</span><span>26</span><span>27</span><span>28</span><span>29</span><span>30</span><span class="weekend">31</span>
             </div>
           </div>
         </div>
@@ -404,22 +403,22 @@
   <main id="main" tabindex="-1">
     <section class="section" id="how">
       <div class="container">
-        <h2 class="reveal" data-reveal>Core experience</h2>
+        <h2 class="reveal" data-reveal>How it works</h2>
         <div class="cards">
           <div class="card reveal" data-reveal>
             <div class="icon">01</div>
             <h3>Calendar modes</h3>
-            <p>Switch between Gregorian and Jalali views without losing context or events.</p>
+            <p>Show Gregorian or Jalali day numbers on the same month. Your events stay where they are.</p>
           </div>
           <div class="card reveal" data-reveal>
             <div class="icon">02</div>
             <h3>Date conversion</h3>
-            <p>Convert dates instantly with input validation and real-time output.</p>
+            <p>Convert dates as you type. Invalid Gregorian dates are rejected; check that your Jalali day exists in the selected month.</p>
           </div>
           <div class="card reveal" data-reveal>
             <div class="icon">03</div>
-            <h3>Event rhythm</h3>
-            <p>Create events that repeat yearly and keep track of what matters.</p>
+            <h3>Yearly repeating events</h3>
+            <p>Create events that repeat on the same Gregorian date each year.</p>
           </div>
         </div>
       </div>
@@ -435,8 +434,8 @@
           <!-- cocode-apps:install:start -->
 <ul class="install" role="list">
   <li><p class="fdroid-soon">Coming to F-Droid</p></li>
-  <li><a href="https://github.com/cocodedk/persian-calendar/releases/latest/download/persian-calendar.apk">Download the APK from GitHub</a></li>
-  <li><a href="https://apps.obtainium.imranr.dev/redirect?r=obtainium://add/https://github.com/cocodedk/persian-calendar">Auto-update the GitHub APK with Obtainium</a></li>
+  <li><a href="https://github.com/cocodedk/persian-calendar/releases/latest/download/persian-calendar.apk">Download the Android installation file (APK) from GitHub</a></li>
+  <li><a href="https://apps.obtainium.imranr.dev/redirect?r=obtainium://add/https://github.com/cocodedk/persian-calendar">Add the app to Obtainium, an app that keeps it up to date</a></li>
 </ul>
 <!-- cocode-apps:install:end -->
         </div>
@@ -454,7 +453,7 @@
         </div>
         <div class="stack reveal" data-reveal>
           <h2>Tech stack</h2>
-          <p>Jetpack Compose UI, Room persistence, MVVM state, and Material 3 design.</p>
+          <p>Written in Kotlin, with an interface built using Jetpack Compose and Material 3. Calendar events are stored locally using Room.</p>
           <code>Compose + Kotlin
 Room + LiveData
 Material 3 + MVVM</code>
@@ -466,29 +465,28 @@ Material 3 + MVVM</code>
       <div class="container">
         <h2 class="reveal" data-reveal>Privacy policy</h2>
         <p class="lead reveal" data-reveal>
-          This app respects your privacy. It does not access personal data or transmit any information.
-          The only data used is your device system time for calendar functionality.
+          The app uses your device's clock and stores the events you create on your phone. It does not send your events or any other data to us, and it has no internet permission. Android may include the app's data in your device backup.
         </p>
         <div class="cards">
           <div class="card reveal" data-reveal>
             <h3>English</h3>
-            <p>This app respects your privacy. It does not interfere with your device, read any personal data, or transmit any information. The only data accessed is your device's system time for calendar functionality.</p>
+            <p>The app reads your device's clock and the events you save locally. It does not send your events to us. Android may include app data in backups.</p>
           </div>
           <div class="card reveal" data-reveal>
             <h3>Persian (فارسی)</h3>
-            <p class="rtl" lang="fa">این برنامه به حریم خصوصی شما احترام می‌گذارد. هیچ تداخلی با دستگاه شما ندارد، هیچ اطلاعات شخصی را نمی‌خواند و هیچ داده‌ای را منتقل نمی‌کند. تنها داده‌ای که برای عملکرد تقویم دسترسی پیدا می‌کند، زمان سیستم دستگاه شماست.</p>
+            <p class="rtl" lang="fa">این برنامه ساعت دستگاه و رویدادهایی را که روی گوشی ذخیره می‌کنید می‌خواند. برنامه رویدادها را برای ما نمی‌فرستد، اما اندروید ممکن است آن‌ها را در پشتیبان خودش بگذارد.</p>
           </div>
           <div class="card reveal" data-reveal>
             <h3>Arabic (العربية)</h3>
-            <p class="rtl" lang="ar">يحترم هذا التطبيق خصوصيتك. لا يتدخل في جهازك، ولا يقرأ أي بيانات شخصية، ولا ينقل أي معلومات. البيانات الوحيدة التي يتم الوصول إليها هي وقت نظام جهازك لوظيفة التقويم.</p>
+            <p class="rtl" lang="ar">يقرأ التطبيق وقت جهازك والأحداث التي تحفظها محليًا. لا يرسل التطبيق أحداثك إلينا، لكن قد يشملها النسخ الاحتياطي لنظام Android.</p>
           </div>
           <div class="card reveal" data-reveal>
             <h3>Chinese (简体中文)</h3>
-            <p lang="zh-Hans">此应用程序尊重您的隐私。它不会干扰您的设备，不会读取任何个人数据，也不会传输任何信息。唯一访问的数据是您的设备的系统时间，用于日历功能。</p>
+            <p lang="zh-Hans">此应用会读取设备时间和你保存在本地的日历事件。应用不会将这些事件发送给开发者，但 Android 备份可能包含这些数据。</p>
           </div>
           <div class="card reveal" data-reveal>
             <h3>Japanese (日本語)</h3>
-            <p lang="ja">このアプリはあなたのプライバシーを尊重します。デバイスに干渉したり、個人データを読み取ったり、情報を送信したりすることはありません。アクセスされる唯一のデータは、カレンダー機能のためのデバイスのシステム時刻です。</p>
+            <p lang="ja">このアプリは端末の時刻と、端末内に保存した予定を読み取ります。予定を開発者に送信することはありませんが、Android のバックアップに含まれる場合があります。</p>
           </div>
         </div>
       </div>
