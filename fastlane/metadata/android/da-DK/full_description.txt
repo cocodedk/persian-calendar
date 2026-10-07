@@ -1,0 +1,7 @@
+Calendar er en lokal kalender-app til Android, der viser både den gregorianske og den persiske (jalali) kalender. Den kræver ingen netforbindelse, ingen konto og ingen sporing.
+
+Skift mellem de to kalendersystemer for at se den aktuelle måned med ugedage og weekender markeret. Gå til forrige eller næste måned, eller hop tilbage til i dag med ét tryk.
+
+En indbygget omregner laver en gregoriansk dato om til den tilsvarende jalali-dato og omvendt, og resultatet opdateres, mens du skriver.
+
+Appen viser også det aktuelle klokkeslæt i Iran ved siden af kalenderen, og det opdateres i realtid.

@@ -1,0 +1,1 @@
+Gregoriansk og persisk (jalali) kalender med omregning af datoer begge veje

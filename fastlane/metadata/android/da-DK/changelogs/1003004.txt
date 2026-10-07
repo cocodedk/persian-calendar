@@ -1,0 +1,1 @@
+Datoomregneren regner nu om, mens du skriver, som beskrivelsen siger. Før kom resultatet først frem, når du trykkede på Udført på tastaturet.
