@@ -9,6 +9,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -29,7 +30,7 @@ import com.cocode.calendar.components.date.DateFormattingUtils
  *
  * @return This function doesn't return a value, but creates and displays a Composable UI for date conversion.
  */
-@OptIn(ExperimentalFoundationApi::class, ExperimentalLayoutApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun DateConverter(
     showJalaliToGregorianConverter: Boolean,
@@ -43,13 +44,13 @@ fun DateConverter(
     val showConverter by viewModel.showConverter.collectAsState()
 
     // The result (or the invalid-date message) is scrolled into view after every edit, a change of
-    // direction and each time the keyboard opens, so neither the keyboard nor a large text size
-    // can hide it. A message that stays the same (an invalid date edited to another invalid date)
-    // needs this as much as a new result.
+    // direction and at every step of the keyboard's height, so neither the keyboard (opening, or
+    // still growing) nor a large text size can hide it. A message that stays the same (an invalid
+    // date edited to another invalid date) needs this as much as a new result.
     val resultRequester = remember { BringIntoViewRequester() }
     val resultShown = convertedDate != null || DateFormattingUtils.hasCompleteInput(year, month, day)
-    val keyboardVisible = WindowInsets.isImeVisible
-    LaunchedEffect(resultShown, year, month, day, showJalaliToGregorianConverter, keyboardVisible) {
+    val keyboardHeight = WindowInsets.ime.getBottom(LocalDensity.current)
+    LaunchedEffect(resultShown, year, month, day, showJalaliToGregorianConverter, keyboardHeight) {
         if (resultShown) {
             withFrameNanos { }
             resultRequester.bringIntoView()
