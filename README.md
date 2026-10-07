@@ -1,6 +1,6 @@
-# Persian Calendar
+# Jalali Persian Calendar
 
-Persian Calendar is an Android app that displays Gregorian and Persian (Jalali) dates, stores calendar events on your phone, and converts dates between the two calendars. It is free software, works without an account or a network connection, and is built with Jetpack Compose.
+Jalali Persian Calendar is an Android app that displays Gregorian and Persian (Jalali) dates, stores calendar events on your phone, and converts dates between the two calendars. It is free software, works without an account or a network connection, and is built with Jetpack Compose.
 
 ## Download
 

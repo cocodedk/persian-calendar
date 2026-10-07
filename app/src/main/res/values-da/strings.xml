@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Persian Calendar</string>
+    <string name="app_name">Jalali Persian Calendar</string>
 
     <!-- Knapper, der bruges flere steder -->
     <string name="action_cancel">Annullér</string>
@@ -138,11 +138,11 @@
     <string name="event_error_end_year_invalid">Sidste år skal være et tal, for eksempel 2030</string>
 
     <!-- Om-skærmen -->
-    <string name="about_title">Om Persian Calendar</string>
+    <string name="about_title">Om Jalali Persian Calendar</string>
     <string name="about_version">Version %1$s</string>
     <string name="about_check_updates">Se den nyeste version</string>
     <string name="about_what_title">Hvad appen kan</string>
-    <string name="about_what_body">Persian Calendar viser hver måned som et gitter af dage. Dagstallene følger enten den gregorianske kalender, som bruges over hele verden, eller den persiske kalender (jalali). Appen omregner en dato fra den ene kalender til den anden og viser klokkeslættet i Iran. Tryk på en dag for at tilføje en begivenhed eller se dagens begivenheder.</string>
+    <string name="about_what_body">Jalali Persian Calendar viser hver måned som et gitter af dage. Dagstallene følger enten den gregorianske kalender, som bruges over hele verden, eller den persiske kalender (jalali). Appen omregner en dato fra den ene kalender til den anden og viser klokkeslættet i Iran. Tryk på en dag for at tilføje en begivenhed eller se dagens begivenheder.</string>
     <string name="about_privacy_title">Privatliv</string>
     <string name="about_privacy_no_data">Appen indsamler, sender og deler ingen personoplysninger.</string>
     <string name="about_privacy_events">Begivenheder, du tilføjer, gemmes i en privat database på din telefon, og appen sender dem ikke nogen steder hen. Hvis du sletter appen eller rydder dens data, forsvinder denne kopi.</string>
@@ -155,9 +155,9 @@
     <string name="about_report">Meld en fejl på GitHub</string>
     <string name="about_no_browser">Ingen app på telefonen kan åbne linket. Installér en webbrowser, og prøv igen.</string>
     <string name="about_credits">Tak og licenser</string>
-    <string name="about_credits_license">Persian Calendar er fri software under MIT-licensen. Copyright © 2025 Babak Bandpey.</string>
+    <string name="about_credits_license">Jalali Persian Calendar er fri software under MIT-licensen. Copyright © 2025 Babak Bandpey.</string>
     <string name="about_credits_libraries">Appen er bygget med AndroidX, Jetpack Compose, Material 3 og Room, som er udgivet under Apache License 2.0.</string>
     <string name="about_made_by">Lavet af Cocode (cocode.dk)</string>
-    <string name="about_made_by_body">Persian Calendar er lavet af Babak Bandpey hos Cocode.</string>
+    <string name="about_made_by_body">Jalali Persian Calendar er lavet af Babak Bandpey hos Cocode.</string>
     <string name="about_cocode">Åbn cocode.dk</string>
 </resources>

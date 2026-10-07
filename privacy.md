@@ -1,13 +1,13 @@
-# Privacy Policy — Persian Calendar
+# Privacy Policy — Jalali Persian Calendar
 
-**App:** Persian Calendar (`com.cocode.calendar`)
+**App:** Jalali Persian Calendar (`com.cocode.calendar`)
 **Developer:** CoCode.dk — Babak Bandpey
 **Last updated:** 7 October 2026
 
 > The canonical, always-current version of this policy is published at
 > **https://calendar.cocode.dk/privacy/**
 
-**Persian Calendar does not collect, transmit, or share any personal data.**
+**Jalali Persian Calendar does not collect, transmit, or share any personal data.**
 It is a Gregorian and Persian (Jalali) calendar that works entirely on your device.
 
 ## Data you create

@@ -1,4 +1,4 @@
-Persian Calendar is a local calendar app for Android that displays Gregorian and Persian (Jalali) dates. It works without a network connection or account and does not track you.
+Jalali Persian Calendar is a local calendar app for Android that displays Gregorian and Persian (Jalali) dates. It works without a network connection or account and does not track you.
 
 View each Gregorian month with Gregorian or Jalali day numbers, with weekends marked. Swipe between months, or tap Today to return to the current date.
 

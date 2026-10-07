@@ -1,4 +1,4 @@
-Persian Calendar er en lokal kalender-app til Android, der viser gregorianske og persiske (jalali) datoer. Den virker uden netforbindelse og uden konto og sporer dig ikke.
+Jalali Persian Calendar er en lokal kalender-app til Android, der viser gregorianske og persiske (jalali) datoer. Den virker uden netforbindelse og uden konto og sporer dig ikke.
 
 Se hver gregorianske måned med gregorianske eller jalali-dagstal, og med weekender markeret. Stryg mellem månederne, eller tryk på I dag for at vende tilbage til dagens dato.
 
