@@ -54,7 +54,7 @@ fun CalendarNavigation() {
             modifier = Modifier
                 .weight(1f)
                 .padding(end = 8.dp)
-                .height(48.dp)
+                .heightIn(min = 48.dp)
         ) {
             Text(
                 text = stringResource(R.string.calendar_select_month),
@@ -71,7 +71,7 @@ fun CalendarNavigation() {
             modifier = Modifier
                 .weight(1f)
                 .padding(start = 8.dp)
-                .height(48.dp)
+                .heightIn(min = 48.dp)
         ) {
             Text(
                 text = stringResource(R.string.calendar_select_year),
@@ -85,18 +85,16 @@ fun CalendarNavigation() {
     val currentDate = viewModel.gregorianDate.observeAsState(LocalDate.now()).value ?: LocalDate.now()
     val isJalaliCalendar = viewModel.isJalaliCalendar.observeAsState(false).value
 
-    // Show dialogs when requested. The grid always shows a Gregorian month, so a Jalali choice
-    // moves it to the Gregorian month that contains day 1 of the chosen Jalali month.
+    // Show dialogs when requested. The grid always shows the Gregorian month of the stored date.
+    // A Jalali choice stores the date of day 1 of the chosen Jalali month, so the Jalali month
+    // and year the pickers show next time are read from that same date.
     if (showMonthPicker) {
         com.cocode.calendar.components.pickers.MonthPickerDialog(
             onDismiss = { showMonthPicker = false },
             onMonthSelected = { month ->
-                val newYearMonth = if (isJalaliCalendar) {
-                    PickerTargets.afterJalaliMonthChoice(currentDate, month)
-                } else {
-                    YearMonth.of(currentDate.year, month)
-                }
-                viewModel.changeMonth(newYearMonth)
+                viewModel.updateGregorianDate(
+                    PickerTargets.afterMonthChoice(currentDate, isJalaliCalendar, month)
+                )
                 showMonthPicker = false
             }
         )
@@ -106,11 +104,9 @@ fun CalendarNavigation() {
         com.cocode.calendar.components.pickers.YearPickerDialog(
             onDismiss = { showYearPicker = false },
             onYearSelected = { year ->
-                if (isJalaliCalendar) {
-                    viewModel.changeMonth(PickerTargets.afterJalaliYearChoice(currentDate, year))
-                } else {
-                    viewModel.changeYear(year)
-                }
+                viewModel.updateGregorianDate(
+                    PickerTargets.afterYearChoice(currentDate, isJalaliCalendar, year)
+                )
                 showYearPicker = false
             }
         )

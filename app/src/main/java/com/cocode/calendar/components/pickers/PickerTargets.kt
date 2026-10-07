@@ -2,31 +2,48 @@ package com.cocode.calendar.components.pickers
 
 import com.cocode.calendar.converter.GregorianToJalaliConverter
 import com.cocode.calendar.converter.JalaliToGregorianConverter
+import com.cocode.calendar.viewmodel.NavigationDates
 import java.time.LocalDate
 import java.time.YearMonth
 
 /**
- * Where the calendar grid goes when the user picks a Jalali month or year. The grid always
- * shows one Gregorian month, so a Jalali choice becomes "the Gregorian month that contains
- * day 1 of that Jalali month". Pure Kotlin, no Android classes.
+ * The date the main screen stores after a month or year is picked. The grid always shows the
+ * Gregorian month of that date, and the Jalali month and year the pickers highlight are read
+ * from it too. A Jalali pick stores the Gregorian date of day 1 of the chosen Jalali month, so
+ * repeating a pick gives the same date. Pure Kotlin, no Android classes.
  */
 object PickerTargets {
 
-    /** The Gregorian month that contains day 1 of Jalali month [jalaliMonth] (1-12) of [jalaliYear]. */
-    fun gregorianMonthOfJalaliMonth(jalaliYear: Int, jalaliMonth: Int): YearMonth =
-        YearMonth.from(JalaliToGregorianConverter.jalaliToGregorian(jalaliYear, jalaliMonth, 1))
+    /** The Gregorian date of day 1 of Jalali month [jalaliMonth] (1-12) in [jalaliYear]. */
+    fun jalaliMonthStart(jalaliYear: Int, jalaliMonth: Int): LocalDate =
+        JalaliToGregorianConverter.jalaliToGregorian(jalaliYear, jalaliMonth, 1)
 
     /**
-     * Target after choosing Jalali month [jalaliMonth] while the grid shows [current]:
-     * that month of the Jalali year [current] falls in.
+     * The date to store after month [month] (1-12) is picked in the calendar the pickers show,
+     * while the screen is on [current]. In Jalali mode it is that month of the Jalali year
+     * [current] falls in. Gregorian mode keeps the long-standing rule (see [NavigationDates]).
      */
-    fun afterJalaliMonthChoice(current: LocalDate, jalaliMonth: Int): YearMonth =
-        gregorianMonthOfJalaliMonth(GregorianToJalaliConverter.gregorianToJalali(current).year, jalaliMonth)
+    fun afterMonthChoice(
+        current: LocalDate,
+        isJalaliCalendar: Boolean,
+        month: Int,
+        today: LocalDate = LocalDate.now()
+    ): LocalDate =
+        if (isJalaliCalendar) {
+            jalaliMonthStart(GregorianToJalaliConverter.gregorianToJalali(current).year, month)
+        } else {
+            NavigationDates.forMonth(YearMonth.of(current.year, month), today)
+        }
 
     /**
-     * Target after choosing Jalali year [jalaliYear] while the grid shows [current]:
-     * the Jalali month [current] falls in, in the chosen year.
+     * The date to store after [year] is picked in the calendar the pickers show, while the
+     * screen is on [current]. In Jalali mode it is the Jalali month [current] falls in, in
+     * that year. Gregorian mode keeps the long-standing rule (see [NavigationDates]).
      */
-    fun afterJalaliYearChoice(current: LocalDate, jalaliYear: Int): YearMonth =
-        gregorianMonthOfJalaliMonth(jalaliYear, GregorianToJalaliConverter.gregorianToJalali(current).monthValue)
+    fun afterYearChoice(current: LocalDate, isJalaliCalendar: Boolean, year: Int): LocalDate =
+        if (isJalaliCalendar) {
+            jalaliMonthStart(year, GregorianToJalaliConverter.gregorianToJalali(current).monthValue)
+        } else {
+            NavigationDates.forYear(current, year)
+        }
 }

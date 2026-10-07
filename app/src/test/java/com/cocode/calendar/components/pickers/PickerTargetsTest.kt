@@ -1,86 +1,103 @@
 package com.cocode.calendar.components.pickers
 
 import java.time.LocalDate
-import java.time.YearMonth
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class PickerTargetsTest {
 
+    // 7 October 2026 is 15 Mehr 1405
+    private val today = LocalDate.of(2026, 10, 7)
+
     @Test
-    fun `should open March for Farvardin, which starts at Nowruz`() {
+    fun `should start Farvardin at Nowruz`() {
         // 1 Farvardin 1405 is 21 March 2026
-        assertEquals(YearMonth.of(2026, 3), PickerTargets.gregorianMonthOfJalaliMonth(1405, 1))
+        assertEquals(LocalDate.of(2026, 3, 21), PickerTargets.jalaliMonthStart(1405, 1))
     }
 
     @Test
-    fun `should open December for Dey, which starts before the Gregorian new year`() {
-        // 1 Dey 1404 is 22 December 2025, and Dey runs into January
-        assertEquals(YearMonth.of(2025, 12), PickerTargets.gregorianMonthOfJalaliMonth(1404, 10))
+    fun `should start Dey in December and Bahman in January`() {
+        // Dey runs from 22 December 2025 into January, and Bahman starts on 21 January 2026
+        assertEquals(LocalDate.of(2025, 12, 22), PickerTargets.jalaliMonthStart(1404, 10))
+        assertEquals(LocalDate.of(2026, 1, 21), PickerTargets.jalaliMonthStart(1404, 11))
     }
 
     @Test
-    fun `should open January for Bahman, the month after Dey`() {
-        // 1 Bahman 1404 is 21 January 2026
-        assertEquals(YearMonth.of(2026, 1), PickerTargets.gregorianMonthOfJalaliMonth(1404, 11))
+    fun `should start Esfand in February in a leap year and in a common year`() {
+        // 1403 is a leap year (30 days in Esfand), 1404 is not
+        assertEquals(LocalDate.of(2025, 2, 19), PickerTargets.jalaliMonthStart(1403, 12))
+        assertEquals(LocalDate.of(2026, 2, 20), PickerTargets.jalaliMonthStart(1404, 12))
     }
 
     @Test
-    fun `should open February for Esfand of a leap year`() {
-        // 1403 is a leap year: Esfand has 30 days and 1 Esfand 1403 is 19 February 2025
-        assertEquals(YearMonth.of(2025, 2), PickerTargets.gregorianMonthOfJalaliMonth(1403, 12))
+    fun `should store day 1 of the chosen Jalali month`() {
+        assertEquals(LocalDate.of(2026, 3, 21), PickerTargets.afterMonthChoice(today, true, 1))
+        assertEquals(LocalDate.of(2026, 10, 23), PickerTargets.afterMonthChoice(today, true, 8))
     }
 
     @Test
-    fun `should open February for Esfand of a common year`() {
-        // 1 Esfand 1404 is 20 February 2026
-        assertEquals(YearMonth.of(2026, 2), PickerTargets.gregorianMonthOfJalaliMonth(1404, 12))
+    fun `should give the same date when Farvardin is picked twice in a row`() {
+        val first = PickerTargets.afterMonthChoice(today, true, 1)
+        val second = PickerTargets.afterMonthChoice(first, true, 1)
+        val third = PickerTargets.afterMonthChoice(second, true, 1)
+        assertEquals(LocalDate.of(2026, 3, 21), first)
+        assertEquals(first, second)
+        assertEquals(first, third)
     }
 
     @Test
-    fun `should open March 2025 for Farvardin 1404`() {
-        // 1 Farvardin 1404 is 21 March 2025
-        assertEquals(YearMonth.of(2025, 3), PickerTargets.gregorianMonthOfJalaliMonth(1404, 1))
+    fun `should give the same date when Dey is picked again, and Bahman follows it`() {
+        val dey = PickerTargets.afterMonthChoice(today, true, 10)
+        assertEquals(LocalDate.of(2026, 12, 22), dey)
+        assertEquals(dey, PickerTargets.afterMonthChoice(dey, true, 10))
+        // Bahman 1405 starts on 21 January 2027
+        assertEquals(LocalDate.of(2027, 1, 21), PickerTargets.afterMonthChoice(dey, true, 11))
     }
 
     @Test
-    fun `should keep the Jalali year of the screen when a Jalali month is chosen`() {
-        // 7 October 2026 is 15 Mehr 1405, so Aban 1405 starts on 23 October 2026
+    fun `should give the same date when Esfand of a leap year is picked again`() {
+        // 7 October 2024 is 16 Mehr 1403, a leap year
+        val esfand = PickerTargets.afterMonthChoice(LocalDate.of(2024, 10, 7), true, 12)
+        assertEquals(LocalDate.of(2025, 2, 19), esfand)
+        assertEquals(esfand, PickerTargets.afterMonthChoice(esfand, true, 12))
+    }
+
+    @Test
+    fun `should keep the Jalali year when a month is picked after a year`() {
+        // Year 1406 keeps Mehr: 1 Mehr 1406 is 23 September 2027
+        val year = PickerTargets.afterYearChoice(today, true, 1406)
+        assertEquals(LocalDate.of(2027, 9, 23), year)
+        // Farvardin then stays in 1406: 1 Farvardin 1406 is 21 March 2027
+        assertEquals(LocalDate.of(2027, 3, 21), PickerTargets.afterMonthChoice(year, true, 1))
+    }
+
+    @Test
+    fun `should keep the Jalali month when the same year is picked again`() {
+        val year = PickerTargets.afterYearChoice(today, true, 1406)
+        assertEquals(year, PickerTargets.afterYearChoice(year, true, 1406))
+    }
+
+    @Test
+    fun `should keep the Jalali month when a year is picked in Dey`() {
+        // 25 December 2025 is 4 Dey 1404. 1 Dey 1403 is 21 December 2024.
         assertEquals(
-            YearMonth.of(2026, 10),
-            PickerTargets.afterJalaliMonthChoice(LocalDate.of(2026, 10, 7), 8)
-        )
-        // and Farvardin 1405 starts in March 2026, in the same Jalali year
-        assertEquals(
-            YearMonth.of(2026, 3),
-            PickerTargets.afterJalaliMonthChoice(LocalDate.of(2026, 10, 7), 1)
+            LocalDate.of(2024, 12, 21),
+            PickerTargets.afterYearChoice(LocalDate.of(2025, 12, 25), true, 1403)
         )
     }
 
     @Test
-    fun `should use the Jalali year in force at the date on screen when a month is chosen in January`() {
-        // 15 January 2026 is in Dey 1404, so choosing Farvardin goes to March 2025
-        assertEquals(
-            YearMonth.of(2025, 3),
-            PickerTargets.afterJalaliMonthChoice(LocalDate.of(2026, 1, 15), 1)
-        )
+    fun `should leave Gregorian month picks as they were`() {
+        // another month: its first day
+        assertEquals(LocalDate.of(2026, 3, 1), PickerTargets.afterMonthChoice(today, false, 3, today))
+        // the month the user is in today: today
+        assertEquals(today, PickerTargets.afterMonthChoice(LocalDate.of(2026, 3, 1), false, 10, today))
     }
 
     @Test
-    fun `should keep the Jalali month of the screen when a Jalali year is chosen`() {
-        // 7 October 2026 is in Mehr (month 7). 1 Mehr 1406 is 23 September 2027.
-        assertEquals(
-            YearMonth.of(2027, 9),
-            PickerTargets.afterJalaliYearChoice(LocalDate.of(2026, 10, 7), 1406)
-        )
-    }
-
-    @Test
-    fun `should keep Dey when a year is chosen while Dey is on screen`() {
-        // 25 December 2025 is in Dey 1404. 1 Dey 1403 is 21 December 2024.
-        assertEquals(
-            YearMonth.of(2024, 12),
-            PickerTargets.afterJalaliYearChoice(LocalDate.of(2025, 12, 25), 1403)
-        )
+    fun `should leave Gregorian year picks as they were`() {
+        // the same month in the chosen year, on its first day
+        assertEquals(LocalDate.of(2027, 10, 1), PickerTargets.afterYearChoice(today, false, 2027))
+        assertEquals(LocalDate.of(2027, 2, 1), PickerTargets.afterYearChoice(LocalDate.of(2028, 2, 29), false, 2027))
     }
 }

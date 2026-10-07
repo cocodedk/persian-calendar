@@ -108,7 +108,7 @@ fun YearPickerDialog(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(vertical = 2.dp)
-                            .height(52.dp)
+                            .heightIn(min = 52.dp)
                     ) {
                         Text(
                             text = displayYear.toString(),
@@ -128,7 +128,7 @@ fun YearPickerDialog(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 16.dp)
-                    .height(48.dp)
+                    .heightIn(min = 48.dp)
             ) {
                 Text(
                     text = stringResource(R.string.action_cancel),
