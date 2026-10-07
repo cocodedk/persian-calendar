@@ -91,15 +91,7 @@ fun EventFormFields(
             label = { Text(stringResource(R.string.event_form_title_label)) },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = CalColors.background,
-                unfocusedBorderColor = Color.Gray,
-                focusedLabelColor = CalColors.background,
-                unfocusedLabelColor = Color.Gray,
-                focusedTextColor = Color.Black,
-                unfocusedTextColor = Color.Black,
-                cursorColor = CalColors.background
-            )
+            colors = eventFieldColors()
         )
 
         // Description input
@@ -110,15 +102,7 @@ fun EventFormFields(
             modifier = Modifier.fillMaxWidth(),
             minLines = 2,
             maxLines = 4,
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = CalColors.background,
-                unfocusedBorderColor = Color.Gray,
-                focusedLabelColor = CalColors.background,
-                unfocusedLabelColor = Color.Gray,
-                focusedTextColor = Color.Black,
-                unfocusedTextColor = Color.Black,
-                cursorColor = CalColors.background
-            )
+            colors = eventFieldColors()
         )
 
         // Yearly repetition checkbox
@@ -151,15 +135,7 @@ fun EventFormFields(
                 placeholder = { Text(stringResource(R.string.event_form_end_year_placeholder)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = CalColors.background,
-                    unfocusedBorderColor = Color.Gray,
-                    focusedLabelColor = CalColors.background,
-                    unfocusedLabelColor = Color.Gray,
-                    focusedTextColor = Color.Black,
-                    unfocusedTextColor = Color.Black,
-                    cursorColor = CalColors.background
-                )
+                colors = eventFieldColors()
             )
 
             Text(
@@ -181,44 +157,12 @@ fun EventFormFields(
         val isFormValid = validationResult.isValid
 
         // Buttons
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            // Cancel button
-            Button(
-                onClick = onCancel,
-                modifier = Modifier.weight(1f),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color.Gray
-            ),
-            shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp)
-            ) {
-                Text(stringResource(R.string.action_cancel), color = Color.White)
-            }
-
-            // Create/Update button
-            Button(
-                onClick = {
-                    if (isFormValid) {
-                        onSaveEvent(formData)
-                    }
-                },
-                modifier = Modifier.weight(1f),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = CalColors.button_background
-            ),
-            shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp),
-                enabled = isFormValid
-            ) {
-                Text(
-                    text = stringResource(
-                        if (isEditMode) R.string.event_form_update else R.string.event_form_create
-                    ),
-                    color = CalColors.text
-                )
-            }
-        }
+        EventFormButtons(
+            isEditMode = isEditMode,
+            isFormValid = isFormValid,
+            onCancel = onCancel,
+            onSave = { onSaveEvent(formData) }
+        )
 
         // Show validation errors if any
         validationResult.errors.forEach { error ->
@@ -231,13 +175,3 @@ fun EventFormFields(
         }
     }
 }
-
-/**
- * Data class representing the form data for event creation/editing.
- */
-data class EventFormData(
-    val title: String,
-    val description: String?,
-    val isRepeating: Boolean,
-    val repetitionEndYear: String
-)
