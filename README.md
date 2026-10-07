@@ -32,7 +32,7 @@ Jalali Persian Calendar is an Android app that displays Gregorian and Persian (J
 ### 🔄 Date Converter
 - Convert from Jalali to Gregorian dates, or the other way round
 - The result updates as you type
-- Numeric date fields with Gregorian date validation; Jalali month lengths are not validated
+- Numeric date fields that reject a date that does not exist, Gregorian or Jalali (for example 30 February, or day 30 of Esfand in a year that is not a leap year)
 - Shows the time until or since the date
 
 ### 🎨 Look
