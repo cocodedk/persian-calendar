@@ -1,6 +1,5 @@
 package com.cocode.calendar.components.pickers
 
-import CalendarConverter
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -12,17 +11,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalResources
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.cocode.calendar.CalColors
 import com.cocode.calendar.CalendarViewModel
+import com.cocode.calendar.R
 import java.time.LocalDate
 
 /**
  * Dialog for selecting a month from a 3x4 grid layout.
- * Allows users to select a month from the current calendar system.
+ * The month chosen is a Gregorian month, whichever calendar the main screen shows.
  */
 @Composable
 fun MonthPickerDialog(
@@ -31,16 +33,11 @@ fun MonthPickerDialog(
 ) {
     val viewModel: CalendarViewModel = viewModel()
     val currentDate = viewModel.gregorianDate.observeAsState(LocalDate.now()).value
-    val isJalaliCalendar = viewModel.isJalaliCalendar.observeAsState(false).value
 
-    // Use centralized month names from Strings object
-    val months = com.cocode.calendar.components.pickers.PickerUtils.getMonthNames(isJalaliCalendar)
-    val currentMonth = if (isJalaliCalendar) {
-        // Convert current Gregorian date to Jalali and get the Jalali month
-        currentDate?.let { CalendarConverter.gregorianToJalali(it).monthValue } ?: 1
-    } else {
-        currentDate?.monthValue ?: 1
-    }
+    // The chosen month always changes the Gregorian month, in both calendar modes, so the
+    // buttons carry Gregorian names. The names come from the string resources.
+    val months = PickerUtils.getMonthNames(LocalResources.current)
+    val currentMonth = currentDate?.monthValue ?: 1
 
     Dialog(onDismissRequest = onDismiss) {
         Column(
@@ -49,7 +46,7 @@ fun MonthPickerDialog(
                 .padding(16.dp)
         ) {
             Text(
-                text = "Select Month",
+                text = stringResource(R.string.picker_month_title),
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold,
                 color = CalColors.active_text,
@@ -103,7 +100,7 @@ fun MonthPickerDialog(
                     .height(48.dp)
             ) {
                 Text(
-                    text = "Cancel",
+                    text = stringResource(R.string.action_cancel),
                     color = Color.White,
                     fontWeight = FontWeight.Bold
                 )

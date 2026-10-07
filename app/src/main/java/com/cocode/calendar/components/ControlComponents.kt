@@ -11,12 +11,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.cocode.calendar.CalColors
 import com.cocode.calendar.CalendarViewModel
-import utils.Strings
+import com.cocode.calendar.R
 import java.time.LocalDate
 
 /**
@@ -72,7 +73,7 @@ fun TodayButton() {
         ) {
             // Set the display text for the button
             Text(
-                text = Strings.Calendar.TODAY,
+                text = stringResource(R.string.calendar_today),
                 color = CalColors.text,
                 fontWeight = FontWeight.Bold
             )
@@ -110,7 +111,7 @@ fun DateConverterToggleButton() {
                 .height(52.dp)
         ) {
             Text(
-                text = "Converter",
+                text = stringResource(R.string.calendar_converter),
                 color = CalColors.text,
                 fontWeight = FontWeight.Bold
             )
@@ -143,7 +144,9 @@ fun CalendarToggleButton() {
 
         ) {
             Text(
-                text = if (isJalaliCalendar) Strings.Calendar.GREGORIAN else Strings.Calendar.JALALI,
+                text = stringResource(
+                    if (isJalaliCalendar) R.string.calendar_show_gregorian else R.string.calendar_show_jalali
+                ),
                 color = CalColors.text,
                 fontWeight = FontWeight.Bold
 

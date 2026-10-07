@@ -6,10 +6,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cocode.calendar.CalColors
+import com.cocode.calendar.R
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -48,7 +50,7 @@ fun DisplayTimeInIran() {
         // put the text in a row and center it
         Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxWidth()) {
             Text(
-                text = "Iran time: ${currentTime.value}",
+                text = stringResource(R.string.header_iran_time, currentTime.value),
                 style = MaterialTheme.typography.bodyLarge,
                 color = CalColors.text
             )

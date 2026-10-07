@@ -3,14 +3,16 @@ package com.cocode.calendar.components.forms
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import com.cocode.calendar.CalColors
+import com.cocode.calendar.R
 import java.time.LocalDate
 
 /**
- * Result of form validation.
+ * Result of form validation. Each error is the id of a string resource, so the
+ * screen shows it in the language of the app and the checks stay free of Android context.
  */
 data class ValidationResult(
     val isValid: Boolean,
-    val errors: List<String>
+    val errors: List<Int>
 )
 
 /**
@@ -23,28 +25,28 @@ data class ValidationResult(
  * This function can be used independently of UI components.
  */
 fun validateEventForm(formData: EventFormData): ValidationResult {
-    val errors = mutableListOf<String>()
+    val errors = mutableListOf<Int>()
 
     if (formData.title.isBlank()) {
-        errors.add("Event title is required")
+        errors.add(R.string.event_error_title_required)
     }
 
     if (formData.title.length > 100) {
-        errors.add("Event title must be less than 100 characters")
+        errors.add(R.string.event_error_title_too_long)
     }
 
     if (formData.description != null && formData.description.length > 500) {
-        errors.add("Description must be less than 500 characters")
+        errors.add(R.string.event_error_description_too_long)
     }
 
     if (formData.isRepeating && formData.repetitionEndYear.isNotBlank()) {
         try {
             val year = formData.repetitionEndYear.toInt()
             if (year < LocalDate.now().year) {
-                errors.add("End year must be in the future")
+                errors.add(R.string.event_error_end_year_past)
             }
         } catch (e: NumberFormatException) {
-            errors.add("End year must be a valid number")
+            errors.add(R.string.event_error_end_year_invalid)
         }
     }
 
@@ -62,12 +64,12 @@ fun validateRepetitionEndYear(yearString: String): ValidationResult {
     return try {
         val year = yearString.toInt()
         if (year < LocalDate.now().year) {
-            ValidationResult(isValid = false, errors = listOf("End year must be in the future"))
+            ValidationResult(isValid = false, errors = listOf(R.string.event_error_end_year_past))
         } else {
             ValidationResult(isValid = true, errors = emptyList())
         }
     } catch (e: NumberFormatException) {
-        ValidationResult(isValid = false, errors = listOf("End year must be a valid number"))
+        ValidationResult(isValid = false, errors = listOf(R.string.event_error_end_year_invalid))
     }
 }
 
@@ -75,14 +77,14 @@ fun validateRepetitionEndYear(yearString: String): ValidationResult {
  * Validates event title.
  */
 fun validateEventTitle(title: String): ValidationResult {
-    val errors = mutableListOf<String>()
+    val errors = mutableListOf<Int>()
 
     if (title.isBlank()) {
-        errors.add("Event title is required")
+        errors.add(R.string.event_error_title_required)
     }
 
     if (title.length > 100) {
-        errors.add("Event title must be less than 100 characters")
+        errors.add(R.string.event_error_title_too_long)
     }
 
     return ValidationResult(isValid = errors.isEmpty(), errors = errors)
@@ -96,10 +98,10 @@ fun validateEventDescription(description: String?): ValidationResult {
         return ValidationResult(isValid = true, errors = emptyList()) // Optional field
     }
 
-    val errors = mutableListOf<String>()
+    val errors = mutableListOf<Int>()
 
     if (description.length > 500) {
-        errors.add("Description must be less than 500 characters")
+        errors.add(R.string.event_error_description_too_long)
     }
 
     return ValidationResult(isValid = errors.isEmpty(), errors = errors)

@@ -10,11 +10,13 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.cocode.calendar.CalColors
 import com.cocode.calendar.CalendarViewModel
+import com.cocode.calendar.R
 import java.time.LocalDate
 import java.time.YearMonth
 
@@ -54,7 +56,7 @@ fun CalendarNavigation() {
                 .height(48.dp)
         ) {
             Text(
-                text = "Select Month",
+                text = stringResource(R.string.calendar_select_month),
                 color = CalColors.text,
                 fontWeight = FontWeight.Bold
             )
@@ -71,7 +73,7 @@ fun CalendarNavigation() {
                 .height(48.dp)
         ) {
             Text(
-                text = "Select Year",
+                text = stringResource(R.string.calendar_select_year),
                 color = CalColors.text,
                 fontWeight = FontWeight.Bold
             )

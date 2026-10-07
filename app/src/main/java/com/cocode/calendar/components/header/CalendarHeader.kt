@@ -5,12 +5,12 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.unit.dp
 import com.cocode.calendar.CalColors
-import utils.Strings
+import com.cocode.calendar.R
 
 /**
  * Displays a header row containing the days of the week.
@@ -19,14 +19,13 @@ import utils.Strings
  * of the days of the week (Sun, Mon, Tue, etc.). The row is styled with a border
  * and rounded corners at the top.
  *
- * The function uses [remember] to memorize the list of day names, preventing
- * unnecessary recomposition.
+ * The day names come from the `weekday_short` string array, Sunday first.
  *
  * @see DayOfWeekBox
  */
 @Composable
 fun WeekDaysHeader() {
-    val daysOfWeek = remember { Strings.Calendar.DAYS_OF_WEEK }
+    val daysOfWeek = stringArrayResource(R.array.weekday_short)
 
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -40,8 +39,9 @@ fun WeekDaysHeader() {
                 RoundedCornerShape(10.dp, 10.dp, 0.dp, 0.dp)
             )
     ) {
-        daysOfWeek.forEach { day ->
-            DayOfWeekBox(day)
+        // The grid starts on Sunday, so Sunday (first) and Saturday (last) are the weekend columns.
+        daysOfWeek.forEachIndexed { index, day ->
+            DayOfWeekBox(day, isWeekend = index == 0 || index == daysOfWeek.lastIndex)
         }
     }
 }
@@ -53,16 +53,17 @@ fun WeekDaysHeader() {
  * The text color is different for weekdays and weekends.
  *
  * @param day The string representation of the day of the week (e.g., "Mon", "Tue").
+ * @param isWeekend Whether the day is shown in the weekend colour.
  */
 @Composable
-fun DayOfWeekBox(day: String) {
+fun DayOfWeekBox(day: String, isWeekend: Boolean = false) {
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
             .width(55.dp)
             .height(40.dp)
     ) {
-        val color = if(day != Strings.Calendar.SUN && day != Strings.Calendar.SAT) CalColors.weekday_text else CalColors.weekend_text
+        val color = if (isWeekend) CalColors.weekend_text else CalColors.weekday_text
         Text(
             text = day,
             color = color

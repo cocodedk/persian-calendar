@@ -13,6 +13,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -20,6 +21,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.cocode.calendar.CalColors
 import com.cocode.calendar.CalendarViewModel
 import com.cocode.calendar.Event
+import com.cocode.calendar.R
 import com.cocode.calendar.components.events.EventItemCard
 import java.time.format.DateTimeFormatter
 
@@ -62,7 +64,7 @@ fun EventListDialog() {
                     ) {
                         Column {
                             Text(
-                                text = "Events",
+                                text = stringResource(R.string.events_title),
                                 style = MaterialTheme.typography.headlineSmall,
                                 fontWeight = FontWeight.Bold,
                                 color = CalColors.active_text
@@ -81,7 +83,7 @@ fun EventListDialog() {
                             containerColor = CalColors.button_background,
                             contentColor = CalColors.text
                         ) {
-                            Icon(Icons.Default.Add, contentDescription = "Add Event")
+                            Icon(Icons.Default.Add, contentDescription = stringResource(R.string.events_add))
                         }
                     }
 
@@ -99,7 +101,7 @@ fun EventListDialog() {
                                 verticalArrangement = Arrangement.spacedBy(16.dp)
                             ) {
                                 Text(
-                                    text = "No events for this day",
+                                    text = stringResource(R.string.events_empty),
                                     style = MaterialTheme.typography.bodyLarge,
                                     color = CalColors.inactive_text
                                 )
@@ -112,7 +114,7 @@ fun EventListDialog() {
                                 ) {
                                     Icon(Icons.Default.Add, contentDescription = null)
                                     Spacer(modifier = Modifier.width(8.dp))
-                                    Text("Create First Event", color = CalColors.text)
+                                    Text(stringResource(R.string.events_create_first), color = CalColors.text)
                                 }
                             }
                         }
@@ -160,7 +162,7 @@ fun EventListDialog() {
                 ) {
                     // Header
                     Text(
-                        text = "Delete Event",
+                        text = stringResource(R.string.event_delete_title),
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold,
                         color = CalColors.active_text
@@ -168,13 +170,18 @@ fun EventListDialog() {
 
                     // Confirmation message
                     Text(
-                        text = "Are you sure you want to delete \"${eventToDelete!!.title}\"?",
+                        text = stringResource(
+                            // A repeating event is one record, so deleting it removes every repeat
+                            if (eventToDelete!!.isRepeating) R.string.event_delete_message_repeating
+                            else R.string.event_delete_message,
+                            eventToDelete!!.title
+                        ),
                         style = MaterialTheme.typography.bodyLarge,
                         color = CalColors.inactive_text
                     )
 
                     Text(
-                        text = "This action cannot be undone.",
+                        text = stringResource(R.string.event_delete_warning),
                         style = MaterialTheme.typography.bodyMedium,
                         color = Color.Red.copy(alpha = 0.7f)
                     )
@@ -193,7 +200,7 @@ fun EventListDialog() {
                             ),
                             shape = RoundedCornerShape(8.dp)
                         ) {
-                            Text("Cancel", color = Color.White)
+                            Text(stringResource(R.string.action_cancel), color = Color.White)
                         }
 
                         // Delete button
@@ -205,7 +212,7 @@ fun EventListDialog() {
                             ),
                             shape = RoundedCornerShape(8.dp)
                         ) {
-                            Text("Delete", color = Color.White)
+                            Text(stringResource(R.string.action_delete), color = Color.White)
                         }
                     }
                 }

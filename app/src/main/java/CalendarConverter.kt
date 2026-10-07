@@ -4,7 +4,6 @@ import com.cocode.calendar.models.JalaliDate
 import com.cocode.calendar.models.JalaliMonth
 import com.cocode.calendar.utils.JalaliWeekCalculator
 import java.time.LocalDate
-import utils.Strings
 
 /**
  * This class provides methods to convert Gregorian dates to Jalali (Persian) dates and vice versa.
@@ -82,7 +81,7 @@ class CalendarConverter {
              val startJalaliMonth = toJalaliMonth(startDate)
              val endJalaliMonth = toJalaliMonth(endDate)
 
-             return if (startJalaliMonth.monthName != endJalaliMonth.monthName) {
+             return if (startJalaliMonth.monthValue != endJalaliMonth.monthValue) {
                  mapOf("left" to startJalaliMonth, "right" to endJalaliMonth)
              } else {
                  mapOf("left" to startJalaliMonth, "right" to startJalaliMonth)

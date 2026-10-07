@@ -10,11 +10,15 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.cocode.calendar.CalendarViewModel
+import com.cocode.calendar.R
 
 /**
  * Displays a calendar converter box that allows switching between Jalali and Gregorian date converters.
@@ -67,7 +71,7 @@ fun CalendarConverterBox() {
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "📅 Date Converter",
+                            text = stringResource(R.string.converter_title),
                             style = MaterialTheme.typography.headlineSmall,
                             color = MaterialTheme.colorScheme.onSurface,
                             fontWeight = FontWeight.Bold
@@ -77,8 +81,13 @@ fun CalendarConverterBox() {
                             horizontalArrangement = Arrangement.spacedBy(8.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
+                            val swapDescription = stringResource(
+                                if (showJalaliToGregorianConverter) R.string.converter_swap_to_gregorian_to_jalali
+                                else R.string.converter_swap_to_jalali_to_gregorian
+                            )
                             FilledTonalButton(
                                 onClick = { viewModel.toggleJalaliToGregorianConverter() },
+                                modifier = Modifier.semantics { contentDescription = swapDescription },
                                 colors = ButtonDefaults.filledTonalButtonColors(
                                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                                     contentColor = MaterialTheme.colorScheme.onPrimaryContainer
@@ -101,7 +110,7 @@ fun CalendarConverterBox() {
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.Close,
-                                    contentDescription = "Close converter"
+                                    contentDescription = stringResource(R.string.converter_close)
                                 )
                             }
                         }
@@ -115,9 +124,9 @@ fun CalendarConverterBox() {
                     ) {
                         Text(
                             text = when {
-                                showJalaliToGregorianConverter -> "Jalali → Gregorian"
-                                showGregorianToJalaliConverter -> "Gregorian → Jalali"
-                                else -> "Error"
+                                showJalaliToGregorianConverter -> stringResource(R.string.converter_direction_jalali_to_gregorian)
+                                showGregorianToJalaliConverter -> stringResource(R.string.converter_direction_gregorian_to_jalali)
+                                else -> stringResource(R.string.converter_problem)
                             },
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.onPrimaryContainer,

@@ -7,10 +7,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.cocode.calendar.CalendarViewModel
+import com.cocode.calendar.R
 
 /**
  * A composable function that creates a date converter interface.
@@ -50,9 +52,11 @@ fun DateConverter(
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     Text(
-                        text = if (showJalaliToGregorianConverter) "Enter Jalali Date"
-                        else if (showGregorianToJalaliConverter) "Enter Gregorian Date"
-                        else "Something is wrong",
+                        text = stringResource(
+                            if (showJalaliToGregorianConverter) R.string.converter_enter_jalali
+                            else if (showGregorianToJalaliConverter) R.string.converter_enter_gregorian
+                            else R.string.converter_problem
+                        ),
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         fontWeight = FontWeight.SemiBold

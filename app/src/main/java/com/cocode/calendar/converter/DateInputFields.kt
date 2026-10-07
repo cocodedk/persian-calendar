@@ -13,9 +13,11 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.cocode.calendar.R
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -43,18 +45,18 @@ fun DateInputFields(
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         listOf(
-            Triple("Year", year) { input: String ->
+            Triple(stringResource(R.string.converter_field_year), year) { input: String ->
                 if (input.isEmpty() || input.length <= 4 && input.all { it.isDigit() }) {
                     onYearChange(input)
                 }
             },
-            Triple("Mo", month) { input: String ->
+            Triple(stringResource(R.string.converter_field_month), month) { input: String ->
                 val num = input.toIntOrNull()
                 if (input.isEmpty() || input.length <= 2 && num != null && num in 1..12) {
                     onMonthChange(input)
                 }
             },
-            Triple("Day", day) { input: String ->
+            Triple(stringResource(R.string.converter_field_day), day) { input: String ->
                 val num = input.toIntOrNull()
                 if (input.isEmpty() || input.length <= 2 && num != null && num in 1..31) {
                     onDayChange(input)

@@ -7,11 +7,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cocode.calendar.CalColors
 import com.cocode.calendar.Event
+import com.cocode.calendar.R
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -64,7 +66,9 @@ fun EventFormFields(
     ) {
         // Header
         Text(
-            text = if (isEditMode) "Edit Event" else "Create Event",
+            text = stringResource(
+                if (isEditMode) R.string.event_form_edit_title else R.string.event_form_create_title
+            ),
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold,
             color = CalColors.active_text
@@ -72,7 +76,10 @@ fun EventFormFields(
 
         // Date display
         Text(
-            text = "Date: ${dialogDate.format(DateTimeFormatter.ofPattern("MMM dd, yyyy"))}",
+            text = stringResource(
+                R.string.event_form_date,
+                dialogDate.format(DateTimeFormatter.ofPattern("MMM dd, yyyy"))
+            ),
             style = MaterialTheme.typography.bodyMedium,
             color = CalColors.inactive_text
         )
@@ -81,7 +88,7 @@ fun EventFormFields(
         OutlinedTextField(
             value = title,
             onValueChange = { title = it },
-            label = { Text("Event Title") },
+            label = { Text(stringResource(R.string.event_form_title_label)) },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
             colors = OutlinedTextFieldDefaults.colors(
@@ -99,7 +106,7 @@ fun EventFormFields(
         OutlinedTextField(
             value = description,
             onValueChange = { description = it },
-            label = { Text("Description (Optional)") },
+            label = { Text(stringResource(R.string.event_form_description_label)) },
             modifier = Modifier.fillMaxWidth(),
             minLines = 2,
             maxLines = 4,
@@ -129,7 +136,7 @@ fun EventFormFields(
                 )
             )
             Text(
-                text = "Repeat yearly",
+                text = stringResource(R.string.event_form_repeat_yearly),
                 style = MaterialTheme.typography.bodyMedium,
                 color = Color.Black
             )
@@ -140,8 +147,8 @@ fun EventFormFields(
             OutlinedTextField(
                 value = repetitionEndYear,
                 onValueChange = { repetitionEndYear = it },
-                label = { Text("End repetition year (Optional)") },
-                placeholder = { Text("e.g., 2030") },
+                label = { Text(stringResource(R.string.event_form_end_year_label)) },
+                placeholder = { Text(stringResource(R.string.event_form_end_year_placeholder)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 colors = OutlinedTextFieldDefaults.colors(
@@ -156,7 +163,7 @@ fun EventFormFields(
             )
 
             Text(
-                text = "If specified, the event will repeat every year until this year",
+                text = stringResource(R.string.event_form_end_year_hint),
                 style = MaterialTheme.typography.bodySmall,
                 color = CalColors.inactive_text
             )
@@ -187,7 +194,7 @@ fun EventFormFields(
             ),
             shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp)
             ) {
-                Text("Cancel", color = Color.White)
+                Text(stringResource(R.string.action_cancel), color = Color.White)
             }
 
             // Create/Update button
@@ -205,7 +212,9 @@ fun EventFormFields(
                 enabled = isFormValid
             ) {
                 Text(
-                    text = if (isEditMode) "Update" else "Create",
+                    text = stringResource(
+                        if (isEditMode) R.string.event_form_update else R.string.event_form_create
+                    ),
                     color = CalColors.text
                 )
             }
@@ -214,7 +223,7 @@ fun EventFormFields(
         // Show validation errors if any
         validationResult.errors.forEach { error ->
             androidx.compose.material3.Text(
-                text = error,
+                text = stringResource(error),
                 style = androidx.compose.material3.MaterialTheme.typography.bodySmall,
                 color = Color.Red,
                 modifier = Modifier.padding(top = 4.dp)

@@ -14,6 +14,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInteropFilter
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -21,10 +22,10 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.cocode.calendar.CalColors
 import com.cocode.calendar.CalendarViewModel
+import com.cocode.calendar.R
 import com.cocode.calendar.components.ui.CenteredText
 import com.cocode.calendar.components.ui.SpacerCell
 import kotlinx.coroutines.delay
-import utils.Strings
 
 /**
  * Creates a composable cross-shaped click area with directional controls.
@@ -63,11 +64,11 @@ fun CrossClickArea(
             SpacerCell(width = 0.2f)
             ClickableCell(
                 onClick = onClickUp, onLongPress = onClickUp, width = 0.75f,
-                icon = Icons.Default.KeyboardArrowUp, contentDescription = Strings.Calendar.NEXT_YEAR)
+                icon = Icons.Default.KeyboardArrowUp, contentDescription = stringResource(R.string.calendar_next_year))
             SpacerCell(width = 1f)
         }
 
-        Text(Strings.Calendar.Controls.NEXT_YEAR, modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center,
+        Text(stringResource(R.string.calendar_next_year), modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center,
             fontWeight = FontWeight.Bold, color = CalColors.text, fontSize = 12.sp)
 
         Row(modifier = Modifier
@@ -80,19 +81,19 @@ fun CrossClickArea(
                 onLongPress = onClickLeft,
                 width = 0.2f,
                 icon = Icons.Default.KeyboardArrowLeft,
-                contentDescription = Strings.Calendar.PREVIOUS_MONTH
+                contentDescription = stringResource(R.string.calendar_previous_month)
             )
-            CenteredText(Strings.Calendar.Controls.PREVIOUS_MONTH)
+            CenteredText(stringResource(R.string.calendar_previous_month))
             SpacerCell(width = 0.67f)  // Optionally, this cell can be interactive or display info.
-            CenteredText(Strings.Calendar.Controls.NEXT_MONTH)
+            CenteredText(stringResource(R.string.calendar_next_month))
             ClickableCell(
                 onClick = onClickRight, onLongPress = onClickRight, width = 1f,
-                icon = Icons.Default.KeyboardArrowRight, contentDescription = Strings.Calendar.NEXT_MONTH
+                icon = Icons.Default.KeyboardArrowRight, contentDescription = stringResource(R.string.calendar_next_month)
             )
 
         }
 
-        Text(Strings.Calendar.Controls.PREVIOUS_YEAR, modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center,
+        Text(stringResource(R.string.calendar_previous_year), modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center,
             fontWeight = FontWeight.Bold, color = CalColors.text, fontSize = 12.sp)
 
         Row(modifier = Modifier
@@ -100,7 +101,7 @@ fun CrossClickArea(
             .fillMaxWidth()) {
             SpacerCell(0.2f)
             ClickableCell(onClick = onClickDown, onLongPress = onClickDown, width = 0.75f,
-                icon = Icons.Default.KeyboardArrowDown, contentDescription = Strings.Calendar.NEXT_YEAR)
+                icon = Icons.Default.KeyboardArrowDown, contentDescription = stringResource(R.string.calendar_previous_year))
             SpacerCell(1f)
         }
     }

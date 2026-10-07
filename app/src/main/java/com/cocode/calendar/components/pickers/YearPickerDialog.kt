@@ -1,6 +1,5 @@
 package com.cocode.calendar.components.pickers
 
-import CalendarConverter
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -16,6 +15,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -23,11 +23,12 @@ import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.cocode.calendar.CalColors
 import com.cocode.calendar.CalendarViewModel
+import com.cocode.calendar.R
 import java.time.LocalDate
 
 /**
  * Dialog for selecting a year from a scrollable list.
- * Supports both Gregorian and Jalali calendar systems with automatic conversion.
+ * The year chosen is a Gregorian year, whichever calendar the main screen shows.
  */
 @Composable
 fun YearPickerDialog(
@@ -36,7 +37,6 @@ fun YearPickerDialog(
 ) {
     val viewModel: CalendarViewModel = viewModel()
     val currentDate = viewModel.gregorianDate.observeAsState(LocalDate.now()).value
-    val isJalaliCalendar = viewModel.isJalaliCalendar.observeAsState(false).value
 
     val currentGregorianYear = currentDate?.year ?: LocalDate.now().year
 
@@ -45,21 +45,10 @@ fun YearPickerDialog(
     val endGregorianYear = 2100
     val gregorianYears = (startGregorianYear..endGregorianYear).toList()
 
-    // Convert to display years and current year based on calendar mode
-    val (displayYears, currentDisplayYear) = if (isJalaliCalendar) {
-        // Convert Gregorian years to Jalali years for display
-        val jalaliYears = gregorianYears.map { gregorianYear ->
-            val tempDate = LocalDate.of(gregorianYear, 6, 15) // Use middle of year for conversion
-            CalendarConverter.gregorianToJalali(tempDate).year
-        }
-
-        // Get current Jalali year
-        val currentJalaliYear = CalendarConverter.gregorianToJalali(currentDate ?: LocalDate.now()).year
-
-        jalaliYears to currentJalaliYear
-    } else {
-        gregorianYears to currentGregorianYear
-    }
+    // The chosen year always changes the Gregorian year, in both calendar modes, so the list
+    // shows Gregorian years. The title says so.
+    val displayYears = gregorianYears
+    val currentDisplayYear = currentGregorianYear
 
     // Calculate the index of the current year in the display list
     val currentYearIndex = displayYears.indexOf(currentDisplayYear)
@@ -85,7 +74,7 @@ fun YearPickerDialog(
                 .height(400.dp)
         ) {
             Text(
-                text = "Select Year",
+                text = stringResource(R.string.picker_year_title),
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold,
                 color = CalColors.active_text,
@@ -140,7 +129,7 @@ fun YearPickerDialog(
                     .height(48.dp)
             ) {
                 Text(
-                    text = "Cancel",
+                    text = stringResource(R.string.action_cancel),
                     color = Color.White,
                     fontWeight = FontWeight.Bold
                 )

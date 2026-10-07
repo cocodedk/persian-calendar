@@ -10,10 +10,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.cocode.calendar.CalColors
+import com.cocode.calendar.R
 import java.time.LocalDate
 
 /**
@@ -65,7 +67,7 @@ fun EventItemCard(
 
                 if (event.isAllDay) {
                     Text(
-                        text = "All Day",
+                        text = stringResource(R.string.event_all_day),
                         style = MaterialTheme.typography.bodySmall,
                         color = CalColors.button_background,
                         fontWeight = FontWeight.Medium
@@ -77,9 +79,12 @@ fun EventItemCard(
                     val repetitionEndDate = event.repetitionEndDate
                     Text(
                         text = if (repetitionEndDate != null) {
-                            "Repeats yearly until ${LocalDate.parse(repetitionEndDate).year}"
+                            stringResource(
+                                R.string.event_repeats_yearly_until,
+                                LocalDate.parse(repetitionEndDate).year.toString()
+                            )
                         } else {
-                            "Repeats yearly"
+                            stringResource(R.string.event_repeats_yearly)
                         },
                         style = MaterialTheme.typography.bodySmall,
                         color = Color(0xFF2196F3),
@@ -99,7 +104,7 @@ fun EventItemCard(
                 ) {
                     Icon(
                         Icons.Default.Edit,
-                        contentDescription = "Edit Event",
+                        contentDescription = stringResource(R.string.event_edit),
                         tint = CalColors.button_background,
                         modifier = Modifier.size(20.dp)
                     )
@@ -111,7 +116,7 @@ fun EventItemCard(
                 ) {
                     Icon(
                         Icons.Default.Delete,
-                        contentDescription = "Delete Event",
+                        contentDescription = stringResource(R.string.event_delete),
                         tint = Color.Red.copy(alpha = 0.7f),
                         modifier = Modifier.size(20.dp)
                     )

@@ -2,10 +2,16 @@ package com.cocode.calendar.screens
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.cocode.calendar.components.*
+import com.cocode.calendar.components.about.AboutEntryButton
+import com.cocode.calendar.components.about.AboutScreen
 import com.cocode.calendar.converter.CalendarConverterBox
 import com.cocode.calendar.components.footer.FooterInfo
 
@@ -16,6 +22,8 @@ import com.cocode.calendar.components.footer.FooterInfo
  */
 @Composable
 fun CalendarScreen() {
+    // Whether the About screen is open. Saved, so it stays open when the phone is rotated.
+    var showAbout by rememberSaveable { mutableStateOf(false) }
 
     // Use Box to allow absolute positioning
     Box(modifier = Modifier.fillMaxSize()) {
@@ -23,7 +31,7 @@ fun CalendarScreen() {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(bottom = 80.dp) // Leave space for footer
+                .padding(bottom = 130.dp) // Leave space for the About button and the footer
         ) {
             // The header section with gradient background, calendar info, and Iran time
             HeaderSection()
@@ -50,9 +58,18 @@ fun CalendarScreen() {
         // Event list dialog
         EventListDialog()
 
-        // Footer positioned at the bottom
-        FooterInfo(
+        // About button and footer positioned at the bottom
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.align(Alignment.BottomCenter)
-        )
+        ) {
+            AboutEntryButton(onClick = { showAbout = true })
+            FooterInfo()
+        }
+
+        // About screen, drawn over everything else
+        if (showAbout) {
+            AboutScreen(onClose = { showAbout = false })
+        }
     }
 }
