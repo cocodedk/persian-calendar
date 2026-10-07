@@ -8,15 +8,21 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalResources
+import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.cocode.calendar.CalColors
 import com.cocode.calendar.CalendarViewModel
+import com.cocode.calendar.R
+import com.cocode.calendar.models.JalaliMonth
 import utils.DateTimeUtils
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
+import com.cocode.calendar.components.date.currentLocale
+import com.cocode.calendar.components.date.deviceBestPattern
+import utils.DateFormats
 
 /**
  * Calendar-specific header component that displays calendar information.
@@ -28,13 +34,19 @@ fun CalendarHeader() {
     val gregorianDate by viewModel.gregorianDate.observeAsState(initial = LocalDate.now())
     val isJalaliCalendar by viewModel.isJalaliCalendar.observeAsState(initial = false)
 
-    val (primaryText, secondaryText) = remember(gregorianDate, isJalaliCalendar) {
+    val resources = LocalResources.current
+    val locale = currentLocale()
+    val persianMonths = stringArrayResource(R.array.jalali_months_persian)
+    val (primaryText, secondaryText) = remember(gregorianDate, isJalaliCalendar, resources, persianMonths, locale) {
         val jalaliMonths = CalendarConverter.gregorianToJalaliMonths(gregorianDate)
         val jalaliDate = CalendarConverter.gregorianToJalali(gregorianDate)
         val jalaliWeekNumber = CalendarConverter.getJalaliWeekNumber(jalaliDate)
+        fun weekLabel(week: Int) = resources.getString(R.string.header_week, week.toString())
+        fun monthName(month: JalaliMonth?) = month?.let { persianMonths[it.monthValue - 1] }
 
-        val jalaliText = "week $jalaliWeekNumber - ${jalaliMonths["left"]?.monthName} - ${jalaliMonths["right"]?.monthName} ${jalaliMonths["right"]?.year}"
-        val gregorianText = "${gregorianDate.format(DateTimeFormatter.ofPattern("MMMM yyyy"))} - week ${DateTimeUtils.getCurrentWeekNumber(gregorianDate)}"
+        val right = jalaliMonths["right"]
+        val jalaliText = "${weekLabel(jalaliWeekNumber)} - ${monthName(jalaliMonths["left"])} - ${monthName(right)} ${right?.year}"
+        val gregorianText = "${DateFormats.monthYear(gregorianDate, locale, deviceBestPattern)} - ${weekLabel(DateTimeUtils.getCurrentWeekNumber(gregorianDate))}"
 
         if (isJalaliCalendar) jalaliText to gregorianText else gregorianText to jalaliText
     }

@@ -31,52 +31,6 @@ object EventUtils {
     }
 
     /**
-     * Formats event duration for display.
-     *
-     * @param event The event to format
-     * @return Formatted duration string
-     */
-    fun formatEventDuration(event: Event): String {
-        return if (event.isAllDay) {
-            "All Day"
-        } else {
-            val startDate = LocalDate.parse(event.startDate)
-            val endDate = LocalDate.parse(event.endDate)
-
-            if (startDate == endDate) {
-                "Single Day"
-            } else {
-                val days = java.time.temporal.ChronoUnit.DAYS.between(startDate, endDate) + 1
-                "${days} Days"
-            }
-        }
-    }
-
-    /**
-     * Gets the repetition description for an event.
-     *
-     * @param event The event to get repetition info for
-     * @return Formatted repetition description
-     */
-    fun getRepetitionDescription(event: Event): String {
-        return when {
-            !event.isRepeating -> "One-time event"
-            event.repetitionType == "DAILY" -> "Repeats daily"
-            event.repetitionType == "WEEKLY" -> "Repeats weekly"
-            event.repetitionType == "MONTHLY" -> "Repeats monthly"
-            event.repetitionType == "YEARLY" -> {
-                val repetitionEndDate = event.repetitionEndDate
-                if (repetitionEndDate != null) {
-                    "Repeats yearly until ${LocalDate.parse(repetitionEndDate).year}"
-                } else {
-                    "Repeats yearly"
-                }
-            }
-            else -> "Unknown repetition"
-        }
-    }
-
-    /**
      * Checks if an event occurs on a specific date.
      *
      * @param event The event to check

@@ -17,11 +17,10 @@ object JalaliToGregorianConverter {
      * @return A LocalDate object representing the Gregorian date
      */
     fun jalaliToGregorian(jalaliY: Int, jalaliM: Int, jalaliD: Int): LocalDate {
-        val jalaliYear = jalaliY - 979
         val jalaliMonth = jalaliM - 1
         val jalaliDay = jalaliD - 1
 
-        var jalaliDayNo = 365 * jalaliYear + (jalaliYear / 33) * 8 + ((jalaliYear % 33 + 3) / 4)
+        var jalaliDayNo = JalaliCalendar.daysBeforeYear(jalaliY)
         for (i in 0 until jalaliMonth) jalaliDayNo += CalendarConstants.jalaliDaysInMonth[i]
 
         jalaliDayNo += jalaliDay

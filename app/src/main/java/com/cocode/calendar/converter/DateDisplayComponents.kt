@@ -1,6 +1,7 @@
 package com.cocode.calendar.converter
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 
 /**
  * DateDisplayComponents.kt - Facade for date display components.
@@ -16,12 +17,19 @@ import androidx.compose.runtime.Composable
 
 // Re-export display components for backward compatibility
 @Composable
-fun DisplayConvertedDate(convertedDate: Any?, year: String, month: String, day: String) {
+fun DisplayConvertedDate(
+    convertedDate: Any?,
+    year: String,
+    month: String,
+    day: String,
+    modifier: Modifier = Modifier
+) {
     com.cocode.calendar.components.date.DisplayConvertedDate(
         convertedDate = convertedDate,
         year = year,
         month = month,
-        day = day
+        day = day,
+        modifier = modifier
     )
 }
 

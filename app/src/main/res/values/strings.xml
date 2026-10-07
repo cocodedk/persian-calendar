@@ -1,3 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Persian Calendar</string>
+    <string name="app_name">Jalali Persian Calendar</string>
+
+    <!-- Buttons used in more than one place -->
+    <string name="action_cancel">Cancel</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_close">Close</string>
+    <string name="action_about">About this app</string>
+
+    <!-- Calendar screen: header -->
+    <string name="header_week">week %1$s</string>
+    <string name="header_iran_time">Iran time: %1$s</string>
+
+    <!-- Calendar screen: week days, Sunday first -->
+    <string-array name="weekday_short">
+        <item>Sun</item>
+        <item>Mon</item>
+        <item>Tue</item>
+        <item>Wed</item>
+        <item>Thu</item>
+        <item>Fri</item>
+        <item>Sat</item>
+    </string-array>
+
+    <!-- Month names. The Persian names are in Persian script in every language, so they are not translated. -->
+    <string-array name="jalali_months_persian" translatable="false">
+        <item>فروردین</item>
+        <item>اردیبهشت</item>
+        <item>خرداد</item>
+        <item>تیر</item>
+        <item>مرداد</item>
+        <item>شهریور</item>
+        <item>مهر</item>
+        <item>آبان</item>
+        <item>آذر</item>
+        <item>دی</item>
+        <item>بهمن</item>
+        <item>اسفند</item>
+    </string-array>
+    <string-array name="jalali_months_short">
+        <item>Far</item>
+        <item>Ord</item>
+        <item>Kho</item>
+        <item>Tir</item>
+        <item>Mor</item>
+        <item>Sha</item>
+        <item>Meh</item>
+        <item>Aba</item>
+        <item>Aza</item>
+        <item>Dey</item>
+        <item>Bah</item>
+        <item>Esf</item>
+    </string-array>
+    <string-array name="gregorian_months_short">
+        <item>Jan</item>
+        <item>Feb</item>
+        <item>Mar</item>
+        <item>Apr</item>
+        <item>May</item>
+        <item>Jun</item>
+        <item>Jul</item>
+        <item>Aug</item>
+        <item>Sep</item>
+        <item>Oct</item>
+        <item>Nov</item>
+        <item>Dec</item>
+    </string-array>
+
+    <!-- Calendar screen: buttons -->
+    <string name="calendar_today">Today</string>
+    <string name="calendar_converter">Converter</string>
+    <string name="calendar_show_jalali">Show Jalali dates</string>
+    <string name="calendar_show_gregorian">Show Gregorian dates</string>
+    <string name="calendar_select_month">Select Month</string>
+    <string name="calendar_select_year">Select Year</string>
+    <string name="picker_month_title_gregorian">Select Gregorian month</string>
+    <string name="picker_month_title_jalali">Select Jalali month</string>
+    <string name="picker_year_title_gregorian">Select Gregorian year</string>
+    <string name="picker_year_title_jalali">Select Jalali year</string>
+    <string name="calendar_next_month">Next month</string>
+    <string name="calendar_previous_month">Previous month</string>
+    <string name="calendar_next_year">Next year</string>
+    <string name="calendar_previous_year">Previous year</string>
+
+    <!-- Date converter -->
+    <string name="converter_title">📅 Date Converter</string>
+    <string name="converter_close">Close converter</string>
+    <string name="converter_direction_jalali_to_gregorian">Jalali → Gregorian</string>
+    <string name="converter_direction_gregorian_to_jalali">Gregorian → Jalali</string>
+    <string name="converter_swap_to_gregorian_to_jalali">Convert from Gregorian to Jalali instead</string>
+    <string name="converter_swap_to_jalali_to_gregorian">Convert from Jalali to Gregorian instead</string>
+    <string name="converter_enter_jalali">Enter a Jalali date</string>
+    <string name="converter_enter_gregorian">Enter a Gregorian date</string>
+    <string name="converter_problem">Something went wrong. Close the converter and open it again.</string>
+    <string name="converter_field_year">Year</string>
+    <string name="converter_field_month">Month</string>
+    <string name="converter_field_day">Day</string>
+    <string name="converter_result_gregorian">Gregorian Date</string>
+    <string name="converter_result_jalali">Jalali Date</string>
+    <string name="converter_result">Result</string>
+    <string name="converter_invalid_date">Invalid Date</string>
+    <string name="converter_invalid_jalali">Enter a valid Jalali date</string>
+    <string name="converter_invalid_gregorian">Enter a valid Gregorian date</string>
+    <string name="converter_invalid_other">Enter a valid date</string>
+    <string name="converter_period_unreadable">The date could not be read. Check the year, month and day.</string>
+    <string name="converter_period_until">⏰ Time until this date</string>
+    <string name="converter_period_since">⏰ Time since this date</string>
+    <string name="converter_period_same_day">Same day</string>
+    <plurals name="period_years">
+        <item quantity="one">%1$s year</item>
+        <item quantity="other">%1$s years</item>
+    </plurals>
+    <plurals name="period_months">
+        <item quantity="one">%1$s month</item>
+        <item quantity="other">%1$s months</item>
+    </plurals>
+    <plurals name="period_days">
+        <item quantity="one">%1$s day</item>
+        <item quantity="other">%1$s days</item>
+    </plurals>
+
+    <!-- Events -->
+    <string name="events_title">Events</string>
+    <string name="events_add">Add event</string>
+    <string name="events_empty">No events were added on this day</string>
+    <string name="events_create_first">Add an event</string>
+    <string name="event_all_day">All Day</string>
+    <string name="event_repeats_yearly">Repeats on this Gregorian date each year</string>
+    <string name="event_repeats_yearly_until">Repeats on this Gregorian date each year through %1$s</string>
+    <string name="event_edit">Edit event</string>
+    <string name="event_delete">Delete event</string>
+    <string name="event_delete_title">Delete Event</string>
+    <string name="event_delete_message">Delete \"%1$s\"?</string>
+    <string name="event_delete_message_repeating">Delete \"%1$s\" and all its yearly repeats?</string>
+    <string name="event_delete_warning">You cannot undo this.</string>
+    <string name="event_form_create_title">Create Event</string>
+    <string name="event_form_edit_title">Edit Event</string>
+    <string name="event_form_date">Date: %1$s</string>
+    <string name="event_form_title_label">Event Title</string>
+    <string name="event_form_description_label">Description (Optional)</string>
+    <string name="event_form_repeat_yearly">Repeat yearly on this Gregorian date</string>
+    <string name="event_form_end_year_label">Last Gregorian year (Optional)</string>
+    <string name="event_form_end_year_placeholder">e.g., 2030</string>
+    <string name="event_form_end_year_hint">The event repeats through the year you enter. Leave it empty to repeat every year with no end.</string>
+    <string name="event_form_create">Create</string>
+    <string name="event_form_update">Update</string>
+    <string name="event_error_title_required">Event title is required</string>
+    <string name="event_error_title_too_long">Event title must be 100 characters or fewer</string>
+    <string name="event_error_description_too_long">Description must be 500 characters or fewer</string>
+    <string name="event_error_end_year_past">Last year must be the current Gregorian year or later</string>
+    <string name="event_error_end_year_invalid">Last year must be a number, such as 2030</string>
+
+    <!-- About screen -->
+    <string name="about_title">About Jalali Persian Calendar</string>
+    <string name="about_version">Version %1$s</string>
+    <string name="about_check_updates">See the latest version</string>
+    <string name="about_what_title">What the app does</string>
+    <string name="about_what_body">Jalali Persian Calendar shows each month as a grid of days. The day numbers can be Gregorian, the calendar used around the world, or Jalali, the Persian calendar. It converts a date from one calendar to the other and shows the time in Iran. Tap a day to add an event or see that day\'s events.</string>
+    <string name="about_privacy_title">Privacy</string>
+    <string name="about_privacy_no_data">The app does not collect, send or share any personal data.</string>
+    <string name="about_privacy_events">Events you add are stored in a private database on your phone, and the app does not send them anywhere. Deleting the app or clearing its data removes this copy.</string>
+    <string name="about_privacy_no_internet">The app has no internet permission, so it cannot send your data anywhere. It has no analytics, crash reporting or ads.</string>
+    <string name="about_privacy_backup">If Android or Google account backup is on, your phone may include the app\'s data in your own Google backup. You and Google control that backup. We cannot see it.</string>
+    <string name="about_privacy_link">Read the privacy policy</string>
+    <string name="about_links_title">Links</string>
+    <string name="about_website">Open the website</string>
+    <string name="about_source">See the source code on GitHub</string>
+    <string name="about_report">Report a problem on GitHub</string>
+    <string name="about_no_browser">No app on your phone can open this link. Install a web browser, then try again.</string>
+    <string name="about_credits">Credits and licenses</string>
+    <string name="about_credits_license">Jalali Persian Calendar is free software under the MIT License. Copyright © 2025 Babak Bandpey.</string>
+    <string name="about_credits_libraries">The app is built with AndroidX, Jetpack Compose, Material 3 and Room, released under the Apache License 2.0.</string>
+    <string name="about_made_by">Made by Cocode (cocode.dk)</string>
+    <string name="about_made_by_body">Jalali Persian Calendar is made by Babak Bandpey at Cocode.</string>
+    <string name="about_cocode">Open cocode.dk</string>
 </resources>

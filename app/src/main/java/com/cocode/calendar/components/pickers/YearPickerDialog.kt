@@ -1,6 +1,5 @@
 package com.cocode.calendar.components.pickers
 
-import CalendarConverter
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -16,6 +15,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -23,11 +23,13 @@ import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.cocode.calendar.CalColors
 import com.cocode.calendar.CalendarViewModel
+import com.cocode.calendar.R
 import java.time.LocalDate
 
 /**
  * Dialog for selecting a year from a scrollable list.
- * Supports both Gregorian and Jalali calendar systems with automatic conversion.
+ * Shows Jalali or Gregorian years, as the main screen does, and returns the year chosen
+ * in that calendar.
  */
 @Composable
 fun YearPickerDialog(
@@ -38,28 +40,15 @@ fun YearPickerDialog(
     val currentDate = viewModel.gregorianDate.observeAsState(LocalDate.now()).value
     val isJalaliCalendar = viewModel.isJalaliCalendar.observeAsState(false).value
 
-    val currentGregorianYear = currentDate?.year ?: LocalDate.now().year
-
     // Year range (can be adjusted as needed)
     val startGregorianYear = 1900
     val endGregorianYear = 2100
     val gregorianYears = (startGregorianYear..endGregorianYear).toList()
 
-    // Convert to display years and current year based on calendar mode
-    val (displayYears, currentDisplayYear) = if (isJalaliCalendar) {
-        // Convert Gregorian years to Jalali years for display
-        val jalaliYears = gregorianYears.map { gregorianYear ->
-            val tempDate = LocalDate.of(gregorianYear, 6, 15) // Use middle of year for conversion
-            CalendarConverter.gregorianToJalali(tempDate).year
-        }
-
-        // Get current Jalali year
-        val currentJalaliYear = CalendarConverter.gregorianToJalali(currentDate ?: LocalDate.now()).year
-
-        jalaliYears to currentJalaliYear
-    } else {
-        gregorianYears to currentGregorianYear
-    }
+    // The list shows Jalali or Gregorian years, as the main screen does, and the highlighted
+    // year is the one the main screen is in, in the same calendar.
+    val displayYears = PickerUtils.convertYearsForDisplay(gregorianYears, isJalaliCalendar)
+    val currentDisplayYear = PickerUtils.getCurrentYear(currentDate, isJalaliCalendar)
 
     // Calculate the index of the current year in the display list
     val currentYearIndex = displayYears.indexOf(currentDisplayYear)
@@ -85,10 +74,13 @@ fun YearPickerDialog(
                 .height(400.dp)
         ) {
             Text(
-                text = "Select Year",
+                text = stringResource(
+                    if (isJalaliCalendar) R.string.picker_year_title_jalali
+                    else R.string.picker_year_title_gregorian
+                ),
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold,
-                color = CalColors.active_text,
+                color = CalColors.background,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
@@ -100,13 +92,12 @@ fun YearPickerDialog(
             ) {
                 items(displayYears.indices.toList()) { index ->
                     val displayYear = displayYears[index]
-                    val gregorianYear = gregorianYears[index]
                     val isSelected = displayYear == currentDisplayYear
 
                     Button(
                         onClick = {
-                            // Always pass the Gregorian year to maintain internal consistency
-                            onYearSelected(gregorianYear)
+                            // The year is in the calendar the list shows (Jalali or Gregorian)
+                            onYearSelected(displayYear)
                         },
                         colors = ButtonDefaults.buttonColors(
                             containerColor = if (isSelected)
@@ -117,7 +108,7 @@ fun YearPickerDialog(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(vertical = 2.dp)
-                            .height(52.dp)
+                            .heightIn(min = 52.dp)
                     ) {
                         Text(
                             text = displayYear.toString(),
@@ -137,10 +128,10 @@ fun YearPickerDialog(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 16.dp)
-                    .height(48.dp)
+                    .heightIn(min = 48.dp)
             ) {
                 Text(
-                    text = "Cancel",
+                    text = stringResource(R.string.action_cancel),
                     color = Color.White,
                     fontWeight = FontWeight.Bold
                 )

@@ -10,11 +10,14 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.cocode.calendar.CalColors
 import com.cocode.calendar.CalendarViewModel
+import com.cocode.calendar.R
+import com.cocode.calendar.components.pickers.PickerTargets
 import java.time.LocalDate
 import java.time.YearMonth
 
@@ -51,10 +54,10 @@ fun CalendarNavigation() {
             modifier = Modifier
                 .weight(1f)
                 .padding(end = 8.dp)
-                .height(48.dp)
+                .heightIn(min = 48.dp)
         ) {
             Text(
-                text = "Select Month",
+                text = stringResource(R.string.calendar_select_month),
                 color = CalColors.text,
                 fontWeight = FontWeight.Bold
             )
@@ -68,10 +71,10 @@ fun CalendarNavigation() {
             modifier = Modifier
                 .weight(1f)
                 .padding(start = 8.dp)
-                .height(48.dp)
+                .heightIn(min = 48.dp)
         ) {
             Text(
-                text = "Select Year",
+                text = stringResource(R.string.calendar_select_year),
                 color = CalColors.text,
                 fontWeight = FontWeight.Bold
             )
@@ -79,15 +82,19 @@ fun CalendarNavigation() {
     }
 
     // Current date for month selection
-    val currentDate = viewModel.gregorianDate.observeAsState(LocalDate.now()).value
+    val currentDate = viewModel.gregorianDate.observeAsState(LocalDate.now()).value ?: LocalDate.now()
+    val isJalaliCalendar = viewModel.isJalaliCalendar.observeAsState(false).value
 
-    // Show dialogs when requested
+    // Show dialogs when requested. The grid always shows the Gregorian month of the stored date.
+    // A Jalali choice stores the date of day 1 of the chosen Jalali month, so the Jalali month
+    // and year the pickers show next time are read from that same date.
     if (showMonthPicker) {
         com.cocode.calendar.components.pickers.MonthPickerDialog(
             onDismiss = { showMonthPicker = false },
             onMonthSelected = { month ->
-                val newYearMonth = YearMonth.of(currentDate?.year ?: LocalDate.now().year, month)
-                viewModel.changeMonth(newYearMonth)
+                viewModel.updateGregorianDate(
+                    PickerTargets.afterMonthChoice(currentDate, isJalaliCalendar, month)
+                )
                 showMonthPicker = false
             }
         )
@@ -97,7 +104,9 @@ fun CalendarNavigation() {
         com.cocode.calendar.components.pickers.YearPickerDialog(
             onDismiss = { showYearPicker = false },
             onYearSelected = { year ->
-                viewModel.changeYear(year)
+                viewModel.updateGregorianDate(
+                    PickerTargets.afterYearChoice(currentDate, isJalaliCalendar, year)
+                )
                 showYearPicker = false
             }
         )

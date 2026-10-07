@@ -3,18 +3,20 @@ package com.cocode.calendar.converter
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.cocode.calendar.CalendarViewModel
+import com.cocode.calendar.R
 
 /**
  * Displays a calendar converter box that allows switching between Jalali and Gregorian date converters.
@@ -42,7 +44,9 @@ fun CalendarConverterBox() {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(MaterialTheme.colorScheme.scrim.copy(alpha = 0.5f)),
+                .background(MaterialTheme.colorScheme.scrim.copy(alpha = 0.5f))
+                // Keeps the card clear of the keyboard and the system bars
+                .safeDrawingPadding(),
             contentAlignment = Alignment.Center
         ) {
             Card(
@@ -56,56 +60,19 @@ fun CalendarConverterBox() {
                 ),
                 shape = RoundedCornerShape(20.dp)
             ) {
+                // The card is as tall as its content, up to the room above the keyboard; beyond
+                // that it scrolls, so every part can be reached at any text size.
                 Column(
-                    modifier = Modifier.padding(24.dp),
+                    modifier = Modifier
+                        .verticalScroll(rememberScrollState())
+                        .padding(24.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    // Header with title, toggle button, and close button
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "📅 Date Converter",
-                            style = MaterialTheme.typography.headlineSmall,
-                            color = MaterialTheme.colorScheme.onSurface,
-                            fontWeight = FontWeight.Bold
-                        )
-
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            FilledTonalButton(
-                                onClick = { viewModel.toggleJalaliToGregorianConverter() },
-                                colors = ButtonDefaults.filledTonalButtonColors(
-                                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                                ),
-                                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
-                            ) {
-                                Text(
-                                    text = "⇄",
-                                    style = MaterialTheme.typography.titleMedium,
-                                    fontWeight = FontWeight.Bold
-                                )
-                            }
-
-                            IconButton(
-                                onClick = { viewModel.toggleConverter() },
-                                colors = IconButtonDefaults.iconButtonColors(
-                                    containerColor = MaterialTheme.colorScheme.errorContainer,
-                                    contentColor = MaterialTheme.colorScheme.onErrorContainer
-                                )
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Close,
-                                    contentDescription = "Close converter"
-                                )
-                            }
-                        }
-                    }
+                    ConverterHeader(
+                        isJalaliToGregorian = showJalaliToGregorianConverter,
+                        onSwap = { viewModel.toggleJalaliToGregorianConverter() },
+                        onClose = { viewModel.toggleConverter() }
+                    )
 
                     // Conversion direction indicator
                     Surface(
@@ -115,9 +82,9 @@ fun CalendarConverterBox() {
                     ) {
                         Text(
                             text = when {
-                                showJalaliToGregorianConverter -> "Jalali → Gregorian"
-                                showGregorianToJalaliConverter -> "Gregorian → Jalali"
-                                else -> "Error"
+                                showJalaliToGregorianConverter -> stringResource(R.string.converter_direction_jalali_to_gregorian)
+                                showGregorianToJalaliConverter -> stringResource(R.string.converter_direction_gregorian_to_jalali)
+                                else -> stringResource(R.string.converter_problem)
                             },
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.onPrimaryContainer,

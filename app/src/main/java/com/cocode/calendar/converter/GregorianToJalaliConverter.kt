@@ -2,7 +2,6 @@ package com.cocode.calendar.converter
 
 import com.cocode.calendar.models.CalendarConstants
 import com.cocode.calendar.models.JalaliDate
-import utils.Strings
 import java.time.LocalDate
 
 /**
@@ -51,17 +50,13 @@ object GregorianToJalaliConverter {
     }
 
     /**
-     * Returns the name of the Jalali month for a given Gregorian date.
+     * Returns the Jalali month (number and year) for a given Gregorian date.
      *
      * @param gregorianDate The Gregorian date for which to find the corresponding Jalali month
      * @return A JalaliMonth object representing the Jalali month
      */
     fun toJalaliMonth(gregorianDate: LocalDate): com.cocode.calendar.models.JalaliMonth {
         val jalaliDate = gregorianToJalali(gregorianDate)
-        // 'month' is the Jalali month number. Use it to get the month name from the centralized Strings object.
-        // Adjust for zero-based index
-        val monthName = utils.Strings.Months.JALALI_PERSIAN[jalaliDate.monthValue - 1]
-
-        return com.cocode.calendar.models.JalaliMonth(monthName, jalaliDate.monthValue, jalaliDate.year)
+        return com.cocode.calendar.models.JalaliMonth(jalaliDate.monthValue, jalaliDate.year)
     }
 }
