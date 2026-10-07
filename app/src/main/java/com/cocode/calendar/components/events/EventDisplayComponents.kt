@@ -49,7 +49,7 @@ fun EventItemCard(
                     text = event.title,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    color = CalColors.active_text,
+                    color = CalColors.background,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -59,7 +59,7 @@ fun EventItemCard(
                     Text(
                         text = description,
                         style = MaterialTheme.typography.bodyMedium,
-                        color = CalColors.inactive_text,
+                        color = Color.DarkGray,
                         maxLines = 3,
                         overflow = TextOverflow.Ellipsis
                     )

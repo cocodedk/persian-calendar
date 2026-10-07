@@ -71,7 +71,7 @@ fun EventFormFields(
             ),
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold,
-            color = CalColors.active_text
+            color = CalColors.background
         )
 
         // Date display
@@ -81,7 +81,7 @@ fun EventFormFields(
                 dialogDate.format(DateTimeFormatter.ofPattern("MMM dd, yyyy"))
             ),
             style = MaterialTheme.typography.bodyMedium,
-            color = CalColors.inactive_text
+            color = Color.DarkGray
         )
 
         // Title input
@@ -165,7 +165,7 @@ fun EventFormFields(
             Text(
                 text = stringResource(R.string.event_form_end_year_hint),
                 style = MaterialTheme.typography.bodySmall,
-                color = CalColors.inactive_text
+                color = Color.DarkGray
             )
         }
 

@@ -77,7 +77,7 @@ fun YearPickerDialog(
                 text = stringResource(R.string.picker_year_title),
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold,
-                color = CalColors.active_text,
+                color = CalColors.background,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 

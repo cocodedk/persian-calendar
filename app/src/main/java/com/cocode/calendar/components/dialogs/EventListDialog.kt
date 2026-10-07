@@ -67,12 +67,12 @@ fun EventListDialog() {
                                 text = stringResource(R.string.events_title),
                                 style = MaterialTheme.typography.headlineSmall,
                                 fontWeight = FontWeight.Bold,
-                                color = CalColors.active_text
+                                color = CalColors.background
                             )
                             Text(
                                 text = selectedDate!!.format(DateTimeFormatter.ofPattern("MMM dd, yyyy")),
                                 style = MaterialTheme.typography.bodyMedium,
-                                color = CalColors.inactive_text
+                                color = Color.DarkGray
                             )
                         }
 
@@ -103,7 +103,7 @@ fun EventListDialog() {
                                 Text(
                                     text = stringResource(R.string.events_empty),
                                     style = MaterialTheme.typography.bodyLarge,
-                                    color = CalColors.inactive_text
+                                    color = Color.DarkGray
                                 )
                                 Button(
                                     onClick = { viewModel.showEventCreationFromEventList(selectedDate!!) },
@@ -165,7 +165,7 @@ fun EventListDialog() {
                         text = stringResource(R.string.event_delete_title),
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold,
-                        color = CalColors.active_text
+                        color = CalColors.background
                     )
 
                     // Confirmation message
@@ -177,7 +177,7 @@ fun EventListDialog() {
                             eventToDelete!!.title
                         ),
                         style = MaterialTheme.typography.bodyLarge,
-                        color = CalColors.inactive_text
+                        color = Color.DarkGray
                     )
 
                     Text(
