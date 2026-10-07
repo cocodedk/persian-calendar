@@ -38,6 +38,14 @@ class StringResourcesTest {
     }
 
     @Test
+    fun `should list the short Jalali month names in the same order`() {
+        assertEquals(
+            listOf("Far", "Ord", "Kho", "Tir", "Mor", "Sha", "Meh", "Aba", "Aza", "Dey", "Bah", "Esf"),
+            array("jalali_months_short")
+        )
+    }
+
+    @Test
     fun `should list the short Gregorian month names, January first`() {
         assertEquals(
             listOf("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"),

@@ -17,6 +17,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.cocode.calendar.CalColors
 import com.cocode.calendar.CalendarViewModel
 import com.cocode.calendar.R
+import com.cocode.calendar.components.pickers.PickerTargets
 import java.time.LocalDate
 import java.time.YearMonth
 
@@ -81,14 +82,20 @@ fun CalendarNavigation() {
     }
 
     // Current date for month selection
-    val currentDate = viewModel.gregorianDate.observeAsState(LocalDate.now()).value
+    val currentDate = viewModel.gregorianDate.observeAsState(LocalDate.now()).value ?: LocalDate.now()
+    val isJalaliCalendar = viewModel.isJalaliCalendar.observeAsState(false).value
 
-    // Show dialogs when requested
+    // Show dialogs when requested. The grid always shows a Gregorian month, so a Jalali choice
+    // moves it to the Gregorian month that contains day 1 of the chosen Jalali month.
     if (showMonthPicker) {
         com.cocode.calendar.components.pickers.MonthPickerDialog(
             onDismiss = { showMonthPicker = false },
             onMonthSelected = { month ->
-                val newYearMonth = YearMonth.of(currentDate?.year ?: LocalDate.now().year, month)
+                val newYearMonth = if (isJalaliCalendar) {
+                    PickerTargets.afterJalaliMonthChoice(currentDate, month)
+                } else {
+                    YearMonth.of(currentDate.year, month)
+                }
                 viewModel.changeMonth(newYearMonth)
                 showMonthPicker = false
             }
@@ -99,7 +106,11 @@ fun CalendarNavigation() {
         com.cocode.calendar.components.pickers.YearPickerDialog(
             onDismiss = { showYearPicker = false },
             onYearSelected = { year ->
-                viewModel.changeYear(year)
+                if (isJalaliCalendar) {
+                    viewModel.changeMonth(PickerTargets.afterJalaliYearChoice(currentDate, year))
+                } else {
+                    viewModel.changeYear(year)
+                }
                 showYearPicker = false
             }
         )

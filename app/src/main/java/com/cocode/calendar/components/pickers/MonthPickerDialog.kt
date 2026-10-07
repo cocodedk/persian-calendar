@@ -24,7 +24,8 @@ import java.time.LocalDate
 
 /**
  * Dialog for selecting a month from a 3x4 grid layout.
- * The month chosen is a Gregorian month, whichever calendar the main screen shows.
+ * Shows Jalali or Gregorian month names, as the main screen does, and returns the month number
+ * (1-12) in that calendar.
  */
 @Composable
 fun MonthPickerDialog(
@@ -33,11 +34,12 @@ fun MonthPickerDialog(
 ) {
     val viewModel: CalendarViewModel = viewModel()
     val currentDate = viewModel.gregorianDate.observeAsState(LocalDate.now()).value
+    val isJalaliCalendar = viewModel.isJalaliCalendar.observeAsState(false).value
 
-    // The chosen month always changes the Gregorian month, in both calendar modes, so the
-    // buttons carry Gregorian names. The names come from the string resources.
-    val months = PickerUtils.getMonthNames(LocalResources.current)
-    val currentMonth = currentDate?.monthValue ?: 1
+    // The names come from the string resources: Jalali or Gregorian, as the main screen shows.
+    // The highlighted month is the one the main screen is in, in the same calendar.
+    val months = PickerUtils.getMonthNames(LocalResources.current, isJalaliCalendar)
+    val currentMonth = PickerUtils.getCurrentMonth(currentDate, isJalaliCalendar)
 
     Dialog(onDismissRequest = onDismiss) {
         Column(
@@ -46,7 +48,10 @@ fun MonthPickerDialog(
                 .padding(16.dp)
         ) {
             Text(
-                text = stringResource(R.string.picker_month_title),
+                text = stringResource(
+                    if (isJalaliCalendar) R.string.picker_month_title_jalali
+                    else R.string.picker_month_title_gregorian
+                ),
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold,
                 color = CalColors.background,

@@ -38,6 +38,20 @@
         <item>بهمن</item>
         <item>اسفند</item>
     </string-array>
+    <string-array name="jalali_months_short">
+        <item>Far</item>
+        <item>Ord</item>
+        <item>Kho</item>
+        <item>Tir</item>
+        <item>Mor</item>
+        <item>Sha</item>
+        <item>Meh</item>
+        <item>Aba</item>
+        <item>Aza</item>
+        <item>Dey</item>
+        <item>Bah</item>
+        <item>Esf</item>
+    </string-array>
     <string-array name="gregorian_months_short">
         <item>Jan</item>
         <item>Feb</item>
@@ -60,8 +74,10 @@
     <string name="calendar_show_gregorian">Show Gregorian dates</string>
     <string name="calendar_select_month">Select Month</string>
     <string name="calendar_select_year">Select Year</string>
-    <string name="picker_month_title">Select Gregorian month</string>
-    <string name="picker_year_title">Select Gregorian year</string>
+    <string name="picker_month_title_gregorian">Select Gregorian month</string>
+    <string name="picker_month_title_jalali">Select Jalali month</string>
+    <string name="picker_year_title_gregorian">Select Gregorian year</string>
+    <string name="picker_year_title_jalali">Select Jalali year</string>
     <string name="calendar_next_month">Next month</string>
     <string name="calendar_previous_month">Previous month</string>
     <string name="calendar_next_year">Next year</string>

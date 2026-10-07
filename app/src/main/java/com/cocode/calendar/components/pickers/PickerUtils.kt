@@ -17,10 +17,13 @@ import kotlin.math.max
 object PickerUtils {
 
     /**
-     * Gets the short Gregorian month names (from the string resources), January first.
+     * Gets the short month names (from the string resources) for the calendar type,
+     * January or Farvardin first.
      */
-    fun getMonthNames(resources: Resources): Array<String> {
-        return resources.getStringArray(R.array.gregorian_months_short)
+    fun getMonthNames(resources: Resources, isJalaliCalendar: Boolean): Array<String> {
+        return resources.getStringArray(
+            if (isJalaliCalendar) R.array.jalali_months_short else R.array.gregorian_months_short
+        )
     }
 
     /**
