@@ -29,7 +29,7 @@ import com.cocode.calendar.components.date.DateFormattingUtils
  *
  * @return This function doesn't return a value, but creates and displays a Composable UI for date conversion.
  */
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalLayoutApi::class)
 @Composable
 fun DateConverter(
     showJalaliToGregorianConverter: Boolean,
@@ -42,11 +42,14 @@ fun DateConverter(
     val viewModel: CalendarViewModel = viewModel()
     val showConverter by viewModel.showConverter.collectAsState()
 
-    // The result (or the invalid-date message) is scrolled into view when it appears or changes,
-    // so the keyboard and a large text size cannot hide it.
+    // The result (or the invalid-date message) is scrolled into view after every edit, a change of
+    // direction and each time the keyboard opens, so neither the keyboard nor a large text size
+    // can hide it. A message that stays the same (an invalid date edited to another invalid date)
+    // needs this as much as a new result.
     val resultRequester = remember { BringIntoViewRequester() }
     val resultShown = convertedDate != null || DateFormattingUtils.hasCompleteInput(year, month, day)
-    LaunchedEffect(resultShown, convertedDate) {
+    val keyboardVisible = WindowInsets.isImeVisible
+    LaunchedEffect(resultShown, year, month, day, showJalaliToGregorianConverter, keyboardVisible) {
         if (resultShown) {
             withFrameNanos { }
             resultRequester.bringIntoView()
