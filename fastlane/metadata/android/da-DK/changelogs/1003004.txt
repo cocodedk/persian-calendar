@@ -1,1 +1,1 @@
-Datoomregneren regner nu om, mens du skriver, som beskrivelsen siger. Før kom resultatet først frem, når du trykkede på Udført på tastaturet.
+Datoomregningen opdateres nu, mens du skriver. Du behøver ikke længere trykke på Udført på tastaturet for at se resultatet.

@@ -1,3 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Persian Calendar</string>
+
+    <!-- Knapper, der bruges flere steder -->
+    <string name="action_cancel">Annullér</string>
+    <string name="action_delete">Slet</string>
+    <string name="action_close">Luk</string>
+    <string name="action_about">Om appen</string>
+
+    <!-- Kalenderskærmen: overskrift -->
+    <string name="header_week">uge %1$s</string>
+    <string name="header_iran_time">Klokken i Iran: %1$s</string>
+
+    <!-- Kalenderskærmen: ugedage, søndag først -->
+    <string-array name="weekday_short">
+        <item>Søn</item>
+        <item>Man</item>
+        <item>Tir</item>
+        <item>Ons</item>
+        <item>Tor</item>
+        <item>Fre</item>
+        <item>Lør</item>
+    </string-array>
+
+    <!-- Månedsnavne. De persiske navne står på persisk i alle sprog og er derfor ikke oversat (jalali_months_persian). -->
+    <string-array name="jalali_months_short">
+        <item>Far</item>
+        <item>Ord</item>
+        <item>Kho</item>
+        <item>Tir</item>
+        <item>Mor</item>
+        <item>Sha</item>
+        <item>Meh</item>
+        <item>Aba</item>
+        <item>Aza</item>
+        <item>Dey</item>
+        <item>Bah</item>
+        <item>Esf</item>
+    </string-array>
+    <string-array name="gregorian_months_short">
+        <item>Jan</item>
+        <item>Feb</item>
+        <item>Mar</item>
+        <item>Apr</item>
+        <item>Maj</item>
+        <item>Jun</item>
+        <item>Jul</item>
+        <item>Aug</item>
+        <item>Sep</item>
+        <item>Okt</item>
+        <item>Nov</item>
+        <item>Dec</item>
+    </string-array>
+
+    <!-- Kalenderskærmen: knapper -->
+    <string name="calendar_today">I dag</string>
+    <string name="calendar_converter">Omregner</string>
+    <string name="calendar_show_jalali">Vis jalali-datoer</string>
+    <string name="calendar_show_gregorian">Vis gregorianske datoer</string>
+    <string name="calendar_select_month">Vælg måned</string>
+    <string name="calendar_select_year">Vælg år</string>
+    <string name="picker_month_title_gregorian">Vælg gregoriansk måned</string>
+    <string name="picker_month_title_jalali">Vælg jalali-måned</string>
+    <string name="picker_year_title_gregorian">Vælg gregoriansk år</string>
+    <string name="picker_year_title_jalali">Vælg jalali-år</string>
+    <string name="calendar_next_month">Næste måned</string>
+    <string name="calendar_previous_month">Forrige måned</string>
+    <string name="calendar_next_year">Næste år</string>
+    <string name="calendar_previous_year">Forrige år</string>
+
+    <!-- Datoomregner -->
+    <string name="converter_title">📅 Datoomregner</string>
+    <string name="converter_close">Luk omregneren</string>
+    <string name="converter_direction_jalali_to_gregorian">Jalali → gregoriansk</string>
+    <string name="converter_direction_gregorian_to_jalali">Gregoriansk → jalali</string>
+    <string name="converter_swap_to_gregorian_to_jalali">Omregn i stedet fra gregoriansk til jalali</string>
+    <string name="converter_swap_to_jalali_to_gregorian">Omregn i stedet fra jalali til gregoriansk</string>
+    <string name="converter_enter_jalali">Skriv en jalali-dato</string>
+    <string name="converter_enter_gregorian">Skriv en gregoriansk dato</string>
+    <string name="converter_problem">Noget gik galt. Luk omregneren, og åbn den igen.</string>
+    <string name="converter_field_year">År</string>
+    <string name="converter_field_month">Måned</string>
+    <string name="converter_field_day">Dag</string>
+    <string name="converter_result_gregorian">Gregoriansk dato</string>
+    <string name="converter_result_jalali">Jalali-dato</string>
+    <string name="converter_result">Resultat</string>
+    <string name="converter_invalid_date">Ugyldig dato</string>
+    <string name="converter_invalid_jalali">Skriv en gyldig jalali-dato</string>
+    <string name="converter_invalid_gregorian">Skriv en gyldig gregoriansk dato</string>
+    <string name="converter_invalid_other">Skriv en gyldig dato</string>
+    <string name="converter_period_unreadable">Datoen kunne ikke læses. Tjek år, måned og dag.</string>
+    <string name="converter_period_until">⏰ Tid til denne dato</string>
+    <string name="converter_period_since">⏰ Tid siden denne dato</string>
+    <string name="converter_period_same_day">Samme dag</string>
+    <plurals name="period_years">
+        <item quantity="one">%1$s år</item>
+        <item quantity="other">%1$s år</item>
+    </plurals>
+    <plurals name="period_months">
+        <item quantity="one">%1$s måned</item>
+        <item quantity="other">%1$s måneder</item>
+    </plurals>
+    <plurals name="period_days">
+        <item quantity="one">%1$s dag</item>
+        <item quantity="other">%1$s dage</item>
+    </plurals>
+
+    <!-- Begivenheder -->
+    <string name="events_title">Begivenheder</string>
+    <string name="events_add">Tilføj begivenhed</string>
+    <string name="events_empty">Der er ikke tilføjet nogen begivenheder denne dag</string>
+    <string name="events_create_first">Tilføj en begivenhed</string>
+    <string name="event_all_day">Hele dagen</string>
+    <string name="event_repeats_yearly">Gentages hvert år på denne gregorianske dato</string>
+    <string name="event_repeats_yearly_until">Gentages hvert år på denne gregorianske dato til og med %1$s</string>
+    <string name="event_edit">Redigér begivenhed</string>
+    <string name="event_delete">Slet begivenhed</string>
+    <string name="event_delete_title">Slet begivenhed</string>
+    <string name="event_delete_message">Slet \"%1$s\"?</string>
+    <string name="event_delete_message_repeating">Slet \"%1$s\" og alle dens årlige gentagelser?</string>
+    <string name="event_delete_warning">Det kan ikke fortrydes.</string>
+    <string name="event_form_create_title">Opret begivenhed</string>
+    <string name="event_form_edit_title">Redigér begivenhed</string>
+    <string name="event_form_date">Dato: %1$s</string>
+    <string name="event_form_title_label">Begivenhedens titel</string>
+    <string name="event_form_description_label">Beskrivelse (valgfri)</string>
+    <string name="event_form_repeat_yearly">Gentag hvert år på denne gregorianske dato</string>
+    <string name="event_form_end_year_label">Sidste gregorianske år (valgfrit)</string>
+    <string name="event_form_end_year_placeholder">fx 2030</string>
+    <string name="event_form_end_year_hint">Begivenheden gentages til og med det år, du skriver. Lad feltet stå tomt, hvis den skal gentages hvert år uden slutdato.</string>
+    <string name="event_form_create">Opret</string>
+    <string name="event_form_update">Opdatér</string>
+    <string name="event_error_title_required">Begivenheden skal have en titel</string>
+    <string name="event_error_title_too_long">Titlen må højst være på 100 tegn</string>
+    <string name="event_error_description_too_long">Beskrivelsen må højst være på 500 tegn</string>
+    <string name="event_error_end_year_past">Sidste år skal være det nuværende gregorianske år eller senere</string>
+    <string name="event_error_end_year_invalid">Sidste år skal være et tal, for eksempel 2030</string>
+
+    <!-- Om-skærmen -->
+    <string name="about_title">Om Persian Calendar</string>
+    <string name="about_version">Version %1$s</string>
+    <string name="about_check_updates">Se den nyeste version</string>
+    <string name="about_what_title">Hvad appen kan</string>
+    <string name="about_what_body">Persian Calendar viser hver måned som et gitter af dage. Dagstallene kan være gregorianske, den kalender, der bruges i det meste af verden, eller jalali, den persiske kalender. Appen omregner en dato fra den ene kalender til den anden og viser klokkeslættet i Iran. Tryk på en dag for at tilføje en begivenhed eller se dagens begivenheder.</string>
+    <string name="about_privacy_title">Privatliv</string>
+    <string name="about_privacy_no_data">Appen indsamler, sender og deler ingen personoplysninger.</string>
+    <string name="about_privacy_events">Begivenheder, du tilføjer, gemmes i en privat database på din telefon, og appen sender dem ikke nogen steder hen. Hvis du sletter appen eller rydder dens data, forsvinder denne kopi.</string>
+    <string name="about_privacy_no_internet">Appen har ikke adgang til internettet, så den kan ikke sende dine data nogen steder hen. Den har hverken analyseværktøjer, fejlrapportering eller reklamer.</string>
+    <string name="about_privacy_backup">Hvis Androids sikkerhedskopiering eller sikkerhedskopiering til din Google-konto er slået til, kan din telefon tage appens data med i din egen Google-sikkerhedskopi. Det er dig og Google, der styrer den sikkerhedskopi. Vi kan ikke se den.</string>
+    <string name="about_privacy_link">Læs privatlivspolitikken</string>
+    <string name="about_links_title">Links</string>
+    <string name="about_website">Åbn hjemmesiden</string>
+    <string name="about_source">Se kildekoden på GitHub</string>
+    <string name="about_report">Meld en fejl på GitHub</string>
+    <string name="about_no_browser">Ingen app på telefonen kan åbne linket. Installér en webbrowser, og prøv igen.</string>
+    <string name="about_credits">Tak og licenser</string>
+    <string name="about_credits_license">Persian Calendar er fri software under MIT-licensen. Copyright © 2025 Babak Bandpey.</string>
+    <string name="about_credits_libraries">Appen er bygget med AndroidX, Jetpack Compose, Material 3 og Room, som er udgivet under Apache License 2.0.</string>
+    <string name="about_made_by">Lavet af Cocode (cocode.dk)</string>
+    <string name="about_made_by_body">Persian Calendar er lavet af Babak Bandpey hos Cocode.</string>
+    <string name="about_cocode">Åbn cocode.dk</string>
 </resources>
