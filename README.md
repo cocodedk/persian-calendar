@@ -46,7 +46,7 @@ A modern Android calendar application built with Jetpack Compose that supports b
 
 ## Privacy
 
-The app does not collect, transmit or share any personal data. It requests no internet permission and no runtime permissions, and it uses no analytics, crash reporting or advertising. The events you add are stored only in a database on your own device.
+The app does not collect, transmit or share any personal data. It requests no internet permission and no runtime permissions, and it uses no analytics, crash reporting or advertising. The events you add are stored only in a database on your own device. If you have enabled Android Auto Backup or Google account backup, the operating system may include this data in your own personal Google backup. That is controlled entirely by you and Google, and we have no access to it.
 
 Read the full [privacy policy](https://calendar.cocode.dk/privacy/).
 
