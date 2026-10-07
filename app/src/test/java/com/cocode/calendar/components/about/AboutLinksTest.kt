@@ -13,7 +13,7 @@ class AboutLinksTest {
     fun `should open the latest GitHub release while the app is not on F-Droid`() {
         assertEquals(
             "https://github.com/cocodedk/persian-calendar/releases/latest",
-            aboutUrl(AboutLink.LatestVersion, applicationId, liveOnFdroid = false)
+            aboutUrl(AboutLink.LatestVersion, applicationId, "en", liveOnFdroid = false)
         )
     }
 
@@ -21,7 +21,7 @@ class AboutLinksTest {
     fun `should open the F-Droid page once the app is on F-Droid`() {
         assertEquals(
             "https://f-droid.org/packages/com.cocode.calendar/",
-            aboutUrl(AboutLink.LatestVersion, applicationId, liveOnFdroid = true)
+            aboutUrl(AboutLink.LatestVersion, applicationId, "en", liveOnFdroid = true)
         )
     }
 
@@ -31,26 +31,56 @@ class AboutLinksTest {
     }
 
     @Test
-    fun `should link the privacy policy on the app site`() {
-        assertEquals("https://calendar.cocode.dk/privacy/", aboutUrl(AboutLink.PrivacyPolicy, applicationId))
+    fun `should open the English website and privacy policy in English`() {
+        assertEquals("https://calendar.cocode.dk", aboutUrl(AboutLink.Website, applicationId, "en"))
+        assertEquals("https://calendar.cocode.dk/privacy/", aboutUrl(AboutLink.PrivacyPolicy, applicationId, "en"))
     }
 
     @Test
-    fun `should link the website, source code and issue tracker`() {
-        assertEquals("https://calendar.cocode.dk", aboutUrl(AboutLink.Website, applicationId))
-        assertEquals("https://github.com/cocodedk/persian-calendar", aboutUrl(AboutLink.Source, applicationId))
-        assertEquals("https://github.com/cocodedk/persian-calendar/issues", aboutUrl(AboutLink.Issues, applicationId))
+    fun `should open the Danish website and privacy policy in Danish`() {
+        assertEquals("https://calendar.cocode.dk/da/", aboutUrl(AboutLink.Website, applicationId, "da"))
+        assertEquals(
+            "https://calendar.cocode.dk/da/privacy/",
+            aboutUrl(AboutLink.PrivacyPolicy, applicationId, "da")
+        )
+    }
+
+    @Test
+    fun `should open the English pages in a language the site lacks`() {
+        listOf("fa", "de").forEach { language ->
+            assertEquals("https://calendar.cocode.dk", aboutUrl(AboutLink.Website, applicationId, language))
+            assertEquals(
+                "https://calendar.cocode.dk/privacy/",
+                aboutUrl(AboutLink.PrivacyPolicy, applicationId, language)
+            )
+        }
+    }
+
+    @Test
+    fun `should link the source code and issue tracker in every language`() {
+        listOf("en", "da", "fa").forEach { language ->
+            assertEquals(
+                "https://github.com/cocodedk/persian-calendar",
+                aboutUrl(AboutLink.Source, applicationId, language)
+            )
+            assertEquals(
+                "https://github.com/cocodedk/persian-calendar/issues",
+                aboutUrl(AboutLink.Issues, applicationId, language)
+            )
+        }
     }
 
     @Test
     fun `should link cocode dot dk`() {
-        assertEquals("https://cocode.dk", aboutUrl(AboutLink.Cocode, applicationId))
+        assertEquals("https://cocode.dk", aboutUrl(AboutLink.Cocode, applicationId, "en"))
     }
 
     @Test
     fun `should only open secure addresses`() {
         AboutLink.values().forEach { link ->
-            assertTrue(link.name, aboutUrl(link, applicationId).startsWith("https://"))
+            listOf("en", "da", "fa").forEach { language ->
+                assertTrue(link.name, aboutUrl(link, applicationId, language).startsWith("https://"))
+            }
         }
     }
 }
