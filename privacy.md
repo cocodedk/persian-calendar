@@ -2,7 +2,7 @@
 
 **App:** Jalali Persian Calendar (`com.cocode.calendar`)
 **Developer:** CoCode.dk — Babak Bandpey
-**Last updated:** 7 October 2026
+**Last updated:** 11 October 2026
 
 > The canonical, always-current version of this policy is published at
 > **https://calendar.cocode.dk/privacy/**
@@ -34,8 +34,7 @@ you and Google — we have no access to it. See
 ## External links
 
 The app has buttons and links that open web pages: the About screen's website, privacy policy, source
-code, issue tracker, latest release page and [cocode.dk](https://cocode.dk), and the developer's LinkedIn
-profile at the bottom of the main screen. The app only hands the address to your browser when you tap
+code, issue tracker, latest release page and [cocode.dk](https://cocode.dk). The app only hands the address to your browser when you tap
 one. The app itself makes no connection, and it adds no information about you to the address. Those
 sites are governed by their own privacy policies.
 

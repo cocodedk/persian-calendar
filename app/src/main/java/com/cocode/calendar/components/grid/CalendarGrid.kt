@@ -30,7 +30,7 @@ import java.util.*
  * - Swipe right to go to previous month
  */
 @Composable
-fun CalendarGrid() {
+fun CalendarGrid(modifier: Modifier = Modifier) {
     // Get an instance of the CalendarViewModel
     val viewModel: CalendarViewModel = viewModel()
     // Observe the gregorianDate LiveData from the ViewModel
@@ -56,7 +56,7 @@ fun CalendarGrid() {
 
     // Create a Column Composable for the calendar grid with swipe gesture support
     Column(
-        modifier = Modifier.pointerInput(yearMonth) {
+        modifier = modifier.pointerInput(yearMonth) {
             detectHorizontalDragGestures(
                 onDragStart = {
                     totalDragDistance = 0f
@@ -88,7 +88,9 @@ fun CalendarGrid() {
                 startDate = weekStartDate,
                 daysInWeek = daysInWeek,
                 yearMonth = yearMonth,
-                allEvents = events
+                allEvents = events,
+                // The six weeks share the grid's height, so the grid can grow to fill the screen
+                modifier = Modifier.weight(1f)
             )
         }
     }
@@ -108,16 +110,17 @@ fun WeekRow(
     startDate: LocalDate,
     daysInWeek: Int,
     yearMonth: YearMonth,
-    allEvents: List<Event>
+    allEvents: List<Event>,
+    modifier: Modifier = Modifier
 ) {
     // Create a Row Composable for the week
     Row(
-        // Arrange the children of the Row horizontally with space between them
-        horizontalArrangement = Arrangement.SpaceBetween,
+        // The days share the width, with a thin gap between them
+        horizontalArrangement = Arrangement.spacedBy(3.dp),
         // Align the children of the Row vertically in the center
         verticalAlignment = Alignment.CenterVertically,
         // Apply a Modifier to the Row to fill the maximum width and add padding
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 4.dp, vertical = 0.dp)
     ) {
@@ -130,7 +133,10 @@ fun WeekRow(
             com.cocode.calendar.components.cells.DayBox(
                 currentDate = currentDate,
                 isInCurrentMonth = currentDate.month == yearMonth.month,
-                events = allEvents.filter { event -> event.occursOn(currentDate) }
+                events = allEvents.filter { event -> event.occursOn(currentDate) },
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight()
             )
         }
     }

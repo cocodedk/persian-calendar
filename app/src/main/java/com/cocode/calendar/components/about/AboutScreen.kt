@@ -97,18 +97,6 @@ fun AboutScreen(onClose: () -> Unit) {
     }
 }
 
-/** The button on the calendar screen that opens [AboutScreen]. */
-@Composable
-fun AboutEntryButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
-    Button(
-        onClick = onClick,
-        colors = ButtonDefaults.buttonColors(containerColor = CalColors.button_background),
-        modifier = modifier
-    ) {
-        Text(text = stringResource(R.string.action_about), color = CalColors.text, fontWeight = FontWeight.Bold)
-    }
-}
-
 @Composable
 private fun SectionTitle(@StringRes title: Int) {
     Text(
