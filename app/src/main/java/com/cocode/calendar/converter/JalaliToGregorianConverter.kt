@@ -15,13 +15,16 @@ object JalaliToGregorianConverter {
      * @param jalaliM The Jalali month
      * @param jalaliD The Jalali day
      * @return A LocalDate object representing the Gregorian date
+     * @throws IllegalArgumentException when the Jalali date does not exist, such as Esfand 30 in a common year
      */
     fun jalaliToGregorian(jalaliY: Int, jalaliM: Int, jalaliD: Int): LocalDate {
-        val jalaliYear = jalaliY - 979
+        require(JalaliCalendar.isValidDate(jalaliY, jalaliM, jalaliD)) {
+            "No such Jalali date: $jalaliY/$jalaliM/$jalaliD"
+        }
         val jalaliMonth = jalaliM - 1
         val jalaliDay = jalaliD - 1
 
-        var jalaliDayNo = 365 * jalaliYear + (jalaliYear / 33) * 8 + ((jalaliYear % 33 + 3) / 4)
+        var jalaliDayNo = JalaliCalendar.daysBeforeYear(jalaliY)
         for (i in 0 until jalaliMonth) jalaliDayNo += CalendarConstants.jalaliDaysInMonth[i]
 
         jalaliDayNo += jalaliDay

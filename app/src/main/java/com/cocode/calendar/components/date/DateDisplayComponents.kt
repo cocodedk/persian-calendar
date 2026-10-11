@@ -30,9 +30,16 @@ import java.time.format.DateTimeFormatter
  * @param year The year input value
  * @param month The month input value
  * @param day The day input value
+ * @param modifier Modifier for the result box, so the caller can scroll it into view
  */
 @Composable
-fun DisplayConvertedDate(convertedDate: Any?, year: String, month: String, day: String) {
+fun DisplayConvertedDate(
+    convertedDate: Any?,
+    year: String,
+    month: String,
+    day: String,
+    modifier: Modifier = Modifier
+) {
     val viewModel: CalendarViewModel = viewModel()
 
     // An error only makes sense once every field is filled; before that the user is still typing
@@ -41,7 +48,7 @@ fun DisplayConvertedDate(convertedDate: Any?, year: String, month: String, day: 
     // Only show the result section if there's a converted date or if there's input but conversion failed
     if (convertedDate != null || hasInput) {
         Surface(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = modifier.fillMaxWidth(),
             color = if (convertedDate != null) {
                 MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.7f)
             } else {

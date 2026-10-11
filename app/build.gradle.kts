@@ -93,6 +93,13 @@ android {
         lintConfig = file("lint.xml")
     }
 
+    testOptions {
+        unitTests {
+            // Robolectric needs the merged resources and manifest to start the activity
+            isIncludeAndroidResources = true
+        }
+    }
+
     // AGP otherwise adds a "Dependency metadata" block to the APK signing block,
     // encrypted with a key only Google Play holds. F-Droid rejects APKs that carry
     // it, and it lands in the published release APK that F-Droid verifies against.
@@ -117,6 +124,10 @@ dependencies {
     implementation(libs.androidx.compose.runtime.livedata)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     testImplementation(libs.junit)
+    // Compose UI tests that run on the JVM with Robolectric (see src/test/resources/robolectric.properties)
+    testImplementation(libs.robolectric)
+    testImplementation(platform(libs.androidx.compose.bom))
+    testImplementation(libs.androidx.ui.test.junit4)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))

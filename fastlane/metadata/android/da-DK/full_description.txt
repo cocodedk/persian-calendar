@@ -2,7 +2,7 @@ Jalali Persian Calendar er en lokal kalender-app til Android, der viser gregoria
 
 Se hver gregorianske måned med gregorianske eller jalali-dagstal, og med weekender markeret. Stryg mellem månederne, eller tryk på I dag for at vende tilbage til dagens dato.
 
-Tryk på en dag for at tilføje en begivenhed. En begivenhed kan gentages hvert år på samme gregorianske dato.
+Tryk på en dag for at tilføje en begivenhed eller se dagens begivenheder. En begivenhed kan gentages hvert år på samme gregorianske dato. Begivenhederne gemmes på din telefon; appen har ingen internetadgang og sender dem aldrig nogen steder hen.
 
 En indbygget omregner laver en gregoriansk dato om til den tilsvarende jalali-dato og omvendt, og resultatet opdateres, mens du skriver.
 

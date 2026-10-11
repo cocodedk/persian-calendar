@@ -1,0 +1,7 @@
+Appen hedder nu Jalali Persian Calendar, fordi F-Droid allerede har en anden app, der hedder Persian Calendar.
+
+Rettelser i datoomregneren:
+- Feltet Måned venter på et ciffer mere, så du kan skrive 10, 11 og 12.
+- Tastaturets Næste-tast går til det næste felt i stedet for at springe et over.
+- Datoer, der ikke findes, som 30. esfand 1402, viser nu "Ugyldig dato" i stedet for et forkert svar.
+- Resultatet og beskeden "Ugyldig dato" bliver over tastaturet.

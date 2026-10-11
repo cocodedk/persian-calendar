@@ -41,6 +41,7 @@ class CalendarConverter {
          * @param jalaliM The Jalali month
          * @param jalaliD The Jalali day
          * @return A LocalDate object representing the Gregorian date
+         * @throws IllegalArgumentException when the Jalali date does not exist
          */
         fun jalaliToGregorian(jalaliY: Int, jalaliM: Int, jalaliD: Int): LocalDate {
             return JalaliToGregorianConverter.jalaliToGregorian(jalaliY, jalaliM, jalaliD)
