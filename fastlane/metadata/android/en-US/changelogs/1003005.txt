@@ -1,0 +1,7 @@
+The app is now called Jalali Persian Calendar, because F-Droid already lists a different app called Persian Calendar.
+
+Date converter fixes:
+- The month field waits for a second digit, so you can type 10, 11 and 12.
+- The keyboard's Next key moves to the next field instead of skipping one.
+- Dates that don't exist, such as 30 Esfand 1402, now show "Invalid Date" instead of a wrong answer.
+- The result and the "Invalid Date" message stay above the keyboard.
