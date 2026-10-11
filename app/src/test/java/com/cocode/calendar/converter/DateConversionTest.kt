@@ -27,4 +27,9 @@ class DateConversionTest {
     fun `should return nothing for a Gregorian date that does not exist`() {
         assertNull(DateConversion.convert(false, "2026", "2", "30"))
     }
+
+    @Test
+    fun `should return nothing for a Jalali date that does not exist`() {
+        assertNull(DateConversion.convert(true, "1402", "12", "30"))
+    }
 }

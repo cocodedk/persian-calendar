@@ -1,6 +1,7 @@
 package com.cocode.calendar.converter
 
 import com.cocode.calendar.models.CalendarConstants
+import com.cocode.calendar.models.JalaliDate
 import java.time.LocalDate
 
 /**
@@ -15,8 +16,10 @@ object JalaliToGregorianConverter {
      * @param jalaliM The Jalali month
      * @param jalaliD The Jalali day
      * @return A LocalDate object representing the Gregorian date
+     * @throws IllegalArgumentException when the Jalali date does not exist, such as Esfand 30 in a common year
      */
     fun jalaliToGregorian(jalaliY: Int, jalaliM: Int, jalaliD: Int): LocalDate {
+        require(jalaliM in 1..12) { "No Jalali month $jalaliM" }
         val jalaliYear = jalaliY - 979
         val jalaliMonth = jalaliM - 1
         val jalaliDay = jalaliD - 1
@@ -60,6 +63,11 @@ object JalaliToGregorianConverter {
         val gregorianMonth = i + 1
         val gregorianDay = gregorianDayNo + 1
 
-        return LocalDate.of(gregorianYear, gregorianMonth, gregorianDay)
+        val gregorian = LocalDate.of(gregorianYear, gregorianMonth, gregorianDay)
+        // The arithmetic above rolls an impossible day over into the next month; the way back exposes it.
+        require(GregorianToJalaliConverter.gregorianToJalali(gregorian) == JalaliDate(jalaliY, jalaliM, jalaliD)) {
+            "No such Jalali date: $jalaliY/$jalaliM/$jalaliD"
+        }
+        return gregorian
     }
 }
