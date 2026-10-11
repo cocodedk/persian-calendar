@@ -4,7 +4,7 @@
 
 Modern Android calendar application built with Jetpack Compose that supports both Gregorian and Persian (Jalali) calendar systems. Provides a clean interface for viewing dates and converting between calendar formats, with Material Design 3 and bilingual (English/Persian) support.
 
-- **Language / Runtime**: Kotlin 2.x, Java 17
+- **Language / Runtime**: Kotlin 1.9.0 (Compose compiler 1.5.1), Java 17
 - **Framework**: Jetpack Compose, Android SDK
 - **Architecture**: Clean Architecture + MVVM
 - **Package / Namespace**: `com.cocode.calendar`
@@ -88,7 +88,7 @@ Calendar/
 ./gradlew assembleDebug --no-daemon          # Build debug APK
 ./gradlew testDebugUnitTest --no-daemon      # Run unit tests
 ./gradlew lintDebug --no-daemon              # Lint
-./gradlew buildSmoke --no-daemon             # Full smoke check (build + test + lint)
+./gradlew assembleDebug testDebugUnitTest lintDebug --no-daemon   # What CI runs (build + test + lint)
 ```
 
 ---
@@ -110,6 +110,6 @@ Calendar/
 ## Starting a New Session
 
 1. Read this file
-2. Run `./gradlew buildSmoke --no-daemon` to confirm everything passes
+2. Run `./gradlew assembleDebug testDebugUnitTest lintDebug --no-daemon` (what CI runs) to confirm everything passes
 3. Invoke `superpowers:brainstorming` before touching any feature
 4. Follow the Required Skills table — every skill is mandatory, not optional
