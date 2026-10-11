@@ -2,7 +2,9 @@ package com.cocode.calendar.components.date
 
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.runtime.*
+import androidx.compose.ui.res.stringResource
 import com.cocode.calendar.CalendarViewModel
+import com.cocode.calendar.R
 import com.cocode.calendar.models.JalaliDate
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -35,28 +37,32 @@ object DateFormattingUtils {
         val showJalaliToGregorianConverter by viewModel.showJalaliToGregorianConverter.collectAsState()
         val showGregorianToJalaliConverter by viewModel.showGregorianToJalaliConverter.collectAsState()
 
-        return when {
-            showJalaliToGregorianConverter -> "Gregorian Date"
-            showGregorianToJalaliConverter -> "Jalali Date"
-            else -> "Result"
-        }
+        return stringResource(
+            when {
+                showJalaliToGregorianConverter -> R.string.converter_result_gregorian
+                showGregorianToJalaliConverter -> R.string.converter_result_jalali
+                else -> R.string.converter_result
+            }
+        )
     }
 
     /**
-     * Gets the appropriate calendar type name for error messages.
+     * Gets the message that asks for a valid date, naming the calendar the user is typing in.
      * @param viewModel The CalendarViewModel to check converter states
-     * @return The calendar type name for error messages
+     * @return The message to show under the "Invalid Date" title
      */
     @Composable
-    fun getCalendarTypeForError(viewModel: CalendarViewModel): String {
+    fun getInvalidDateMessage(viewModel: CalendarViewModel): String {
         val showJalaliToGregorianConverter by viewModel.showJalaliToGregorianConverter.collectAsState()
         val showGregorianToJalaliConverter by viewModel.showGregorianToJalaliConverter.collectAsState()
 
-        return when {
-            showJalaliToGregorianConverter -> "Jalali"
-            showGregorianToJalaliConverter -> "Gregorian"
-            else -> "date"
-        }
+        return stringResource(
+            when {
+                showJalaliToGregorianConverter -> R.string.converter_invalid_jalali
+                showGregorianToJalaliConverter -> R.string.converter_invalid_gregorian
+                else -> R.string.converter_invalid_other
+            }
+        )
     }
 
     /**

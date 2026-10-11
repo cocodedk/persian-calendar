@@ -1,8 +1,10 @@
 package com.cocode.calendar.components.date
 
+import android.content.res.Resources
 import androidx.compose.runtime.*
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.cocode.calendar.CalendarViewModel
+import com.cocode.calendar.R
 import java.time.LocalDate
 import java.time.Period
 
@@ -13,23 +15,24 @@ object TimePeriodCalculator {
 
     /**
      * Calculates the time period between two dates and formats it as a human-readable string.
+     * @param resources Used to look up the words and plurals
      * @param fromDate The starting date
      * @param toDate The ending date
      * @return Formatted period string (e.g., "2 years 3 months 5 days")
      */
-    fun calculateAndFormatPeriod(fromDate: LocalDate, toDate: LocalDate): String {
+    fun calculateAndFormatPeriod(resources: Resources, fromDate: LocalDate, toDate: LocalDate): String {
         val isFuture = toDate.isAfter(fromDate)
         val period = if (isFuture) Period.between(fromDate, toDate) else Period.between(toDate, fromDate)
         val years = period.years
         val months = period.months
         val days = period.days
 
-        return buildString {
-            if (years > 0) append("$years year${if (years > 1) "s" else ""} ")
-            if (months > 0) append("$months month${if (months > 1) "s" else ""} ")
-            if (days > 0) append("$days day${if (days > 1) "s" else ""}")
-            if (isEmpty()) append("Same day")
-        }.trim()
+        // The count goes in as text, so digits stay Latin whatever the phone's language is.
+        return buildList {
+            if (years > 0) add(resources.getQuantityString(R.plurals.period_years, years, years.toString()))
+            if (months > 0) add(resources.getQuantityString(R.plurals.period_months, months, months.toString()))
+            if (days > 0) add(resources.getQuantityString(R.plurals.period_days, days, days.toString()))
+        }.joinToString(" ").ifEmpty { resources.getString(R.string.converter_period_same_day) }
     }
 
     /**
@@ -67,13 +70,16 @@ object TimePeriodCalculator {
 
     /**
      * Gets the appropriate label for the time period display.
+     * @param resources Used to look up the label text
      * @param date The date being compared to now
-     * @return The label text (e.g., "Time Until Date" or "Time Since Date")
+     * @return The label text (e.g., "Time until this date" or "Time since this date")
      */
-    fun getPeriodLabel(date: LocalDate): String {
+    fun getPeriodLabel(resources: Resources, date: LocalDate): String {
         val now = LocalDate.now()
         val isFuture = date.isAfter(now)
-        return "⏰ ${if (isFuture) "Time Until Date" else "Time Since Date"}"
+        return resources.getString(
+            if (isFuture) R.string.converter_period_until else R.string.converter_period_since
+        )
     }
 
     /**

@@ -6,9 +6,10 @@ package com.cocode.calendar.models
 data class JalaliDate(val year: Int, val monthValue: Int, val dayOfMonth: Int)
 
 /**
- * Data class representing a Jalali month with its name, numeric value, and year.
+ * Data class representing a Jalali month with its numeric value (1-12) and year.
+ * The month's name is looked up from the string resources by [monthValue].
  */
-data class JalaliMonth(val monthName: String, val monthValue: Int, val year: Int)
+data class JalaliMonth(val monthValue: Int, val year: Int)
 
 /**
  * Calendar conversion constants used across different calendar systems.

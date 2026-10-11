@@ -1,11 +1,12 @@
 package com.cocode.calendar.components.pickers
 
+import android.content.res.Resources
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.cocode.calendar.CalendarViewModel
-import utils.Strings
+import com.cocode.calendar.R
 import java.time.LocalDate
 import kotlin.math.max
 
@@ -16,14 +17,13 @@ import kotlin.math.max
 object PickerUtils {
 
     /**
-     * Gets the appropriate month names array based on calendar type.
+     * Gets the short month names (from the string resources) for the calendar type,
+     * January or Farvardin first.
      */
-    fun getMonthNames(isJalaliCalendar: Boolean): Array<String> {
-        return if (isJalaliCalendar) {
-            Strings.Months.JALALI_ABBREVIATED.toTypedArray()
-        } else {
-            Strings.Months.GREGORIAN_ABBREVIATED.toTypedArray()
-        }
+    fun getMonthNames(resources: Resources, isJalaliCalendar: Boolean): Array<String> {
+        return resources.getStringArray(
+            if (isJalaliCalendar) R.array.jalali_months_short else R.array.gregorian_months_short
+        )
     }
 
     /**

@@ -55,15 +55,10 @@ class CalendarNavigationViewModel : ViewModel() {
     }
 
     fun changeMonth(newYearMonth: YearMonth) {
-        val now = LocalDate.now()
-        _gregorianDate.value = if (newYearMonth.year == now.year && newYearMonth.monthValue == now.monthValue) {
-            now
-        } else {
-            newYearMonth.atDay(1)
-        }
+        _gregorianDate.value = NavigationDates.forMonth(newYearMonth)
     }
 
     fun changeYear(newYear: Int) {
-        _gregorianDate.value = _gregorianDate.value.withYear(newYear).withDayOfMonth(1)
+        _gregorianDate.value = NavigationDates.forYear(_gregorianDate.value, newYear)
     }
 }

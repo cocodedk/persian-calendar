@@ -13,6 +13,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -20,8 +21,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.cocode.calendar.CalColors
 import com.cocode.calendar.CalendarViewModel
 import com.cocode.calendar.Event
+import com.cocode.calendar.R
 import com.cocode.calendar.components.events.EventItemCard
-import java.time.format.DateTimeFormatter
+import com.cocode.calendar.components.date.currentLocale
+import utils.DateFormats
 
 /**
  * Dialog component for displaying and managing events for a specific date.
@@ -62,15 +65,15 @@ fun EventListDialog() {
                     ) {
                         Column {
                             Text(
-                                text = "Events",
+                                text = stringResource(R.string.events_title),
                                 style = MaterialTheme.typography.headlineSmall,
                                 fontWeight = FontWeight.Bold,
-                                color = CalColors.active_text
+                                color = CalColors.background
                             )
                             Text(
-                                text = selectedDate!!.format(DateTimeFormatter.ofPattern("MMM dd, yyyy")),
+                                text = DateFormats.mediumDate(selectedDate!!, currentLocale()),
                                 style = MaterialTheme.typography.bodyMedium,
-                                color = CalColors.inactive_text
+                                color = Color.DarkGray
                             )
                         }
 
@@ -81,7 +84,7 @@ fun EventListDialog() {
                             containerColor = CalColors.button_background,
                             contentColor = CalColors.text
                         ) {
-                            Icon(Icons.Default.Add, contentDescription = "Add Event")
+                            Icon(Icons.Default.Add, contentDescription = stringResource(R.string.events_add))
                         }
                     }
 
@@ -99,9 +102,9 @@ fun EventListDialog() {
                                 verticalArrangement = Arrangement.spacedBy(16.dp)
                             ) {
                                 Text(
-                                    text = "No events for this day",
+                                    text = stringResource(R.string.events_empty),
                                     style = MaterialTheme.typography.bodyLarge,
-                                    color = CalColors.inactive_text
+                                    color = Color.DarkGray
                                 )
                                 Button(
                                     onClick = { viewModel.showEventCreationFromEventList(selectedDate!!) },
@@ -112,7 +115,7 @@ fun EventListDialog() {
                                 ) {
                                     Icon(Icons.Default.Add, contentDescription = null)
                                     Spacer(modifier = Modifier.width(8.dp))
-                                    Text("Create First Event", color = CalColors.text)
+                                    Text(stringResource(R.string.events_create_first), color = CalColors.text)
                                 }
                             }
                         }
@@ -136,80 +139,6 @@ fun EventListDialog() {
         }
     }
 
-    // Delete confirmation dialog
-    val showDeleteDialog by viewModel.showDeleteConfirmationDialog.collectAsState()
-    val eventToDelete by viewModel.eventToDelete.collectAsState()
-
-    if (showDeleteDialog && eventToDelete != null) {
-        Dialog(onDismissRequest = { viewModel.hideDeleteConfirmationDialog() }) {
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-                    .border(
-                        width = 2.dp,
-                        color = CalColors.background,
-                        shape = RoundedCornerShape(16.dp)
-                    ),
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White)
-            ) {
-                Column(
-                    modifier = Modifier.padding(20.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    // Header
-                    Text(
-                        text = "Delete Event",
-                        style = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.Bold,
-                        color = CalColors.active_text
-                    )
-
-                    // Confirmation message
-                    Text(
-                        text = "Are you sure you want to delete \"${eventToDelete!!.title}\"?",
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = CalColors.inactive_text
-                    )
-
-                    Text(
-                        text = "This action cannot be undone.",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = Color.Red.copy(alpha = 0.7f)
-                    )
-
-                    // Buttons
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        // Cancel button
-                        Button(
-                            onClick = { viewModel.hideDeleteConfirmationDialog() },
-                            modifier = Modifier.weight(1f),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = Color.Gray
-                            ),
-                            shape = RoundedCornerShape(8.dp)
-                        ) {
-                            Text("Cancel", color = Color.White)
-                        }
-
-                        // Delete button
-                        Button(
-                            onClick = { viewModel.confirmDeleteEvent() },
-                            modifier = Modifier.weight(1f),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = Color.Red
-                            ),
-                            shape = RoundedCornerShape(8.dp)
-                        ) {
-                            Text("Delete", color = Color.White)
-                        }
-                    }
-                }
-            }
-        }
-    }
+    // Delete confirmation dialog (it shows itself when a delete is requested)
+    DeleteEventDialog()
 }

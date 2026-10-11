@@ -11,12 +11,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.cocode.calendar.CalColors
 import com.cocode.calendar.CalendarViewModel
-import utils.Strings
+import com.cocode.calendar.R
 import java.time.LocalDate
 
 /**
@@ -38,6 +39,8 @@ fun CalControls() {
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
+            // The row grows with the text size; the three buttons then share its height
+            .height(IntrinsicSize.Min)
             .absolutePadding(left = 2.dp, top = 1.dp, right = 2.dp, bottom = 0.dp)
     ) {
         TodayButton()
@@ -58,7 +61,7 @@ fun TodayButton() {
     val viewModel: CalendarViewModel = viewModel()
 
     // Center the button in the row
-    Box {
+    Box(modifier = Modifier.fillMaxHeight(), propagateMinConstraints = true) {
         // Create a Button Composable
         Button(
             // Set the click event handler for the button
@@ -68,11 +71,11 @@ fun TodayButton() {
             shape = RoundedCornerShape(0.dp, 0.dp, 0.dp, 10.dp),
             modifier = Modifier
                 .width(130.dp)
-                .height(52.dp)
+                .heightIn(min = 52.dp)
         ) {
             // Set the display text for the button
             Text(
-                text = Strings.Calendar.TODAY,
+                text = stringResource(R.string.calendar_today),
                 color = CalColors.text,
                 fontWeight = FontWeight.Bold
             )
@@ -94,7 +97,7 @@ fun TodayButton() {
 fun DateConverterToggleButton() {
     val viewModel: CalendarViewModel = viewModel()
     val showConverter by viewModel.showConverter.collectAsState()
-    Box {
+    Box(modifier = Modifier.fillMaxHeight(), propagateMinConstraints = true) {
         Button(
             onClick = {
                 viewModel.toggleConverter()
@@ -107,10 +110,10 @@ fun DateConverterToggleButton() {
             shape = RoundedCornerShape(0.dp, 0.dp, 0.dp, 0.dp),
             modifier = Modifier
                 .width(130.dp)
-                .height(52.dp)
+                .heightIn(min = 52.dp)
         ) {
             Text(
-                text = "Converter",
+                text = stringResource(R.string.calendar_converter),
                 color = CalColors.text,
                 fontWeight = FontWeight.Bold
             )
@@ -132,18 +135,20 @@ fun CalendarToggleButton() {
     val isJalaliCalendar by viewModel.isJalaliCalendar.observeAsState(initial = false)
 
     // This composable function is a button to toggle between Gregorian and Persian (Jalali) calendars.
-    Box {
+    Box(modifier = Modifier.fillMaxHeight(), propagateMinConstraints = true) {
         Button(
             onClick = {viewModel.toggleIsJalaliCalendar()},
             colors = ButtonDefaults.buttonColors(containerColor = CalColors.button_background),
             shape = RoundedCornerShape(0.dp, 0.dp, 10.dp, 0.dp),
             modifier = Modifier
                 .width(192.dp)
-                .height(52.dp)
+                .heightIn(min = 52.dp)
 
         ) {
             Text(
-                text = if (isJalaliCalendar) Strings.Calendar.GREGORIAN else Strings.Calendar.JALALI,
+                text = stringResource(
+                    if (isJalaliCalendar) R.string.calendar_show_gregorian else R.string.calendar_show_jalali
+                ),
                 color = CalColors.text,
                 fontWeight = FontWeight.Bold
 

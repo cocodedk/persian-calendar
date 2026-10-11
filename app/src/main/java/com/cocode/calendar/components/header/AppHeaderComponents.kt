@@ -8,6 +8,9 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalResources
+import androidx.compose.ui.res.stringArrayResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
@@ -19,12 +22,17 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.cocode.calendar.CalColors
 import com.cocode.calendar.CalendarViewModel
+import com.cocode.calendar.R
+import com.cocode.calendar.models.JalaliMonth
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import utils.DateTimeUtils
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
+import com.cocode.calendar.components.date.currentLocale
+import com.cocode.calendar.components.date.deviceBestPattern
+import com.cocode.calendar.components.date.phoneUses24HourClock
+import utils.DateFormats
 
 /**
  * This Composable function represents the header section of the calendar application.
@@ -40,21 +48,28 @@ fun HeaderSection() {
     val gregorianDate by viewModel.gregorianDate.observeAsState(initial = LocalDate.now())
     val isJalaliCalendar by viewModel.isJalaliCalendar.observeAsState(initial = false)
 
-    /* ---------- build title strings (unchanged) ---------- */
-    val (primaryText, secondaryText) = remember(gregorianDate, isJalaliCalendar) {
+    /* ---------- build title strings ---------- */
+    val resources = LocalResources.current
+    val locale = currentLocale()
+    val persianMonths = stringArrayResource(R.array.jalali_months_persian)
+    val (primaryText, secondaryText) = remember(gregorianDate, isJalaliCalendar, resources, persianMonths, locale) {
         val jalaliMonths = CalendarConverter.gregorianToJalaliMonths(gregorianDate)
         val jalaliDate = CalendarConverter.gregorianToJalali(gregorianDate)
         val jalaliWeek = CalendarConverter.getJalaliWeekNumber(jalaliDate)
+        fun weekLabel(week: Int) = resources.getString(R.string.header_week, week.toString())
+        fun monthName(month: JalaliMonth?) = month?.let { persianMonths[it.monthValue - 1] }
 
         val jalaliText = buildAnnotatedString {
-            withStyle(SpanStyle(fontSize = 18.sp)) { append("week $jalaliWeek") }
-            append(" - ${jalaliMonths["left"]?.monthName} - ${jalaliMonths["right"]?.monthName} ${jalaliMonths["right"]?.year}")
+            withStyle(SpanStyle(fontSize = 18.sp)) { append(weekLabel(jalaliWeek)) }
+            val left = jalaliMonths["left"]
+            val right = jalaliMonths["right"]
+            append(" - ${monthName(left)} - ${monthName(right)} ${right?.year}")
         }
 
         val gregorianText = buildAnnotatedString {
-            append("${gregorianDate.format(DateTimeFormatter.ofPattern("MMMM yyyy"))} - ")
+            append("${DateFormats.monthYear(gregorianDate, locale, deviceBestPattern)} - ")
             withStyle(SpanStyle(fontSize = 18.sp)) {
-                append("week ${DateTimeUtils.getCurrentWeekNumber(gregorianDate)}")
+                append(weekLabel(DateTimeUtils.getCurrentWeekNumber(gregorianDate)))
             }
         }
 
@@ -63,11 +78,12 @@ fun HeaderSection() {
 
     /* ---------- ticking clock (unchanged) ---------- */
     val currentTime = remember { mutableStateOf("") }
-    LaunchedEffect(Unit) {
+    val is24Hour = phoneUses24HourClock()
+    LaunchedEffect(locale, is24Hour) {
         while (currentCoroutineContext().isActive) {
-            currentTime.value = DateTimeUtils
-                .getCurrentTimeInIran()
-                .format(DateTimeFormatter.ofPattern("HH:mm:ss"))
+            currentTime.value = DateFormats.time(
+                DateTimeUtils.getCurrentTimeInIran(), locale, is24Hour, deviceBestPattern
+            )
             delay(1_000)
         }
     }
@@ -101,7 +117,7 @@ fun HeaderSection() {
         )
         Spacer(Modifier.height(6.dp))
         Text(
-            text = "Iran time: ${currentTime.value}",
+            text = stringResource(R.string.header_iran_time, currentTime.value),
             fontSize = 15.sp,
             fontFamily = FontFamily.Monospace,
             color = CalColors.text,

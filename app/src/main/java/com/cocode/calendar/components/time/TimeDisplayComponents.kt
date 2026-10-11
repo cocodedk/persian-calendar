@@ -6,15 +6,20 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cocode.calendar.CalColors
+import com.cocode.calendar.R
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import utils.DateTimeUtils
-import java.time.format.DateTimeFormatter
+import com.cocode.calendar.components.date.currentLocale
+import com.cocode.calendar.components.date.deviceBestPattern
+import com.cocode.calendar.components.date.phoneUses24HourClock
+import utils.DateFormats
 
 /**
  * Component for displaying the current time in Iran timezone.
@@ -28,11 +33,12 @@ fun DisplayTimeInIran() {
         mutableStateOf("")
     }
 
-    LaunchedEffect(key1 = Unit) {
+    val locale = currentLocale()
+    val is24Hour = phoneUses24HourClock()
+    LaunchedEffect(locale, is24Hour) {
         while (currentCoroutineContext().isActive) {
             val iranTime = DateTimeUtils.getCurrentTimeInIran()
-            val formatter = DateTimeFormatter.ofPattern("HH:mm:ss")
-            val formattedIranTime = iranTime.format(formatter)
+            val formattedIranTime = DateFormats.time(iranTime, locale, is24Hour, deviceBestPattern)
             currentTime.value = formattedIranTime
             delay(1000)
         }
@@ -48,7 +54,7 @@ fun DisplayTimeInIran() {
         // put the text in a row and center it
         Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxWidth()) {
             Text(
-                text = "Iran time: ${currentTime.value}",
+                text = stringResource(R.string.header_iran_time, currentTime.value),
                 style = MaterialTheme.typography.bodyLarge,
                 color = CalColors.text
             )

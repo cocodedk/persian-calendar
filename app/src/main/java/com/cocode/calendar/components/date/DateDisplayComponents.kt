@@ -6,11 +6,14 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalResources
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.cocode.calendar.CalendarViewModel
+import com.cocode.calendar.R
 import com.cocode.calendar.models.JalaliDate
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -27,9 +30,16 @@ import java.time.format.DateTimeFormatter
  * @param year The year input value
  * @param month The month input value
  * @param day The day input value
+ * @param modifier Modifier for the result box, so the caller can scroll it into view
  */
 @Composable
-fun DisplayConvertedDate(convertedDate: Any?, year: String, month: String, day: String) {
+fun DisplayConvertedDate(
+    convertedDate: Any?,
+    year: String,
+    month: String,
+    day: String,
+    modifier: Modifier = Modifier
+) {
     val viewModel: CalendarViewModel = viewModel()
 
     // An error only makes sense once every field is filled; before that the user is still typing
@@ -38,7 +48,7 @@ fun DisplayConvertedDate(convertedDate: Any?, year: String, month: String, day: 
     // Only show the result section if there's a converted date or if there's input but conversion failed
     if (convertedDate != null || hasInput) {
         Surface(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = modifier.fillMaxWidth(),
             color = if (convertedDate != null) {
                 MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.7f)
             } else {
@@ -80,13 +90,13 @@ fun DisplayConvertedDate(convertedDate: Any?, year: String, month: String, day: 
                             verticalArrangement = Arrangement.spacedBy(4.dp)
                         ) {
                             Text(
-                                text = "Invalid Date",
+                                text = stringResource(R.string.converter_invalid_date),
                                 style = MaterialTheme.typography.labelMedium,
                                 color = MaterialTheme.colorScheme.onErrorContainer.copy(alpha = 0.8f),
                                 fontWeight = FontWeight.Medium
                             )
                             Text(
-                                text = "Enter a valid ${DateFormattingUtils.getCalendarTypeForError(viewModel)} date",
+                                text = DateFormattingUtils.getInvalidDateMessage(viewModel),
                                 style = MaterialTheme.typography.bodyLarge,
                                 color = MaterialTheme.colorScheme.onErrorContainer,
                                 textAlign = TextAlign.Center
@@ -126,7 +136,9 @@ fun DisplayPeriodToNow(convertedDate: Any?, fromYear: String, fromMonth: String,
     date?.let { validDate ->
         val now = LocalDate.now()
         val isFuture = TimePeriodCalculator.isFutureDate(validDate)
+        val resources = LocalResources.current
         val periodText = TimePeriodCalculator.calculateAndFormatPeriod(
+            resources,
             if (isFuture) now else validDate,
             if (isFuture) validDate else now
         )
@@ -142,7 +154,7 @@ fun DisplayPeriodToNow(convertedDate: Any?, fromYear: String, fromMonth: String,
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Text(
-                    text = TimePeriodCalculator.getPeriodLabel(validDate),
+                    text = TimePeriodCalculator.getPeriodLabel(resources, validDate),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.8f),
                     fontWeight = FontWeight.Medium
@@ -165,7 +177,7 @@ fun DisplayPeriodToNow(convertedDate: Any?, fromYear: String, fromMonth: String,
             shape = RoundedCornerShape(12.dp)
         ) {
             Text(
-                text = "Invalid or missing date",
+                text = stringResource(R.string.converter_period_unreadable),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onErrorContainer,
                 modifier = Modifier.padding(16.dp),
