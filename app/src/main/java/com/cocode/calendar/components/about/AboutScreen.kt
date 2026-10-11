@@ -30,6 +30,7 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.core.net.toUri
 import com.cocode.calendar.CalColors
 import com.cocode.calendar.R
+import com.cocode.calendar.components.date.currentLocale
 
 /**
  * The About screen, in the order of the cocode-apps standard: name and version, what the app does,
@@ -39,7 +40,9 @@ import com.cocode.calendar.R
 @Composable
 fun AboutScreen(onClose: () -> Unit) {
     val context = LocalContext.current
-    val open = { link: AboutLink -> openLink(context, aboutUrl(link, context.packageName)) }
+    // The language the app's own strings use, so the website and privacy pages match it.
+    val language = currentLocale().language
+    val open = { link: AboutLink -> openLink(context, aboutUrl(link, context.packageName, language)) }
 
     Dialog(
         onDismissRequest = onClose,

@@ -1,1 +1,1 @@
-The date converter now converts as you type, as the description says. Before, the result only appeared after pressing Done on the keyboard.
+Date conversion now updates as you type. You no longer need to press Done on the keyboard to see the result.

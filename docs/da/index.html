@@ -1,0 +1,526 @@
+<!doctype html>
+<html lang="da">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Jalali Persian Calendar | Gregoriansk og jalali</title>
+  <meta name="description" content="En Android-kalender, der viser gregorianske og persiske (jalali) datoer og omregner datoer mellem dem, mens du skriver." />
+  <link rel="canonical" href="https://calendar.cocode.dk/da/" />
+  <link rel="alternate" hreflang="en" href="https://calendar.cocode.dk/" />
+  <link rel="alternate" hreflang="da" href="https://calendar.cocode.dk/da/" />
+  <link rel="alternate" hreflang="x-default" href="https://calendar.cocode.dk/" />
+  <meta property="og:title" content="Jalali Persian Calendar | Gregoriansk og jalali" />
+  <meta property="og:description" content="En Android-kalender, der viser gregorianske og persiske (jalali) datoer og omregner datoer mellem dem, mens du skriver." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://calendar.cocode.dk/da/" />
+  <meta property="og:image" content="https://calendar.cocode.dk/og.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Jalali Persian Calendar | Gregoriansk og jalali" />
+  <meta name="twitter:description" content="En Android-kalender, der viser gregorianske og persiske (jalali) datoer og omregner datoer mellem dem, mens du skriver." />
+  <meta name="twitter:image" content="https://calendar.cocode.dk/og.png" />
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=Sora:wght@300;400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://brand.cocode.dk/v1.css">
+  <link rel="stylesheet" href="/css/site-blocks.css">
+  <script type="module" src="https://brand.cocode.dk/v1.js"></script>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #e8f4ef;
+      --bg-2: #d7eee5;
+      --ink: #0b2d25;
+      --muted: #55706a;
+      --primary: #019a64;
+      --primary-2: #025842;
+      --accent: #43c7f9;
+      --alert: #f05066;
+      --card: #ffffff;
+      --shadow: 0 20px 60px rgba(2, 88, 66, 0.2);
+      --radius: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Sora", system-ui, -apple-system, "Segoe UI", sans-serif;
+      color: var(--ink);
+      background: radial-gradient(1200px 700px at 20% -10%, #ffffff 0%, var(--bg) 55%, var(--bg-2) 100%);
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        linear-gradient(120deg, rgba(1, 154, 100, 0.08), rgba(67, 199, 249, 0.08)),
+        repeating-linear-gradient(0deg, rgba(2, 88, 66, 0.05), rgba(2, 88, 66, 0.05) 1px, transparent 1px, transparent 24px),
+        repeating-linear-gradient(90deg, rgba(2, 88, 66, 0.05), rgba(2, 88, 66, 0.05) 1px, transparent 1px, transparent 24px);
+      pointer-events: none;
+      mix-blend-mode: multiply;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .container {
+      width: min(1100px, 92vw);
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* The cocode.dk frame lines up with .container's fluid column, and sits
+       above the fixed decorative grid (body::before) like .container does. */
+    cocode-head, cocode-foot {
+      --cocode-max: calc(1100px + 8vw);
+      --cocode-gutter: 4vw;
+      position: relative;
+      z-index: 1;
+    }
+
+    header {
+      padding: 36px 0 80px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 48px;
+      margin-top: 50px;
+      align-items: center;
+    }
+
+    h1 {
+      font-family: "Fraunces", "Times New Roman", serif;
+      font-size: clamp(2.6rem, 4vw, 3.6rem);
+      margin: 0 0 18px;
+      color: var(--primary-2);
+    }
+
+    .lead {
+      font-size: 1.05rem;
+      line-height: 1.7;
+      color: var(--muted);
+      margin-bottom: 26px;
+    }
+
+    .cta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 22px;
+    }
+
+    .btn {
+      padding: 12px 20px;
+      border-radius: 999px;
+      font-weight: 600;
+      border: 1px solid transparent;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .btn.primary {
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      color: #fff;
+      box-shadow: 0 16px 30px rgba(1, 154, 100, 0.25);
+    }
+
+    .btn.ghost {
+      background: #fff;
+      border-color: rgba(2, 88, 66, 0.2);
+      color: var(--primary-2);
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 18px 34px rgba(2, 88, 66, 0.22);
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .chip {
+      background: rgba(1, 154, 100, 0.12);
+      color: var(--primary-2);
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .phone {
+      background: var(--card);
+      border-radius: 32px;
+      padding: 24px;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .phone::before {
+      content: "";
+      position: absolute;
+      inset: -40% 30% auto auto;
+      width: 220px;
+      height: 220px;
+      background: radial-gradient(circle, rgba(67, 199, 249, 0.4), transparent 70%);
+    }
+
+    .status-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 14px;
+    }
+
+    .calendar-card {
+      background: #f7fbf9;
+      border-radius: 22px;
+      padding: 18px;
+      border: 1px solid rgba(2, 88, 66, 0.08);
+    }
+
+    .month {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      font-weight: 600;
+    }
+
+    .pill {
+      background: rgba(1, 154, 100, 0.14);
+      color: var(--primary-2);
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+      text-align: center;
+      font-size: 0.8rem;
+    }
+
+    .grid span {
+      padding: 8px 0;
+      border-radius: 10px;
+      background: #fff;
+      border: 1px solid rgba(2, 88, 66, 0.06);
+    }
+
+    .grid .muted {
+      color: #9bb4ad;
+      background: transparent;
+      border-color: transparent;
+    }
+
+    .grid .today {
+      background: var(--primary);
+      color: #fff;
+      font-weight: 700;
+      box-shadow: 0 8px 16px rgba(1, 154, 100, 0.2);
+    }
+
+    .grid .weekend {
+      color: var(--alert);
+      font-weight: 600;
+    }
+
+    .section {
+      padding: 70px 0 20px;
+    }
+
+    .section h2 {
+      font-family: "Fraunces", "Times New Roman", serif;
+      font-size: clamp(2rem, 3vw, 2.6rem);
+      margin-bottom: 20px;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 18px;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: 0 10px 30px rgba(2, 88, 66, 0.12);
+      border: 1px solid rgba(2, 88, 66, 0.08);
+    }
+
+    .card h3 {
+      margin: 8px 0 6px;
+    }
+
+    .icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      background: rgba(67, 199, 249, 0.2);
+      color: var(--primary-2);
+      font-weight: 700;
+    }
+
+    .split {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .stack {
+      background: linear-gradient(135deg, #ffffff, #f1faf6);
+      border-radius: var(--radius);
+      padding: 22px;
+      border: 1px solid rgba(2, 88, 66, 0.08);
+    }
+
+    .stack code {
+      display: block;
+      background: #0b2d25;
+      color: #d7f7eb;
+      padding: 12px;
+      border-radius: 12px;
+      margin-top: 12px;
+      font-size: 0.85rem;
+      overflow-x: auto;
+    }
+
+    .rtl {
+      direction: rtl;
+      text-align: right;
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .btn,
+      .reveal {
+        transition: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- cocode.dk-rammen. Uden JavaScript vises dens indhold i stedet: en vej hjem.
+     GitHub-linket fra den gamle navigation er med i links=, så det ikke går tabt;
+     #privacy var et anker på siden og kan stadig nås ved at rulle. -->
+<cocode-head project="Jalali Persian Calendar" accent="#019a64" on-accent="#ffffff"
+              links="GitHub:https://github.com/cocodedk/persian-calendar">
+  <a href="https://cocode.dk">cocode.dk</a>
+</cocode-head>
+
+  <div class="site-nav">
+    <!-- cocode-apps:nav:start -->
+<link rel="stylesheet" href="/css/cocode-nav.css">
+<a class="skip" href="#main">Spring til indhold</a>
+<nav class="cocode-nav" aria-label="Jalali Persian Calendar">
+  <a class="brand" href="/da/" data-nav="home" aria-current="page"><img src="/img/icon.png" alt="" width="32" height="32">Jalali Persian Calendar</a>
+  <a href="/da/#how" data-nav="how">Sådan virker det</a>
+  <a href="/da/#install" data-nav="install">Installér</a>
+  <a href="/da/privacy/" data-nav="privacy">Privatliv</a>
+  <a href="/" hreflang="en" lang="en" data-nav="lang">English</a>
+  <a href="https://cocode.dk/" data-nav="more">Flere apps</a>
+</nav>
+<!-- cocode-apps:nav:end -->
+  </div>
+
+  <header>
+    <div class="container">
+      <div class="hero">
+        <div class="reveal" data-reveal>
+          <h1>Gregorianske og persiske datoer i én Android-kalender.</h1>
+          <p class="lead">
+            Skift mellem gregorianske og jalali-datoer, bladr gennem månederne, tilføj begivenheder, og omregn datoer, mens du skriver.
+          </p>
+          <div class="cta">
+            <a class="btn primary" href="#install">Hent appen</a>
+            <a class="btn ghost" href="https://github.com/cocodedk/persian-calendar">Se på GitHub</a>
+          </div>
+          <div class="chips">
+            <span class="chip">To kalendere</span>
+            <span class="chip">Omregner i realtid</span>
+            <span class="chip">Årlige begivenheder</span>
+          </div>
+        </div>
+
+        <div class="phone reveal" data-reveal>
+          <div class="status-row">
+            <span>Teheran</span>
+            <span class="pill">I dag</span>
+          </div>
+          <div class="calendar-card">
+            <div class="month">
+              <span>oktober 2026</span>
+              <span class="pill">Gregoriansk</span>
+            </div>
+            <div class="grid">
+              <span class="weekend">Sø</span><span>Ma</span><span>Ti</span><span>On</span><span>To</span><span>Fr</span><span class="weekend">Lø</span>
+              <span class="muted">27</span><span class="muted">28</span><span class="muted">29</span><span class="muted">30</span><span>1</span><span>2</span><span>3</span>
+              <span>4</span><span>5</span><span>6</span><span class="today">7</span><span>8</span><span>9</span><span>10</span>
+              <span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span><span>17</span>
+              <span>18</span><span>19</span><span>20</span><span>21</span><span>22</span><span>23</span><span>24</span>
+              <span>25</span><span>26</span><span>27</span><span>28</span><span>29</span><span>30</span><span>31</span>
+              <span class="muted">1</span><span class="muted">2</span><span class="muted">3</span><span class="muted">4</span><span class="muted">5</span><span class="muted">6</span><span class="muted">7</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main id="main" tabindex="-1">
+    <section class="section" id="how">
+      <div class="container">
+        <h2 class="reveal" data-reveal>Sådan virker det</h2>
+        <div class="cards">
+          <div class="card reveal" data-reveal>
+            <div class="icon">01</div>
+            <h3>Kalendervisning</h3>
+            <p>Vis gregorianske dagstal eller jalali-dagstal i samme månedsvisning. Dine begivenheder bliver, hvor de er.</p>
+          </div>
+          <div class="card reveal" data-reveal>
+            <div class="icon">02</div>
+            <h3>Datoomregning</h3>
+            <p>Omregn datoer, mens du skriver. En dato, der ikke findes, afvises, hvad enten den er gregoriansk eller jalali.</p>
+          </div>
+          <div class="card reveal" data-reveal>
+            <div class="icon">03</div>
+            <h3>Årligt gentagne begivenheder</h3>
+            <p>Opret begivenheder, der gentages hvert år på samme gregorianske dato.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="install">
+      <div class="container">
+        <h2 class="reveal" data-reveal>Installér</h2>
+        <p class="lead reveal" data-reveal>
+          Jalali Persian Calendar er fri software under MIT-licensen. Den kræver ingen konto og ingen netforbindelse.
+        </p>
+        <div class="reveal" data-reveal>
+          <!-- cocode-apps:install:start -->
+<ul class="install" role="list">
+  <li><p class="fdroid-soon">Kommer på F-Droid</p></li>
+  <li><a href="https://github.com/cocodedk/persian-calendar/releases/latest/download/persian-calendar.apk">Hent installationsfilen til Android (APK) fra GitHub</a></li>
+  <li><a href="https://apps.obtainium.imranr.dev/redirect?r=obtainium://add/https://github.com/cocodedk/persian-calendar">Tilføj appen i Obtainium, som holder den opdateret</a></li>
+</ul>
+<!-- cocode-apps:install:end -->
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container split">
+        <div class="stack reveal" data-reveal>
+          <h2>Byg appen</h2>
+          <p>Alt bygger på Gradle og er lavet til Android Studio eller arbejde i kommandolinjen.</p>
+          <code>./gradlew assembleDebug
+./gradlew test
+./gradlew lint</code>
+        </div>
+        <div class="stack reveal" data-reveal>
+          <h2>Teknik</h2>
+          <p>Skrevet i Kotlin, med en brugerflade bygget i Jetpack Compose og Material 3. Begivenheder gemmes lokalt med Room.</p>
+          <code>Compose + Kotlin
+Room + LiveData
+Material 3 + MVVM</code>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="privacy">
+      <div class="container">
+        <h2 class="reveal" data-reveal>Privatlivspolitik</h2>
+        <p class="lead reveal" data-reveal>
+          Appen bruger enhedens ur og gemmer de begivenheder, du opretter, på din telefon. Den sender hverken dine begivenheder eller andre data til os, og den har ikke adgang til internettet. Android kan tage appens data med i enhedens sikkerhedskopi.
+        </p>
+        <div class="cards">
+          <div class="card reveal" data-reveal>
+            <h3>Dansk</h3>
+            <p>Appen læser enhedens ur og de begivenheder, du gemmer lokalt. Den sender ikke dine begivenheder til os. Android kan tage appens data med i sikkerhedskopier.</p>
+          </div>
+          <div class="card reveal" data-reveal>
+            <h3>Persisk (فارسی)</h3>
+            <p class="rtl" lang="fa">این برنامه ساعت دستگاه و رویدادهایی را که روی گوشی ذخیره می‌کنید می‌خواند. برنامه رویدادها را برای ما نمی‌فرستد، اما اندروید ممکن است آن‌ها را در پشتیبان خودش بگذارد.</p>
+          </div>
+          <div class="card reveal" data-reveal>
+            <h3>Arabisk (العربية)</h3>
+            <p class="rtl" lang="ar">يقرأ التطبيق وقت جهازك والأحداث التي تحفظها محليًا. لا يرسل التطبيق أحداثك إلينا، لكن قد يشملها النسخ الاحتياطي لنظام Android.</p>
+          </div>
+          <div class="card reveal" data-reveal>
+            <h3>Kinesisk (简体中文)</h3>
+            <p lang="zh-Hans">此应用会读取设备时间和你保存在本地的日历事件。应用不会将这些事件发送给开发者，但 Android 备份可能包含这些数据。</p>
+          </div>
+          <div class="card reveal" data-reveal>
+            <h3>Japansk (日本語)</h3>
+            <p lang="ja">このアプリは端末の時刻と、端末内に保存した予定を読み取ります。予定を開発者に送信することはありませんが、Android のバックアップに含まれる場合があります。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="site-footer">
+    <!-- cocode-apps:footer:start -->
+<footer class="cocode-footer">
+  <a href="https://github.com/cocodedk/persian-calendar">Kildekode</a> ·
+  <a href="/da/privacy/">Privatliv</a> ·
+  Licens: MIT ·
+  <a href="https://cocode.dk/">Lavet af Cocode (cocode.dk)</a>
+</footer>
+<!-- cocode-apps:footer:end -->
+  </div>
+
+<cocode-foot repo="cocodedk/persian-calendar">
+  <a href="https://cocode.dk">cocode.dk</a>
+</cocode-foot>
+
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("visible");
+        }
+      });
+    }, { threshold: 0.2 });
+
+    document.querySelectorAll("[data-reveal]").forEach((el) => observer.observe(el));
+  </script>
+  <script src="../hero-calendar.js"></script>
+</body>
+</html>
