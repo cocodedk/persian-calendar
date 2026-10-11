@@ -17,6 +17,16 @@ class JalaliToGregorianConverterTest {
     }
 
     @Test(expected = IllegalArgumentException::class)
+    fun `should refuse day 31 in a 30-day month`() {
+        JalaliToGregorianConverter.jalaliToGregorian(1403, 7, 31)
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun `should refuse day 0`() {
+        JalaliToGregorianConverter.jalaliToGregorian(1403, 1, 0)
+    }
+
+    @Test(expected = IllegalArgumentException::class)
     fun `should refuse month 13`() {
         JalaliToGregorianConverter.jalaliToGregorian(1403, 13, 1)
     }

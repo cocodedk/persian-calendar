@@ -41,6 +41,11 @@ fun CalendarScreen() {
             CalendarNavigation()
         }
 
+        // Footer positioned at the bottom, drawn before the converter overlay so the scrim covers it
+        FooterInfo(
+            modifier = Modifier.align(Alignment.BottomCenter)
+        )
+
         // Date converter overlay - positioned on top of everything
         CalendarConverterBox()
 
@@ -50,9 +55,5 @@ fun CalendarScreen() {
         // Event list dialog
         EventListDialog()
 
-        // Footer positioned at the bottom
-        FooterInfo(
-            modifier = Modifier.align(Alignment.BottomCenter)
-        )
     }
 }
