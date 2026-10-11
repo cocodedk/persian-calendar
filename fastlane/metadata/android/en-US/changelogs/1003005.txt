@@ -1,4 +1,4 @@
-The app is now called Jalali Persian Calendar, so it can't be confused with another app of the same name.
+The app is now called Jalali Persian Calendar, because F-Droid already lists a different app called Persian Calendar.
 
 Date converter fixes:
 - The month field waits for a second digit, so you can type 10, 11 and 12.

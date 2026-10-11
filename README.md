@@ -23,7 +23,7 @@ A modern Android calendar application built with Jetpack Compose that supports b
 - Current date highlighting
 - Previous/next month navigation
 - Today's date quick access
-- Tap a day to add an event or see that day's events, stored only on your device
+- Tap a day to add an event or see that day's events, saved on your phone
 - Week day headers in both calendar systems
 - Visual distinction between weekdays and weekends
 
