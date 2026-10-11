@@ -36,7 +36,8 @@ import java.time.LocalDate
 fun DayBox(
     currentDate: LocalDate,
     isInCurrentMonth: Boolean,
-    events: List<Event>
+    events: List<Event>,
+    modifier: Modifier = Modifier.size(width = 55.dp, height = 60.dp)
 ) {
     // Get an instance of the CalendarViewModel
     val viewModel: CalendarViewModel = viewModel()
@@ -122,9 +123,7 @@ fun DayBox(
     // Create a Box Composable for the date with 3D border effect for current day
     Box(
         contentAlignment = Alignment.Center,
-        modifier = Modifier
-            .width(55.dp)
-            .height(60.dp)
+        modifier = modifier
             .background(backgroundColor)
             .then(
                 if (isCurrentDay) {

@@ -28,8 +28,8 @@ fun DayOfWeekBox(day: String) {
 
 // Re-export grid components for backward compatibility
 @Composable
-fun CalendarGrid() {
-    com.cocode.calendar.components.grid.CalendarGrid()
+fun CalendarGrid(modifier: androidx.compose.ui.Modifier = androidx.compose.ui.Modifier) {
+    com.cocode.calendar.components.grid.CalendarGrid(modifier)
 }
 
 @Composable
