@@ -70,14 +70,11 @@ fun DateConverter(
                         },
                         onMonthChange = { newMonth ->
                             month = newMonth
-                            val monthNum = newMonth.toIntOrNull()
-                            if (monthNum != null && monthNum in 1..12) {
+                            if (MonthEntry.isComplete(newMonth)) {
                                 focusManager.moveFocus(FocusDirection.Next)
                             }
                         },
-                        onDayChange = { day = it },
-                        onYearDone = { focusManager.moveFocus(FocusDirection.Next) },
-                        onMonthDone = { focusManager.moveFocus(FocusDirection.Next) }
+                        onDayChange = { day = it }
                     )
                 }
             }
