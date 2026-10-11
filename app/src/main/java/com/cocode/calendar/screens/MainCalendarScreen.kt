@@ -29,10 +29,14 @@ fun CalendarScreen() {
     var showAbout by rememberSaveable { mutableStateOf(false) }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        // The screen's content keeps clear of the status and navigation bars, which Android 15
-        // and later draw over the app. The calendar grid takes the height the rest leaves, and
+        // The screen's content keeps clear of the status and navigation bars and of a camera
+        // cutout, which Android 15 and later draw over the app. The calendar grid takes the height the rest leaves, and
         // everything scrolls when large text needs more than the screen.
-        BoxWithConstraints(modifier = Modifier.fillMaxSize().systemBarsPadding()) {
+        BoxWithConstraints(
+            modifier = Modifier
+                .fillMaxSize()
+                .windowInsetsPadding(WindowInsets.systemBars.union(WindowInsets.displayCutout))
+        ) {
             FillColumn(
                 viewportHeight = maxHeight,
                 fillMinHeight = GRID_MIN_HEIGHT,

@@ -1,9 +1,10 @@
 package com.cocode.calendar.components.footer
 
-import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -43,8 +44,10 @@ fun FooterInfo(onAboutClick: () -> Unit, modifier: Modifier = Modifier) {
             textDecoration = TextDecoration.Underline,
             modifier = Modifier
                 .clip(RoundedCornerShape(12.dp))
-                .background(CalColors.prev_month_background.copy(alpha = 0.8f))
+                // White on the screen's own green reads at 8.5:1; a light outline marks the link
+                .border(1.dp, CalColors.inactive_text, RoundedCornerShape(12.dp))
                 .clickable(role = Role.Button, onClick = onAboutClick)
+                .heightIn(min = 48.dp)
                 .padding(horizontal = 20.dp, vertical = 12.dp)
         )
     }

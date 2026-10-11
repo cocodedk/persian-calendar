@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.unit.dp
 import com.cocode.calendar.CalColors
+import com.cocode.calendar.components.grid.DAY_GAP
 import com.cocode.calendar.R
 
 /**
@@ -27,8 +28,9 @@ import com.cocode.calendar.R
 fun WeekDaysHeader() {
     val daysOfWeek = stringArrayResource(R.array.weekday_short)
 
+    // Same padding and gap as the grid's weeks, so each label sits over its column at any width
     Row(
-        horizontalArrangement = Arrangement.SpaceBetween,
+        horizontalArrangement = Arrangement.spacedBy(DAY_GAP),
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
@@ -41,7 +43,7 @@ fun WeekDaysHeader() {
     ) {
         // The grid starts on Sunday, so Sunday (first) and Saturday (last) are the weekend columns.
         daysOfWeek.forEachIndexed { index, day ->
-            DayOfWeekBox(day, isWeekend = index == 0 || index == daysOfWeek.lastIndex)
+            DayOfWeekBox(day, isWeekend = index == 0 || index == daysOfWeek.lastIndex, modifier = Modifier.weight(1f))
         }
     }
 }
@@ -57,14 +59,12 @@ fun WeekDaysHeader() {
  * and last day of `weekday_short` (Sunday and Saturday) count as the weekend, as before.
  */
 @Composable
-fun DayOfWeekBox(day: String, isWeekend: Boolean? = null) {
+fun DayOfWeekBox(day: String, isWeekend: Boolean? = null, modifier: Modifier = Modifier.width(55.dp)) {
     val weekDays = stringArrayResource(R.array.weekday_short)
     val weekend = isWeekend ?: (day == weekDays.first() || day == weekDays.last())
     Box(
         contentAlignment = Alignment.Center,
-        modifier = Modifier
-            .width(55.dp)
-            .height(40.dp)
+        modifier = modifier.height(40.dp)
     ) {
         val color = if (weekend) CalColors.weekend_text else CalColors.weekday_text
         Text(

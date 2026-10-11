@@ -18,6 +18,10 @@ import java.time.temporal.TemporalAdjusters
 import java.time.temporal.WeekFields
 import java.util.*
 
+
+/** The gap between two days, in the grid and in the week day header above it. */
+val DAY_GAP = 3.dp
+
 /**
  * This Composable function represents the grid of the calendar view that displays the dates.
  * It observes the current Gregorian date from the ViewModel and generates a grid of dates for the current month.
@@ -116,7 +120,7 @@ fun WeekRow(
     // Create a Row Composable for the week
     Row(
         // The days share the width, with a thin gap between them
-        horizontalArrangement = Arrangement.spacedBy(3.dp),
+        horizontalArrangement = Arrangement.spacedBy(DAY_GAP),
         // Align the children of the Row vertically in the center
         verticalAlignment = Alignment.CenterVertically,
         // Apply a Modifier to the Row to fill the maximum width and add padding
